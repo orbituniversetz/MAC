@@ -9,7 +9,7 @@ import {
 } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { FileText, Eye } from 'lucide-react';
+import { FileText, Eye, Plus } from 'lucide-react';
 import Link from 'next/link';
 
 export default async function ProformasPage() {
@@ -22,6 +22,11 @@ export default async function ProformasPage() {
           <h2 className="text-3xl font-bold tracking-tight text-black">Proforma Invoices</h2>
           <p className="text-muted-foreground">Manage quotations and estimates.</p>
         </div>
+        <Link href="/dashboard/proformas/new">
+          <Button className="bg-[#c10d12] hover:bg-[#a00b0f]">
+            <Plus className="mr-2 h-4 w-4" /> New Proforma
+          </Button>
+        </Link>
       </div>
 
       <div className="border rounded-md">
@@ -31,6 +36,7 @@ export default async function ProformasPage() {
               <TableHead>Proforma No</TableHead>
               <TableHead>Job No</TableHead>
               <TableHead>Customer</TableHead>
+              <TableHead>Vehicle</TableHead>
               <TableHead>Status</TableHead>
               <TableHead>Date</TableHead>
               <TableHead className="text-right">Actions</TableHead>
@@ -39,7 +45,7 @@ export default async function ProformasPage() {
           <TableBody>
             {proformas.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
+                <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
                   No proforma invoices found.
                 </TableCell>
               </TableRow>
@@ -47,8 +53,9 @@ export default async function ProformasPage() {
               proformas.map((pf: any) => (
                 <TableRow key={pf.id}>
                   <TableCell className="font-bold">{pf.proformaNo}</TableCell>
-                  <TableCell>{pf.jobNo}</TableCell>
+                  <TableCell>{pf.jobNo || <span className="text-xs text-muted-foreground italic">Direct</span>}</TableCell>
                   <TableCell>{pf.customerName}</TableCell>
+                  <TableCell>{pf.vehiclePlate}</TableCell>
                   <TableCell>
                     <Badge variant={pf.status === 'Draft' ? 'outline' : 'secondary'}>
                       {pf.status}
@@ -56,9 +63,11 @@ export default async function ProformasPage() {
                   </TableCell>
                   <TableCell>{new Date(pf.createdAt).toLocaleDateString()}</TableCell>
                   <TableCell className="text-right">
-                    <Button variant="ghost" size="sm">
-                      <Eye className="mr-2 h-4 w-4" /> View
-                    </Button>
+                    <Link href={`/dashboard/proformas/${pf.id}`}>
+                      <Button variant="ghost" size="sm">
+                        <Eye className="mr-2 h-4 w-4" /> View
+                      </Button>
+                    </Link>
                   </TableCell>
                 </TableRow>
               ))

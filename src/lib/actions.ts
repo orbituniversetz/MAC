@@ -1,4 +1,3 @@
-
 'use server'
 
 import db from './db';
@@ -47,8 +46,30 @@ export async function getJobSheetById(id: number) {
 }
 
 export async function createJobSheet(formData: FormData) {
-  const customerId = parseInt(formData.get('customerId') as string);
-  const vehicleId = parseInt(formData.get('vehicleId') as string);
+  let customerId = formData.get('customerId') ? parseInt(formData.get('customerId') as string) : null;
+  const newCustomerName = formData.get('newCustomerName') as string;
+  const newCustomerPhone = formData.get('newCustomerPhone') as string;
+  
+  let vehicleId = formData.get('vehicleId') ? parseInt(formData.get('vehicleId') as string) : null;
+  const newVehiclePlate = formData.get('newVehiclePlate') as string;
+  const newVehicleModel = formData.get('newVehicleModel') as string;
+
+  // Handle On-the-fly Customer creation
+  if (!customerId && newCustomerName) {
+    const info = db.prepare('INSERT INTO customers (name, phone) VALUES (?, ?)').run(newCustomerName, newCustomerPhone);
+    customerId = info.lastInsertRowid as number;
+  }
+
+  // Handle On-the-fly Vehicle creation
+  if (!vehicleId && newVehiclePlate && customerId) {
+    const info = db.prepare('INSERT INTO vehicles (customerId, plateNumber, makeModel) VALUES (?, ?, ?)').run(customerId, newVehiclePlate, newVehicleModel);
+    vehicleId = info.lastInsertRowid as number;
+  }
+
+  if (!customerId || !vehicleId) {
+    throw new Error("Customer and Vehicle are required.");
+  }
+
   const complaint = formData.get('complaint') as string;
 
   const lastJob = db.prepare('SELECT jobNo FROM jobsheets ORDER BY id DESC LIMIT 1').get() as any;
@@ -68,31 +89,30 @@ export async function createJobSheet(formData: FormData) {
   redirect(`/dashboard/jobsheets/${newId}`);
 }
 
-export async function addJobItem(jobId: number, item: any) {
+export async function addJobItem(jobId: number | null, proformaId: number | null, item: any) {
   const subtotal = item.qty * item.unitPrice;
   db.prepare(`
-    INSERT INTO job_items (jobSheetId, type, description, qty, unitPrice, subtotal)
-    VALUES (?, ?, ?, ?, ?, ?)
-  `).run(jobId, item.type, item.description, item.qty, item.unitPrice, subtotal);
-  revalidatePath(`/dashboard/jobsheets/${jobId}`);
+    INSERT INTO job_items (jobSheetId, proformaId, type, description, qty, unitPrice, subtotal)
+    VALUES (?, ?, ?, ?, ?, ?, ?)
+  `).run(jobId, proformaId, item.type, item.description, item.qty, item.unitPrice, subtotal);
+  
+  if (jobId) revalidatePath(`/dashboard/jobsheets/${jobId}`);
+  if (proformaId) revalidatePath(`/dashboard/proformas/${proformaId}`);
 }
 
-export async function deleteJobItem(itemId: number, jobId: number) {
+export async function deleteJobItem(itemId: number, jobId: number | null, proformaId: number | null) {
   db.prepare('DELETE FROM job_items WHERE id = ?').run(itemId);
-  revalidatePath(`/dashboard/jobsheets/${jobId}`);
+  if (jobId) revalidatePath(`/dashboard/jobsheets/${jobId}`);
+  if (proformaId) revalidatePath(`/dashboard/proformas/${proformaId}`);
 }
 
 // Customers & Vehicles
 export async function getCustomers() {
-  return db.prepare('SELECT * FROM customers').all() as any[];
-}
-
-export async function getVehiclesByCustomer(customerId: number) {
-  return db.prepare('SELECT * FROM vehicles WHERE customerId = ?').all(customerId) as any[];
+  return db.prepare('SELECT * FROM customers ORDER BY name ASC').all() as any[];
 }
 
 export async function getAllVehicles() {
-  return db.prepare('SELECT v.*, c.name as customerName FROM vehicles v JOIN customers c ON v.customerId = c.id').all() as any[];
+  return db.prepare('SELECT v.*, c.name as customerName FROM vehicles v JOIN customers c ON v.customerId = c.id ORDER BY v.plateNumber ASC').all() as any[];
 }
 
 // Proformas
@@ -108,22 +128,77 @@ export async function createProformaFromJob(jobId: number) {
   const proformaNo = `PF-${nextNo.toString().padStart(4, '0')}`;
 
   const info = db.prepare(`
-    INSERT INTO proformas (proformaNo, jobSheetId, status)
-    VALUES (?, ?, ?)
-  `).run(proformaNo, jobId, 'Draft');
+    INSERT INTO proformas (proformaNo, jobSheetId, customerId, vehicleId, status)
+    VALUES (?, ?, ?, ?, ?)
+  `).run(proformaNo, jobId, job.customerId, job.vehicleId, 'Draft');
 
   revalidatePath('/dashboard/proformas');
   return info.lastInsertRowid;
 }
 
+export async function createProformaDirect(formData: FormData) {
+  let customerId = formData.get('customerId') ? parseInt(formData.get('customerId') as string) : null;
+  const newCustomerName = formData.get('newCustomerName') as string;
+  const newCustomerPhone = formData.get('newCustomerPhone') as string;
+  
+  let vehicleId = formData.get('vehicleId') ? parseInt(formData.get('vehicleId') as string) : null;
+  const newVehiclePlate = formData.get('newVehiclePlate') as string;
+
+  if (!customerId && newCustomerName) {
+    const info = db.prepare('INSERT INTO customers (name, phone) VALUES (?, ?)').run(newCustomerName, newCustomerPhone);
+    customerId = info.lastInsertRowid as number;
+  }
+
+  if (!vehicleId && newVehiclePlate && customerId) {
+    const info = db.prepare('INSERT INTO vehicles (customerId, plateNumber) VALUES (?, ?)').run(customerId, newVehiclePlate);
+    vehicleId = info.lastInsertRowid as number;
+  }
+
+  const lastPF = db.prepare('SELECT proformaNo FROM proformas ORDER BY id DESC LIMIT 1').get() as any;
+  let nextNo = 1;
+  if (lastPF && lastPF.proformaNo.includes('-')) {
+    nextNo = parseInt(lastPF.proformaNo.split('-')[1]) + 1;
+  }
+  const proformaNo = `PF-${nextNo.toString().padStart(4, '0')}`;
+
+  const info = db.prepare(`
+    INSERT INTO proformas (proformaNo, customerId, vehicleId, status)
+    VALUES (?, ?, ?, ?)
+  `).run(proformaNo, customerId, vehicleId, 'Draft');
+
+  revalidatePath('/dashboard/proformas');
+  redirect(`/dashboard/proformas/${info.lastInsertRowid}`);
+}
+
 export async function getProformas() {
   return db.prepare(`
-    SELECT p.*, js.jobNo, c.name as customerName 
+    SELECT p.*, js.jobNo, c.name as customerName, v.plateNumber as vehiclePlate
     FROM proformas p
-    JOIN jobsheets js ON p.jobSheetId = js.id
-    JOIN customers c ON js.customerId = c.id
+    LEFT JOIN jobsheets js ON p.jobSheetId = js.id
+    LEFT JOIN customers c ON COALESCE(p.customerId, (SELECT customerId FROM jobsheets WHERE id = p.jobSheetId)) = c.id
+    LEFT JOIN vehicles v ON COALESCE(p.vehicleId, (SELECT vehicleId FROM jobsheets WHERE id = p.jobSheetId)) = v.id
     ORDER BY p.createdAt DESC
   `).all();
+}
+
+export async function getProformaById(id: number) {
+  const pf = db.prepare(`
+    SELECT p.*, c.name as customerName, c.phone as customerPhone, v.plateNumber as vehiclePlate, v.makeModel as vehicleModel, js.jobNo
+    FROM proformas p
+    LEFT JOIN customers c ON p.customerId = c.id OR (SELECT customerId FROM jobsheets WHERE id = p.jobSheetId) = c.id
+    LEFT JOIN vehicles v ON p.vehicleId = v.id OR (SELECT vehicleId FROM jobsheets WHERE id = p.jobSheetId) = v.id
+    LEFT JOIN jobsheets js ON p.jobSheetId = js.id
+    WHERE p.id = ?
+  `).get(id) as any;
+
+  if (pf) {
+    // If it's from a job, get job items. If direct, maybe we store items linked to proformaId.
+    // Let's check both.
+    const itemsFromJob = pf.jobSheetId ? db.prepare('SELECT * FROM job_items WHERE jobSheetId = ?').all(pf.jobSheetId) : [];
+    const itemsFromPF = db.prepare('SELECT * FROM job_items WHERE proformaId = ?').all(id);
+    pf.items = [...itemsFromJob, ...itemsFromPF];
+  }
+  return pf;
 }
 
 // Invoices
@@ -131,8 +206,8 @@ export async function getInvoices() {
   return db.prepare(`
     SELECT i.*, js.jobNo, c.name as customerName 
     FROM invoices i
-    JOIN jobsheets js ON i.jobSheetId = js.id
-    JOIN customers c ON js.customerId = c.id
+    LEFT JOIN jobsheets js ON i.jobSheetId = js.id
+    LEFT JOIN customers c ON js.customerId = c.id
     ORDER BY i.createdAt DESC
   `).all();
 }

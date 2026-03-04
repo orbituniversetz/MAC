@@ -45,24 +45,30 @@ db.exec(`
   CREATE TABLE IF NOT EXISTS job_items (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     jobSheetId INTEGER,
+    proformaId INTEGER, -- Linked if created for a direct proforma
     type TEXT NOT NULL, -- 'PART' or 'LABOUR'
     description TEXT,
     qty REAL DEFAULT 1,
     unitPrice REAL DEFAULT 0,
     subtotal REAL DEFAULT 0,
-    FOREIGN KEY(jobSheetId) REFERENCES jobsheets(id)
+    FOREIGN KEY(jobSheetId) REFERENCES jobsheets(id),
+    FOREIGN KEY(proformaId) REFERENCES proformas(id)
   );
 
   CREATE TABLE IF NOT EXISTS proformas (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     proformaNo TEXT NOT NULL UNIQUE,
-    jobSheetId INTEGER,
+    jobSheetId INTEGER, -- Optional
+    customerId INTEGER, -- Optional (for proformas without jobsheets)
+    vehicleId INTEGER,  -- Optional
     status TEXT DEFAULT 'Draft', -- 'Draft', 'Finalized'
     snapshotJson TEXT,
     discount REAL DEFAULT 0,
     taxEnabled INTEGER DEFAULT 0,
     createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY(jobSheetId) REFERENCES jobsheets(id)
+    FOREIGN KEY(jobSheetId) REFERENCES jobsheets(id),
+    FOREIGN KEY(customerId) REFERENCES customers(id),
+    FOREIGN KEY(vehicleId) REFERENCES vehicles(id)
   );
 
   CREATE TABLE IF NOT EXISTS invoices (
