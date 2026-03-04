@@ -9,10 +9,11 @@ export default async function DashboardLayout({
 }) {
   const settings = await getSettings();
   const garageName = settings.garage_name || 'GarageFlow';
+  const logo = settings.garage_logo || null;
 
   return (
     <div className="flex h-screen bg-white">
-      <SidebarNav garageName={garageName} />
+      <SidebarNav garageName={garageName} logo={logo} />
       <main className="flex-1 overflow-y-auto p-8">
         {children}
       </main>

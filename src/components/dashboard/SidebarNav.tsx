@@ -16,7 +16,6 @@ import {
   Database,
   Wrench
 } from 'lucide-react';
-import { PlaceHolderImages } from '@/lib/placeholder-images';
 
 const navItems = [
   { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
@@ -30,30 +29,27 @@ const navItems = [
   { name: 'Backup Manager', href: '/dashboard/backups', icon: Database },
 ];
 
-export function SidebarNav({ garageName }: { garageName: string }) {
+export function SidebarNav({ garageName, logo }: { garageName: string, logo?: string | null }) {
   const pathname = usePathname();
-  const logo = PlaceHolderImages.find(img => img.id === 'garage-logo');
 
   return (
     <div className="flex flex-col h-full bg-white border-r border-[#b0b2b5] w-64">
       <div className="p-6 flex items-center gap-3">
-        {logo && (
-          <div className="relative h-10 w-10 overflow-hidden rounded-lg border">
+        <div className="relative h-12 w-12 overflow-hidden rounded-lg border bg-gray-50 flex items-center justify-center shrink-0">
+          {logo ? (
             <Image 
-              src={logo.imageUrl} 
-              alt="Logo" 
+              src={logo} 
+              alt="Garage Logo" 
               fill
-              className="object-cover"
-              data-ai-hint={logo.imageHint}
+              className="object-contain p-1"
             />
-          </div>
-        )}
-        {!logo && (
-          <div className="bg-[#c10d12] p-2 rounded-lg">
-            <Wrench className="text-white h-6 w-6" />
-          </div>
-        )}
-        <h1 className="text-lg font-bold tracking-tight text-black leading-tight uppercase">
+          ) : (
+            <div className="bg-[#c10d12] h-full w-full flex items-center justify-center">
+              <Wrench className="text-white h-6 w-6" />
+            </div>
+          )}
+        </div>
+        <h1 className="text-sm font-bold tracking-tight text-black leading-tight uppercase line-clamp-2">
           {garageName}
         </h1>
       </div>
