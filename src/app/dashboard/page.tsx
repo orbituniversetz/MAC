@@ -8,6 +8,7 @@ import {
   TrendingUp 
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import Link from 'next/link';
 
 export default async function DashboardPage() {
   const stats = await getDashboardStats();
@@ -55,15 +56,21 @@ export default async function DashboardPage() {
             <CardTitle>Quick Actions</CardTitle>
           </CardHeader>
           <CardContent className="grid gap-2">
-            <button className="w-full text-left px-4 py-2 text-sm bg-[#c10d12] text-white rounded-md hover:bg-[#a00b0f] transition-colors">
-              New Job Sheet
-            </button>
-            <button className="w-full text-left px-4 py-2 text-sm border border-[#b0b2b5] rounded-md hover:bg-gray-50 transition-colors">
-              Add New Customer
-            </button>
-            <button className="w-full text-left px-4 py-2 text-sm border border-[#b0b2b5] rounded-md hover:bg-gray-50 transition-colors">
-              Generate Sales Report
-            </button>
+            <Link href="/dashboard/jobsheets/new">
+              <button className="w-full text-left px-4 py-2 text-sm bg-[#c10d12] text-white rounded-md hover:bg-[#a00b0f] transition-colors">
+                New Job Sheet
+              </button>
+            </Link>
+            <Link href="/dashboard/customers">
+              <button className="w-full text-left px-4 py-2 text-sm border border-[#b0b2b5] rounded-md hover:bg-gray-50 transition-colors">
+                Add New Customer
+              </button>
+            </Link>
+            <Link href="/dashboard/reports">
+              <button className="w-full text-left px-4 py-2 text-sm border border-[#b0b2b5] rounded-md hover:bg-gray-50 transition-colors">
+                Generate Sales Report
+              </button>
+            </Link>
           </CardContent>
         </Card>
       </div>
