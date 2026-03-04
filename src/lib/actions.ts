@@ -3,19 +3,17 @@
 
 import db from './db';
 import { revalidatePath } from 'next/cache';
+import { redirect } from 'next/navigation';
 
 // Stats
 export async function getDashboardStats() {
   const openJobs = db.prepare("SELECT COUNT(*) as count FROM jobsheets WHERE status != 'Closed'").get() as any;
   const completedJobs = db.prepare("SELECT COUNT(*) as count FROM jobsheets WHERE status = 'Completed'").get() as any;
-  const pendingPayments = db.prepare("SELECT SUM(i.snapshotJson->'$.total' - IFNULL((SELECT SUM(p.amount) FROM payments p WHERE p.invoiceId = i.id), 0)) as total FROM invoices i WHERE status != 'Paid'").get() as any;
   
-  // Real stats parsing from JSON snapshots is tricky in SQLite without JSON1 extension reliably, but snapshotJson is text.
-  // We'll calculate totals on the fly for demo.
   return {
     openJobs: openJobs?.count || 0,
     completedJobs: completedJobs?.count || 0,
-    pendingPayments: 0, // Placeholder
+    pendingPayments: 0,
     todaySales: 0,
     monthlySales: 0
   };
@@ -47,10 +45,14 @@ export async function getJobSheetById(id: number) {
   return job;
 }
 
-export async function createJobSheet(data: any) {
+export async function createJobSheet(formData: FormData) {
+  const customerId = parseInt(formData.get('customerId') as string);
+  const vehicleId = parseInt(formData.get('vehicleId') as string);
+  const complaint = formData.get('complaint') as string;
+
   const lastJob = db.prepare('SELECT jobNo FROM jobsheets ORDER BY id DESC LIMIT 1').get() as any;
   let nextNo = 1;
-  if (lastJob) {
+  if (lastJob && lastJob.jobNo.includes('-')) {
     nextNo = parseInt(lastJob.jobNo.split('-')[1]) + 1;
   }
   const jobNo = `JS-${nextNo.toString().padStart(4, '0')}`;
@@ -58,10 +60,11 @@ export async function createJobSheet(data: any) {
   const info = db.prepare(`
     INSERT INTO jobsheets (jobNo, customerId, vehicleId, complaint, status)
     VALUES (?, ?, ?, ?, ?)
-  `).run(jobNo, data.customerId, data.vehicleId, data.complaint, 'Draft');
+  `).run(jobNo, customerId, vehicleId, complaint, 'Draft');
 
+  const newId = info.lastInsertRowid;
   revalidatePath('/dashboard/jobsheets');
-  return info.lastInsertRowid;
+  redirect(`/dashboard/jobsheets/${newId}`);
 }
 
 export async function addJobItem(jobId: number, item: any) {
@@ -80,11 +83,15 @@ export async function deleteJobItem(itemId: number, jobId: number) {
 
 // Customers & Vehicles
 export async function getCustomers() {
-  return db.prepare('SELECT * FROM customers').all();
+  return db.prepare('SELECT * FROM customers').all() as any[];
 }
 
-export async function getVehicles() {
-  return db.prepare('SELECT v.*, c.name as customerName FROM vehicles v JOIN customers c ON v.customerId = c.id').all();
+export async function getVehiclesByCustomer(customerId: number) {
+  return db.prepare('SELECT * FROM vehicles WHERE customerId = ?').all(customerId) as any[];
+}
+
+export async function getAllVehicles() {
+  return db.prepare('SELECT v.*, c.name as customerName FROM vehicles v JOIN customers c ON v.customerId = c.id').all() as any[];
 }
 
 // Proformas
@@ -94,7 +101,7 @@ export async function createProformaFromJob(jobId: number) {
 
   const lastPF = db.prepare('SELECT proformaNo FROM proformas ORDER BY id DESC LIMIT 1').get() as any;
   let nextNo = 1;
-  if (lastPF) {
+  if (lastPF && lastPF.proformaNo.includes('-')) {
     nextNo = parseInt(lastPF.proformaNo.split('-')[1]) + 1;
   }
   const proformaNo = `PF-${nextNo.toString().padStart(4, '0')}`;
