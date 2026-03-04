@@ -100,6 +100,7 @@ db.exec(`
 // Migration safety for existing local databases
 try { db.exec("ALTER TABLE proformas ADD COLUMN customerId INTEGER;"); } catch (e) {}
 try { db.exec("ALTER TABLE proformas ADD COLUMN vehicleId INTEGER;"); } catch (e) {}
+try { db.exec("ALTER TABLE job_items ADD COLUMN proformaId INTEGER;"); } catch (e) {}
 
 const customerCount = db.prepare('SELECT count(*) as count FROM customers').get() as { count: number };
 if (customerCount.count === 0) {
