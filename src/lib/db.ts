@@ -102,8 +102,17 @@ if (customerCount.count === 0) {
   db.prepare('INSERT INTO job_items (jobSheetId, type, description, qty, unitPrice, subtotal) VALUES (?, ?, ?, ?, ?, ?)').run(1, 'PART', 'Oil Filter', 1, 35000, 35000);
   db.prepare('INSERT INTO job_items (jobSheetId, type, description, qty, unitPrice, subtotal) VALUES (?, ?, ?, ?, ?, ?)').run(1, 'LABOUR', 'General Service', 1, 50000, 50000);
   
-  db.prepare('INSERT INTO settings (key, value) VALUES (?, ?)').run('garage_name', 'GarageFlow Desk');
-  db.prepare('INSERT INTO settings (key, value) VALUES (?, ?)').run('garage_address', 'Samora Avenue, Dar es Salaam');
+  // M. A. C. GARAGE Details
+  db.prepare('INSERT INTO settings (key, value) VALUES (?, ?)').run('garage_name', 'M. A. C. GARAGE');
+  db.prepare('INSERT INTO settings (key, value) VALUES (?, ?)').run('garage_address', 'P.O. Box 7005, Arusha');
+  db.prepare('INSERT INTO settings (key, value) VALUES (?, ?)').run('garage_phone', '(+255) 754-349749');
+  db.prepare('INSERT INTO settings (key, value) VALUES (?, ?)').run('garage_tin', '108-133-805');
+  db.prepare('INSERT INTO settings (key, value) VALUES (?, ?)').run('bank_name', 'CRDB');
+  db.prepare('INSERT INTO settings (key, value) VALUES (?, ?)').run('bank_branch', 'TFA');
+  db.prepare('INSERT INTO settings (key, value) VALUES (?, ?)').run('bank_account_name', 'M. A. C. GARAGE');
+  db.prepare('INSERT INTO settings (key, value) VALUES (?, ?)').run('bank_account_number', '0150457890500');
+  db.prepare('INSERT INTO settings (key, value) VALUES (?, ?)').run('bank_swift', 'CORUTZTZ');
+  db.prepare('INSERT INTO settings (key, value) VALUES (?, ?)').run('tax_rate', '18');
 }
 
 export default db;
