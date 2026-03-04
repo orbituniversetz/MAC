@@ -1,4 +1,3 @@
-
 'use client'
 
 import { useState } from 'react';
@@ -8,7 +7,8 @@ import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Building, Save, CreditCard, Upload, Image as ImageIcon } from 'lucide-react';
 import Image from 'next/image';
-import { updateSetting } from '@/lib/actions';
+import { updateAllSettings } from '@/lib/actions';
+import { useToast } from '@/hooks/use-toast';
 
 interface SettingsFormProps {
   settings: any;
@@ -16,13 +16,18 @@ interface SettingsFormProps {
 
 export function SettingsForm({ settings }: SettingsFormProps) {
   const [logoBase64, setLogoBase64] = useState(settings.garage_logo || '');
+  const [isSaving, setIsSaving] = useState(false);
+  const { toast } = useToast();
 
   const handleLogoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      // Limit increased to 2MB
       if (file.size > 2 * 1024 * 1024) {
-        alert("Logo file is too large. Please select an image under 2MB.");
+        toast({
+          variant: "destructive",
+          title: "File too large",
+          description: "Logo file is too large. Please select an image under 2MB."
+        });
         return;
       }
       const reader = new FileReader();
@@ -34,15 +39,34 @@ export function SettingsForm({ settings }: SettingsFormProps) {
   };
 
   async function handleSubmit(formData: FormData) {
-    // Add the logo to the form data manually since it's in state
-    formData.set('garage_logo', logoBase64);
-    
-    for (const [key, value] of formData.entries()) {
-      if (!key.startsWith('$ACTION_ID_')) {
-        await updateSetting(key, value as string);
+    setIsSaving(true);
+    try {
+      const updates: Record<string, string> = {};
+      
+      // Get all values from formData
+      for (const [key, value] of formData.entries()) {
+        if (!key.startsWith('$ACTION_ID_')) {
+          updates[key] = value as string;
+        }
       }
+      
+      // Explicitly set the logo from state
+      updates['garage_logo'] = logoBase64;
+
+      await updateAllSettings(updates);
+      toast({
+        title: "Settings Saved",
+        description: "Your garage configuration has been updated successfully."
+      });
+    } catch (error: any) {
+      toast({
+        variant: "destructive",
+        title: "Error saving settings",
+        description: error.message || "An unexpected error occurred."
+      });
+    } finally {
+      setIsSaving(false);
     }
-    alert('Settings saved successfully!');
   }
 
   return (
@@ -59,7 +83,7 @@ export function SettingsForm({ settings }: SettingsFormProps) {
             <div className="flex flex-col items-center gap-4 p-4 border-2 border-dashed rounded-lg bg-gray-50 mb-4">
               <div className="relative h-24 w-24 overflow-hidden rounded-lg border bg-white flex items-center justify-center">
                 {logoBase64 ? (
-                  <Image src={logoBase64} alt="Garage Logo" fill className="object-contain" />
+                  <Image src={logoBase64} alt="Garage Logo" fill className="object-contain" unoptimized />
                 ) : (
                   <ImageIcon className="h-10 w-10 text-gray-300" />
                 )}
@@ -135,8 +159,13 @@ export function SettingsForm({ settings }: SettingsFormProps) {
       </div>
 
       <div className="flex justify-end">
-        <Button type="submit" className="bg-[#c10d12] hover:bg-[#a00b0f] size-lg px-8">
-          <Save className="mr-2 h-4 w-4" /> Save All Changes
+        <Button 
+          type="submit" 
+          disabled={isSaving}
+          className="bg-[#c10d12] hover:bg-[#a00b0f] size-lg px-8"
+        >
+          <Save className="mr-2 h-4 w-4" /> 
+          {isSaving ? "Saving..." : "Save All Changes"}
         </Button>
       </div>
     </form>

@@ -211,7 +211,15 @@ export async function getSettings() {
   }, {} as any);
 }
 
-export async function updateSetting(key: string, value: string) {
-  db.prepare('INSERT OR REPLACE INTO settings (key, value) VALUES (?, ?)').run(key, value);
+export async function updateAllSettings(settings: Record<string, string>) {
+  const stmt = db.prepare('INSERT OR REPLACE INTO settings (key, value) VALUES (?, ?)');
+  const transaction = db.transaction((items) => {
+    for (const [key, value] of Object.entries(items)) {
+      stmt.run(key, value);
+    }
+  });
+  
+  transaction(settings);
   revalidatePath('/dashboard/settings');
+  revalidatePath('/dashboard'); // For sidebar logo/name
 }
