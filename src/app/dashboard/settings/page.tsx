@@ -41,6 +41,10 @@ export default async function SettingsPage() {
                 <Input id="garage_name" name="garage_name" defaultValue={settings.garage_name} />
               </div>
               <div className="grid gap-2">
+                <Label htmlFor="garage_mailbox">P.O. Box / Mail Box</Label>
+                <Input id="garage_mailbox" name="garage_mailbox" defaultValue={settings.garage_mailbox} placeholder="e.g. P.O. Box 7005, Arusha" />
+              </div>
+              <div className="grid gap-2">
                 <Label htmlFor="garage_address">Physical Address</Label>
                 <Input id="garage_address" name="garage_address" defaultValue={settings.garage_address} />
               </div>

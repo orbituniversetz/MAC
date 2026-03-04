@@ -104,7 +104,8 @@ if (customerCount.count === 0) {
   
   // M. A. C. GARAGE Details
   db.prepare('INSERT INTO settings (key, value) VALUES (?, ?)').run('garage_name', 'M. A. C. GARAGE');
-  db.prepare('INSERT INTO settings (key, value) VALUES (?, ?)').run('garage_address', 'P.O. Box 7005, Arusha');
+  db.prepare('INSERT INTO settings (key, value) VALUES (?, ?)').run('garage_mailbox', 'P.O. Box 7005, Arusha');
+  db.prepare('INSERT INTO settings (key, value) VALUES (?, ?)').run('garage_address', 'Arusha, Tanzania');
   db.prepare('INSERT INTO settings (key, value) VALUES (?, ?)').run('garage_phone', '(+255) 754-349749');
   db.prepare('INSERT INTO settings (key, value) VALUES (?, ?)').run('garage_tin', '108-133-805');
   db.prepare('INSERT INTO settings (key, value) VALUES (?, ?)').run('bank_name', 'CRDB');
