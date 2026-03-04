@@ -22,11 +22,11 @@ export function SettingsForm({ settings }: SettingsFormProps) {
   const handleLogoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      if (file.size > 2 * 1024 * 1024) {
+      if (file.size > 1 * 1024 * 1024) {
         toast({
           variant: "destructive",
           title: "File too large",
-          description: "Logo file is too large. Please select an image under 2MB."
+          description: "Logo file is too large. Please select an image under 1MB."
         });
         return;
       }
@@ -43,14 +43,12 @@ export function SettingsForm({ settings }: SettingsFormProps) {
     try {
       const updates: Record<string, string> = {};
       
-      // Get all values from formData
       for (const [key, value] of formData.entries()) {
         if (!key.startsWith('$ACTION_ID_')) {
           updates[key] = value as string;
         }
       }
       
-      // Explicitly set the logo from state
       updates['garage_logo'] = logoBase64;
 
       await updateAllSettings(updates);
@@ -95,7 +93,7 @@ export function SettingsForm({ settings }: SettingsFormProps) {
                   </span>
                   <input type="file" className="hidden" accept="image/*" onChange={handleLogoChange} />
                 </label>
-                <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-wider">PNG or JPG, max 2MB</p>
+                <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-wider">PNG or JPG, max 1MB</p>
               </div>
             </div>
 
