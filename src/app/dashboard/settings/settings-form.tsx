@@ -20,8 +20,9 @@ export function SettingsForm({ settings }: SettingsFormProps) {
   const handleLogoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      if (file.size > 1024 * 1024) {
-        alert("Logo file is too large. Please select an image under 1MB.");
+      // Limit increased to 2MB
+      if (file.size > 2 * 1024 * 1024) {
+        alert("Logo file is too large. Please select an image under 2MB.");
         return;
       }
       const reader = new FileReader();
@@ -70,7 +71,7 @@ export function SettingsForm({ settings }: SettingsFormProps) {
                   </span>
                   <input type="file" className="hidden" accept="image/*" onChange={handleLogoChange} />
                 </label>
-                <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-wider">PNG or JPG, max 1MB</p>
+                <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-wider">PNG or JPG, max 2MB</p>
               </div>
             </div>
 
