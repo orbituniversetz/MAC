@@ -14,11 +14,20 @@ import {
 import { Trash2, FilePlus, Printer } from 'lucide-react';
 import { redirect } from 'next/navigation';
 
-export default async function JobSheetDetailPage({ params }: { params: { id: string } }) {
-  const job = await getJobSheetById(parseInt(params.id));
+export default async function JobSheetDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+  const job = await getJobSheetById(parseInt(id));
 
   if (!job) {
-    return <div>Job not found</div>;
+    return (
+      <div className="flex flex-col items-center justify-center h-[50vh] space-y-4">
+        <h2 className="text-2xl font-bold text-gray-800">Job Not Found</h2>
+        <p className="text-muted-foreground">The job sheet you are looking for does not exist.</p>
+        <Button asChild variant="outline">
+          <a href="/dashboard/jobsheets">Back to Job Sheets</a>
+        </Button>
+      </div>
+    );
   }
 
   const total = job.items.reduce((acc: number, item: any) => acc + item.subtotal, 0);
