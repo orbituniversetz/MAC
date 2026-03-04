@@ -1,4 +1,3 @@
-
 import { getJobSheetById, addJobItem, deleteJobItem, createProformaFromJob } from '@/lib/actions';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -151,7 +150,7 @@ export default async function JobSheetDetailPage({ params }: { params: { id: str
             <CardContent>
               <div className="flex justify-between items-center text-lg">
                 <span>Estimated Total:</span>
-                <span className="font-bold text-[#c10d12]">KES {total.toLocaleString()}</span>
+                <span className="font-bold text-[#c10d12]">TZS {total.toLocaleString()}</span>
               </div>
             </CardContent>
           </Card>

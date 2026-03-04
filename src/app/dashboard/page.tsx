@@ -1,4 +1,3 @@
-
 import { getDashboardStats } from '@/lib/actions';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { 
@@ -8,6 +7,7 @@ import {
   CircleDollarSign,
   TrendingUp 
 } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 export default async function DashboardPage() {
   const stats = await getDashboardStats();
@@ -15,9 +15,9 @@ export default async function DashboardPage() {
   const cards = [
     { title: 'Open Jobs', value: stats.openJobs, icon: Wrench, color: 'text-blue-600' },
     { title: 'Completed Jobs', value: stats.completedJobs, icon: CheckCircle2, color: 'text-green-600' },
-    { title: 'Pending Payments', value: `KES ${stats.pendingPayments}`, icon: Clock, color: 'text-orange-600' },
-    { title: 'Today\'s Sales', value: `KES ${stats.todaySales}`, icon: CircleDollarSign, color: 'text-[#c10d12]' },
-    { title: 'Monthly Sales', value: `KES ${stats.monthlySales}`, icon: TrendingUp, color: 'text-[#c10d12]' },
+    { title: 'Pending Payments', value: `TZS ${stats.pendingPayments}`, icon: Clock, color: 'text-orange-600' },
+    { title: 'Today\'s Sales', value: `TZS ${stats.todaySales}`, icon: CircleDollarSign, color: 'text-[#c10d12]' },
+    { title: 'Monthly Sales', value: `TZS ${stats.monthlySales}`, icon: TrendingUp, color: 'text-[#c10d12]' },
   ];
 
   return (
@@ -70,5 +70,3 @@ export default async function DashboardPage() {
     </div>
   );
 }
-
-import { cn } from '@/lib/utils';

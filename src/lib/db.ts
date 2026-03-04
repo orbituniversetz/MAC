@@ -1,4 +1,3 @@
-
 import Database from 'better-sqlite3';
 import path from 'path';
 import fs from 'fs';
@@ -82,7 +81,7 @@ db.exec(`
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     invoiceId INTEGER,
     amount REAL NOT NULL,
-    method TEXT, -- 'Cash', 'M-Pesa', 'Bank Transfer', 'Other'
+    method TEXT, -- 'Cash', 'T-Pesa', 'Bank Transfer', 'Other'
     reference TEXT,
     paidAt DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY(invoiceId) REFERENCES invoices(id)
@@ -97,14 +96,14 @@ db.exec(`
 // Seed initial data if empty
 const customerCount = db.prepare('SELECT count(*) as count FROM customers').get() as { count: number };
 if (customerCount.count === 0) {
-  db.prepare('INSERT INTO customers (name, phone, address) VALUES (?, ?, ?)').run('John Doe', '0712345678', '123 Industrial Area');
-  db.prepare('INSERT INTO vehicles (customerId, plateNumber, makeModel) VALUES (?, ?, ?)').run(1, 'KAA 123A', 'Toyota Hilux');
+  db.prepare('INSERT INTO customers (name, phone, address) VALUES (?, ?, ?)').run('Baraka Joseph', '0712 000 000', 'Posta, Dar es Salaam');
+  db.prepare('INSERT INTO vehicles (customerId, plateNumber, makeModel) VALUES (?, ?, ?)').run(1, 'T 123 ABC', 'Toyota Hilux');
   db.prepare('INSERT INTO jobsheets (jobNo, customerId, vehicleId, complaint, status) VALUES (?, ?, ?, ?, ?)').run('JS-0001', 1, 1, 'Oil change and brake check', 'Draft');
-  db.prepare('INSERT INTO job_items (jobSheetId, type, description, qty, unitPrice, subtotal) VALUES (?, ?, ?, ?, ?, ?)').run(1, 'PART', 'Oil Filter', 1, 1500, 1500);
-  db.prepare('INSERT INTO job_items (jobSheetId, type, description, qty, unitPrice, subtotal) VALUES (?, ?, ?, ?, ?, ?)').run(1, 'LABOUR', 'General Service', 1, 2000, 2000);
+  db.prepare('INSERT INTO job_items (jobSheetId, type, description, qty, unitPrice, subtotal) VALUES (?, ?, ?, ?, ?, ?)').run(1, 'PART', 'Oil Filter', 1, 35000, 35000);
+  db.prepare('INSERT INTO job_items (jobSheetId, type, description, qty, unitPrice, subtotal) VALUES (?, ?, ?, ?, ?, ?)').run(1, 'LABOUR', 'General Service', 1, 50000, 50000);
   
   db.prepare('INSERT INTO settings (key, value) VALUES (?, ?)').run('garage_name', 'GarageFlow Desk');
-  db.prepare('INSERT INTO settings (key, value) VALUES (?, ?)').run('garage_address', 'Main Street, Nairobi');
+  db.prepare('INSERT INTO settings (key, value) VALUES (?, ?)').run('garage_address', 'Samora Avenue, Dar es Salaam');
 }
 
 export default db;
