@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import { Settings as SettingsIcon, Building, Save } from 'lucide-react';
 
 export default async function SettingsPage() {
@@ -70,7 +71,7 @@ export default async function SettingsPage() {
               <p className="font-medium">Auto-generate Job Numbers</p>
               <p className="text-xs text-muted-foreground">Automatically assign the next sequential number.</p>
             </div>
-            <Badge className="bg-green-100 text-green-800">Enabled</Badge>
+            <Badge className="bg-green-100 text-green-800 hover:bg-green-100">Enabled</Badge>
           </div>
           <div className="flex items-center justify-between p-4 border rounded-md">
             <div>
