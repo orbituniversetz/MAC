@@ -39,7 +39,7 @@ export default async function JobSheetDetailPage({ params }: { params: Promise<{
     const qty = parseFloat(formData.get('qty') as string);
     const unitPrice = parseFloat(formData.get('unitPrice') as string);
     
-    await addJobItem(job.id, { type, description, qty, unitPrice });
+    await addJobItem(job.id, null, { type, description, qty, unitPrice });
   }
 
   async function handleCreateProforma() {
@@ -95,7 +95,7 @@ export default async function JobSheetDetailPage({ params }: { params: Promise<{
                     <TableCell>{item.unitPrice.toLocaleString()}</TableCell>
                     <TableCell className="font-bold">{item.subtotal.toLocaleString()}</TableCell>
                     <TableCell>
-                      <form action={async () => { 'use server'; await deleteJobItem(item.id, job.id); }}>
+                      <form action={async () => { 'use server'; await deleteJobItem(item.id, job.id, null); }}>
                         <Button variant="ghost" size="icon" className="text-red-500 hover:text-red-700">
                           <Trash2 className="h-4 w-4" />
                         </Button>

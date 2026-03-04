@@ -4,7 +4,6 @@ import db from './db';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 
-// Stats
 export async function getDashboardStats() {
   const openJobs = db.prepare("SELECT COUNT(*) as count FROM jobsheets WHERE status != 'Closed'").get() as any;
   const completedJobs = db.prepare("SELECT COUNT(*) as count FROM jobsheets WHERE status = 'Completed'").get() as any;
@@ -19,7 +18,6 @@ export async function getDashboardStats() {
   };
 }
 
-// Job Sheets
 export async function getJobSheets() {
   return db.prepare(`
     SELECT js.*, c.name as customerName, v.plateNumber as vehiclePlate 
@@ -54,13 +52,11 @@ export async function createJobSheet(formData: FormData) {
   const newVehiclePlate = formData.get('newVehiclePlate') as string;
   const newVehicleModel = formData.get('newVehicleModel') as string;
 
-  // Handle On-the-fly Customer creation
   if (!customerId && newCustomerName) {
     const info = db.prepare('INSERT INTO customers (name, phone) VALUES (?, ?)').run(newCustomerName, newCustomerPhone);
     customerId = info.lastInsertRowid as number;
   }
 
-  // Handle On-the-fly Vehicle creation
   if (!vehicleId && newVehiclePlate && customerId) {
     const info = db.prepare('INSERT INTO vehicles (customerId, plateNumber, makeModel) VALUES (?, ?, ?)').run(customerId, newVehiclePlate, newVehicleModel);
     vehicleId = info.lastInsertRowid as number;
@@ -106,7 +102,6 @@ export async function deleteJobItem(itemId: number, jobId: number | null, profor
   if (proformaId) revalidatePath(`/dashboard/proformas/${proformaId}`);
 }
 
-// Customers & Vehicles
 export async function getCustomers() {
   return db.prepare('SELECT * FROM customers ORDER BY name ASC').all() as any[];
 }
@@ -115,7 +110,6 @@ export async function getAllVehicles() {
   return db.prepare('SELECT v.*, c.name as customerName FROM vehicles v JOIN customers c ON v.customerId = c.id ORDER BY v.plateNumber ASC').all() as any[];
 }
 
-// Proformas
 export async function createProformaFromJob(jobId: number) {
   const job = await getJobSheetById(jobId);
   if (!job) return null;
@@ -175,8 +169,8 @@ export async function getProformas() {
     SELECT p.*, js.jobNo, c.name as customerName, v.plateNumber as vehiclePlate
     FROM proformas p
     LEFT JOIN jobsheets js ON p.jobSheetId = js.id
-    LEFT JOIN customers c ON COALESCE(p.customerId, (SELECT customerId FROM jobsheets WHERE id = p.jobSheetId)) = c.id
-    LEFT JOIN vehicles v ON COALESCE(p.vehicleId, (SELECT vehicleId FROM jobsheets WHERE id = p.jobSheetId)) = v.id
+    LEFT JOIN customers c ON p.customerId = c.id
+    LEFT JOIN vehicles v ON p.vehicleId = v.id
     ORDER BY p.createdAt DESC
   `).all();
 }
@@ -185,15 +179,13 @@ export async function getProformaById(id: number) {
   const pf = db.prepare(`
     SELECT p.*, c.name as customerName, c.phone as customerPhone, v.plateNumber as vehiclePlate, v.makeModel as vehicleModel, js.jobNo
     FROM proformas p
-    LEFT JOIN customers c ON p.customerId = c.id OR (SELECT customerId FROM jobsheets WHERE id = p.jobSheetId) = c.id
-    LEFT JOIN vehicles v ON p.vehicleId = v.id OR (SELECT vehicleId FROM jobsheets WHERE id = p.jobSheetId) = v.id
+    LEFT JOIN customers c ON p.customerId = c.id
+    LEFT JOIN vehicles v ON p.vehicleId = v.id
     LEFT JOIN jobsheets js ON p.jobSheetId = js.id
     WHERE p.id = ?
   `).get(id) as any;
 
   if (pf) {
-    // If it's from a job, get job items. If direct, maybe we store items linked to proformaId.
-    // Let's check both.
     const itemsFromJob = pf.jobSheetId ? db.prepare('SELECT * FROM job_items WHERE jobSheetId = ?').all(pf.jobSheetId) : [];
     const itemsFromPF = db.prepare('SELECT * FROM job_items WHERE proformaId = ?').all(id);
     pf.items = [...itemsFromJob, ...itemsFromPF];
@@ -201,7 +193,6 @@ export async function getProformaById(id: number) {
   return pf;
 }
 
-// Invoices
 export async function getInvoices() {
   return db.prepare(`
     SELECT i.*, js.jobNo, c.name as customerName 
@@ -212,7 +203,6 @@ export async function getInvoices() {
   `).all();
 }
 
-// Settings
 export async function getSettings() {
   const settings = db.prepare('SELECT * FROM settings').all() as any[];
   return settings.reduce((acc, curr) => {

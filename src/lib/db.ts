@@ -2,8 +2,6 @@ import Database from 'better-sqlite3';
 import path from 'path';
 import fs from 'fs';
 
-// In a real Windows desktop app with Electron, this path would be C:\ProgramData\GarageSystem\
-// For this environment, we'll use a local folder 'data' relative to the root.
 const DB_PATH = process.env.NODE_ENV === 'production' 
   ? '/tmp/garage.db' 
   : path.join(process.cwd(), 'garage.db');
@@ -11,7 +9,6 @@ const DB_PATH = process.env.NODE_ENV === 'production'
 const db = new Database(DB_PATH);
 db.pragma('journal_mode = WAL');
 
-// Initialize Schema
 db.exec(`
   CREATE TABLE IF NOT EXISTS customers (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -45,8 +42,8 @@ db.exec(`
   CREATE TABLE IF NOT EXISTS job_items (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     jobSheetId INTEGER,
-    proformaId INTEGER, -- Linked if created for a direct proforma
-    type TEXT NOT NULL, -- 'PART' or 'LABOUR'
+    proformaId INTEGER,
+    type TEXT NOT NULL,
     description TEXT,
     qty REAL DEFAULT 1,
     unitPrice REAL DEFAULT 0,
@@ -58,10 +55,10 @@ db.exec(`
   CREATE TABLE IF NOT EXISTS proformas (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     proformaNo TEXT NOT NULL UNIQUE,
-    jobSheetId INTEGER, -- Optional
-    customerId INTEGER, -- Optional (for proformas without jobsheets)
-    vehicleId INTEGER,  -- Optional
-    status TEXT DEFAULT 'Draft', -- 'Draft', 'Finalized'
+    jobSheetId INTEGER,
+    customerId INTEGER,
+    vehicleId INTEGER,
+    status TEXT DEFAULT 'Draft',
     snapshotJson TEXT,
     discount REAL DEFAULT 0,
     taxEnabled INTEGER DEFAULT 0,
@@ -76,7 +73,7 @@ db.exec(`
     invoiceNo TEXT NOT NULL UNIQUE,
     jobSheetId INTEGER,
     proformaId INTEGER,
-    status TEXT DEFAULT 'Unpaid', -- 'Unpaid', 'Partial', 'Paid'
+    status TEXT DEFAULT 'Unpaid',
     snapshotJson TEXT,
     createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY(jobSheetId) REFERENCES jobsheets(id),
@@ -87,7 +84,7 @@ db.exec(`
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     invoiceId INTEGER,
     amount REAL NOT NULL,
-    method TEXT, -- 'Cash', 'T-Pesa', 'Bank Transfer', 'Other'
+    method TEXT,
     reference TEXT,
     paidAt DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY(invoiceId) REFERENCES invoices(id)
@@ -99,7 +96,10 @@ db.exec(`
   );
 `);
 
-// Seed initial data if empty
+// Migration safety for existing local databases
+try { db.exec("ALTER TABLE proformas ADD COLUMN customerId INTEGER;"); } catch (e) {}
+try { db.exec("ALTER TABLE proformas ADD COLUMN vehicleId INTEGER;"); } catch (e) {}
+
 const customerCount = db.prepare('SELECT count(*) as count FROM customers').get() as { count: number };
 if (customerCount.count === 0) {
   db.prepare('INSERT INTO customers (name, phone, address) VALUES (?, ?, ?)').run('Baraka Joseph', '0712 000 000', 'Posta, Dar es Salaam');
@@ -108,7 +108,6 @@ if (customerCount.count === 0) {
   db.prepare('INSERT INTO job_items (jobSheetId, type, description, qty, unitPrice, subtotal) VALUES (?, ?, ?, ?, ?, ?)').run(1, 'PART', 'Oil Filter', 1, 35000, 35000);
   db.prepare('INSERT INTO job_items (jobSheetId, type, description, qty, unitPrice, subtotal) VALUES (?, ?, ?, ?, ?, ?)').run(1, 'LABOUR', 'General Service', 1, 50000, 50000);
   
-  // M. A. C. GARAGE Details
   db.prepare('INSERT INTO settings (key, value) VALUES (?, ?)').run('garage_name', 'M. A. C. GARAGE');
   db.prepare('INSERT INTO settings (key, value) VALUES (?, ?)').run('garage_mailbox', 'P.O. Box 7005, Arusha');
   db.prepare('INSERT INTO settings (key, value) VALUES (?, ?)').run('garage_address', 'Arusha, Tanzania');
