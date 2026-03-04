@@ -2,6 +2,7 @@
 'use client'
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { 
@@ -15,6 +16,7 @@ import {
   Database,
   Wrench
 } from 'lucide-react';
+import { PlaceHolderImages } from '@/lib/placeholder-images';
 
 const navItems = [
   { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
@@ -28,16 +30,32 @@ const navItems = [
   { name: 'Backup Manager', href: '/dashboard/backups', icon: Database },
 ];
 
-export function SidebarNav() {
+export function SidebarNav({ garageName }: { garageName: string }) {
   const pathname = usePathname();
+  const logo = PlaceHolderImages.find(img => img.id === 'garage-logo');
 
   return (
     <div className="flex flex-col h-full bg-white border-r border-[#b0b2b5] w-64">
       <div className="p-6 flex items-center gap-3">
-        <div className="bg-[#c10d12] p-2 rounded-lg">
-          <Wrench className="text-white h-6 w-6" />
-        </div>
-        <h1 className="text-xl font-bold tracking-tight text-black">GarageFlow</h1>
+        {logo && (
+          <div className="relative h-10 w-10 overflow-hidden rounded-lg border">
+            <Image 
+              src={logo.imageUrl} 
+              alt="Logo" 
+              fill
+              className="object-cover"
+              data-ai-hint={logo.imageHint}
+            />
+          </div>
+        )}
+        {!logo && (
+          <div className="bg-[#c10d12] p-2 rounded-lg">
+            <Wrench className="text-white h-6 w-6" />
+          </div>
+        )}
+        <h1 className="text-lg font-bold tracking-tight text-black leading-tight uppercase">
+          {garageName}
+        </h1>
       </div>
       
       <nav className="flex-1 px-4 space-y-1">
