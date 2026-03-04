@@ -9,13 +9,14 @@ import { redirect } from 'next/navigation';
 export async function getDashboardStats() {
   const openJobs = db.prepare("SELECT COUNT(*) as count FROM jobsheets WHERE status != 'Closed'").get() as any;
   const completedJobs = db.prepare("SELECT COUNT(*) as count FROM jobsheets WHERE status = 'Completed'").get() as any;
+  const totalSales = db.prepare("SELECT SUM(amount) as total FROM payments").get() as any;
   
   return {
     openJobs: openJobs?.count || 0,
     completedJobs: completedJobs?.count || 0,
     pendingPayments: 0,
     todaySales: 0,
-    monthlySales: 0
+    monthlySales: totalSales?.total || 0
   };
 }
 
@@ -123,4 +124,29 @@ export async function getProformas() {
     JOIN customers c ON js.customerId = c.id
     ORDER BY p.createdAt DESC
   `).all();
+}
+
+// Invoices
+export async function getInvoices() {
+  return db.prepare(`
+    SELECT i.*, js.jobNo, c.name as customerName 
+    FROM invoices i
+    JOIN jobsheets js ON i.jobSheetId = js.id
+    JOIN customers c ON js.customerId = c.id
+    ORDER BY i.createdAt DESC
+  `).all();
+}
+
+// Settings
+export async function getSettings() {
+  const settings = db.prepare('SELECT * FROM settings').all() as any[];
+  return settings.reduce((acc, curr) => {
+    acc[curr.key] = curr.value;
+    return acc;
+  }, {} as any);
+}
+
+export async function updateSetting(key: string, value: string) {
+  db.prepare('INSERT OR REPLACE INTO settings (key, value) VALUES (?, ?)').run(key, value);
+  revalidatePath('/dashboard/settings');
 }
