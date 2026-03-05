@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ChevronLeft, Mail, FileText } from 'lucide-react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { PrintDocumentButton } from '@/components/dashboard/PrintDocumentButton';
 
 export default async function DocumentDetailPage({ params }: { params: Promise<{ id: string }> }) {
@@ -32,9 +33,22 @@ export default async function DocumentDetailPage({ params }: { params: Promise<{
       <div className="max-w-4xl mx-auto bg-white border rounded-xl shadow-lg overflow-hidden">
         {/* Document Header Representation */}
         <div className="p-8 border-b bg-gray-50 flex justify-between items-start">
-          <div className="space-y-1">
-            <h1 className="text-3xl font-black text-[#c10d12] uppercase">{settings.garage_name}</h1>
-            <p className="text-xs text-muted-foreground">{settings.garage_address}</p>
+          <div className="flex items-center gap-4">
+            {settings.garage_logo && (
+              <div className="relative h-16 w-16 overflow-hidden rounded-lg border bg-white flex items-center justify-center shrink-0">
+                <Image 
+                  src={settings.garage_logo} 
+                  alt="Garage Logo" 
+                  fill 
+                  className="object-contain p-1" 
+                  unoptimized 
+                />
+              </div>
+            )}
+            <div className="space-y-1">
+              <h1 className="text-3xl font-black text-[#c10d12] uppercase">{settings.garage_name}</h1>
+              <p className="text-xs text-muted-foreground">{settings.garage_address}</p>
+            </div>
           </div>
           <div className="text-right">
             <Badge className="bg-black mb-2">{doc.docType}</Badge>
