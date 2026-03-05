@@ -47,7 +47,7 @@ export function JobCardPreview({ job, settings, mode }: JobCardPreviewProps) {
       backgroundColor: '#ffffff'
     });
     
-    const imgData = canvas.toDataURL('image/jpeg', 0.75);
+    const imgData = canvas.toDataURL('image/jpeg', 0.85);
     const pdf = new jsPDF({
       orientation: 'portrait',
       unit: 'mm',
@@ -55,11 +55,26 @@ export function JobCardPreview({ job, settings, mode }: JobCardPreviewProps) {
       compress: true
     });
 
-    const imgProps = pdf.getImageProperties(imgData);
     const pdfWidth = pdf.internal.pageSize.getWidth();
-    const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+    const pdfHeight = pdf.internal.pageSize.getHeight();
+    const imgProps = pdf.getImageProperties(imgData);
+    const canvasHeightInPdf = (imgProps.height * pdfWidth) / imgProps.width;
+    
+    let heightLeft = canvasHeightInPdf;
+    let position = 0;
 
-    pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight, undefined, 'FAST');
+    // Add first page
+    pdf.addImage(imgData, 'JPEG', 0, position, pdfWidth, canvasHeightInPdf, undefined, 'FAST');
+    heightLeft -= pdfHeight;
+
+    // Add subsequent pages if content overflows
+    while (heightLeft > 0) {
+      position = heightLeft - canvasHeightInPdf;
+      pdf.addPage();
+      pdf.addImage(imgData, 'JPEG', 0, position, pdfWidth, canvasHeightInPdf, undefined, 'FAST');
+      heightLeft -= pdfHeight;
+    }
+
     pdf.save(`JOB CARD ${isInternal ? 'INTERNAL' : 'CUSTOMER'} ${job.jobNo}.pdf`);
   };
 

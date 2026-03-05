@@ -36,7 +36,6 @@ export function InvoicePreview({ invoice, settings }: InvoicePreviewProps) {
     const element = document.getElementById('invoice-document');
     if (!element) return;
 
-    // Scale 2.0 + JPEG 0.75 is the sweet spot for sharpness vs < 500KB size
     const canvas = await html2canvas(element, {
       scale: 2.0,
       useCORS: true,
@@ -44,7 +43,7 @@ export function InvoicePreview({ invoice, settings }: InvoicePreviewProps) {
       backgroundColor: '#ffffff'
     });
     
-    const imgData = canvas.toDataURL('image/jpeg', 0.75);
+    const imgData = canvas.toDataURL('image/jpeg', 0.85);
     const pdf = new jsPDF({
       orientation: 'portrait',
       unit: 'mm',
@@ -52,11 +51,26 @@ export function InvoicePreview({ invoice, settings }: InvoicePreviewProps) {
       compress: true
     });
 
-    const imgProps = pdf.getImageProperties(imgData);
     const pdfWidth = pdf.internal.pageSize.getWidth();
-    const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+    const pdfHeight = pdf.internal.pageSize.getHeight();
+    const imgProps = pdf.getImageProperties(imgData);
+    const canvasHeightInPdf = (imgProps.height * pdfWidth) / imgProps.width;
+    
+    let heightLeft = canvasHeightInPdf;
+    let position = 0;
 
-    pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight, undefined, 'FAST');
+    // Add first page
+    pdf.addImage(imgData, 'JPEG', 0, position, pdfWidth, canvasHeightInPdf, undefined, 'FAST');
+    heightLeft -= pdfHeight;
+
+    // Add subsequent pages if content overflows
+    while (heightLeft > 0) {
+      position = heightLeft - canvasHeightInPdf;
+      pdf.addPage();
+      pdf.addImage(imgData, 'JPEG', 0, position, pdfWidth, canvasHeightInPdf, undefined, 'FAST');
+      heightLeft -= pdfHeight;
+    }
+
     pdf.save(`INVOICE ${invoice.invoiceNo}.pdf`);
   };
 
