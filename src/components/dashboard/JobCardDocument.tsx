@@ -1,8 +1,8 @@
 'use client'
 
+import { cn } from '@/lib/utils';
 import { Wrench, Banknote, TrendingUp, TrendingDown, ShieldCheck, User } from 'lucide-react';
 import Image from 'next/image';
-import { cn } from '@/lib/utils';
 
 interface JobCardDocumentProps {
   job: any;

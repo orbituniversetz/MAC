@@ -1,4 +1,3 @@
-
 'use client'
 
 import { useState, useEffect } from 'react';
@@ -9,6 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Mail, FileText, ChevronLeft } from 'lucide-react';
+import { cn } from '@/lib/utils';
 import Link from 'next/link';
 
 export default function NewDocumentPage() {
@@ -22,7 +22,7 @@ export default function NewDocumentPage() {
   }, []);
 
   return (
-    <div className="max-w-3xl mx-auto space-y-6">
+    <div className="max-w-3xl auto space-y-6">
       <div className="flex items-center justify-between">
         <Link href="/dashboard/documents" className="flex items-center text-sm text-muted-foreground hover:text-black">
           <ChevronLeft className="h-4 w-4 mr-1" /> Back to Documents
@@ -123,5 +123,3 @@ export default function NewDocumentPage() {
     </div>
   );
 }
-
-import { cn } from '@/lib/utils';
