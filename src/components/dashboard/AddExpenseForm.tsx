@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { PriceInput } from './PriceInput';
-import { Banknote, Link as LinkIcon, History } from 'lucide-react';
+import { Banknote, Link as LinkIcon, History, Wrench } from 'lucide-react';
 import { addExpense } from '@/lib/actions';
 import {
   DropdownMenu,
@@ -20,9 +20,17 @@ interface AddExpenseFormProps {
   allJobs?: any[];
   allProformas?: any[];
   recentExpenses?: any[];
+  jobItems?: any[];
 }
 
-export function AddExpenseForm({ jobSheetId, proformaId, allJobs = [], allProformas = [], recentExpenses = [] }: AddExpenseFormProps) {
+export function AddExpenseForm({ 
+  jobSheetId, 
+  proformaId, 
+  allJobs = [], 
+  allProformas = [], 
+  recentExpenses = [],
+  jobItems = []
+}: AddExpenseFormProps) {
   const [description, setDescription] = useState('');
   const [category, setCategory] = useState('PART');
   const [amount, setAmount] = useState<string | number>('');
@@ -31,9 +39,19 @@ export function AddExpenseForm({ jobSheetId, proformaId, allJobs = [], allProfor
   const [selectedProformaId, setSelectedProformaId] = useState(proformaId?.toString() || '');
 
   const handleRecentPick = (exp: any) => {
-    setCategory(exp.category);
+    setCategory(exp.category || 'PART');
     setDescription(exp.description);
     setAmount(exp.amount);
+  };
+
+  const handleJobItemPick = (item: any) => {
+    // Map item type to expense category
+    const mappedCategory = item.type === 'PART' ? 'PART' : 'LABOUR';
+    setCategory(mappedCategory);
+    setDescription(`${item.description} (Cost)`);
+    // Note: User likely paid a different price than they charged, 
+    // but we use the selling price as a default starting point.
+    setAmount(item.unitPrice * (item.qty || 1));
   };
 
   async function handleAction(formData: FormData) {
@@ -57,38 +75,72 @@ export function AddExpenseForm({ jobSheetId, proformaId, allJobs = [], allProfor
 
   return (
     <div className="mt-6 border-t pt-4 bg-red-50/30 p-4 rounded-lg">
-      <div className="flex items-center justify-between mb-4">
-        <h4 className="font-bold text-sm flex items-center gap-2 text-red-800">
-          <Banknote className="h-4 w-4" /> 
-          {isContextual ? 'Record Expense for this Document' : 'Record Garage Expense'}
-        </h4>
+      <div className="flex flex-col gap-4 mb-4">
+        <div className="flex items-center justify-between">
+          <h4 className="font-bold text-sm flex items-center gap-2 text-red-800 uppercase tracking-tight">
+            <Banknote className="h-4 w-4" /> 
+            {isContextual ? 'Record Cost for this Job' : 'Record Garage Expense'}
+          </h4>
+        </div>
 
-        {recentExpenses.length > 0 && (
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" size="sm" className="h-8 text-[10px] uppercase font-bold border-red-200 bg-white/50 text-red-800 hover:bg-red-50">
-                <History className="mr-1.5 h-3.5 w-3.5" /> Quick Pick Previous
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-80 max-h-72 overflow-y-auto">
-              <DropdownMenuLabel className="text-[10px] uppercase tracking-wider text-muted-foreground">Recent Expenses</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              {recentExpenses.map((exp, idx) => (
-                <DropdownMenuItem 
-                  key={idx} 
-                  onClick={() => handleRecentPick(exp)} 
-                  className="flex flex-col items-start gap-1 py-2 cursor-pointer"
-                >
-                  <div className="flex justify-between w-full items-start">
-                    <span className="font-bold text-xs text-black">{exp.description}</span>
-                    <span className="text-[9px] bg-red-100 px-1.5 py-0.5 rounded font-black text-red-600 uppercase">{exp.category}</span>
-                  </div>
-                  <span className="text-[10px] font-bold text-red-700">TZS {exp.amount.toLocaleString()}</span>
-                </DropdownMenuItem>
-              ))}
-            </DropdownMenuContent>
-          </DropdownMenu>
-        )}
+        <div className="flex flex-wrap gap-2">
+          {jobItems.length > 0 && (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" size="sm" className="h-8 text-[10px] uppercase font-bold border-red-200 bg-white/50 text-red-800 hover:bg-red-50">
+                  <Wrench className="mr-1.5 h-3.5 w-3.5" /> Pick from Repair Items
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="w-80 max-h-72 overflow-y-auto">
+                <DropdownMenuLabel className="text-[10px] uppercase tracking-wider text-muted-foreground">Current Repair Items (Income)</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                {jobItems.map((item, idx) => (
+                  <DropdownMenuItem 
+                    key={idx} 
+                    onClick={() => handleJobItemPick(item)} 
+                    className="flex flex-col items-start gap-1 py-2 cursor-pointer"
+                  >
+                    <div className="flex justify-between w-full items-start">
+                      <span className="font-bold text-xs text-black">{item.description}</span>
+                      <span className="text-[9px] bg-blue-100 px-1.5 py-0.5 rounded font-black text-blue-600 uppercase">{item.type}</span>
+                    </div>
+                    <div className="flex gap-2 text-[10px]">
+                      <span className="text-muted-foreground">Qty: {item.qty}</span>
+                      <span className="font-bold text-red-700">Total Billed: {item.subtotal.toLocaleString()}</span>
+                    </div>
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )}
+
+          {recentExpenses.length > 0 && (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" size="sm" className="h-8 text-[10px] uppercase font-bold border-red-200 bg-white/50 text-red-800 hover:bg-red-50">
+                  <History className="mr-1.5 h-3.5 w-3.5" /> Recent Expenses
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="w-80 max-h-72 overflow-y-auto">
+                <DropdownMenuLabel className="text-[10px] uppercase tracking-wider text-muted-foreground">Past Records</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                {recentExpenses.map((exp, idx) => (
+                  <DropdownMenuItem 
+                    key={idx} 
+                    onClick={() => handleRecentPick(exp)} 
+                    className="flex flex-col items-start gap-1 py-2 cursor-pointer"
+                  >
+                    <div className="flex justify-between w-full items-start">
+                      <span className="font-bold text-xs text-black">{exp.description}</span>
+                      <span className="text-[9px] bg-red-100 px-1.5 py-0.5 rounded font-black text-red-600 uppercase">{exp.category}</span>
+                    </div>
+                    <span className="text-[10px] font-bold text-red-700">TZS {exp.amount.toLocaleString()}</span>
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )}
+        </div>
       </div>
 
       <form action={handleAction} className="space-y-4">
@@ -173,13 +225,13 @@ export function AddExpenseForm({ jobSheetId, proformaId, allJobs = [], allProfor
           <PriceInput 
             name="amount" 
             defaultValue={amount}
-            placeholder="Amount (TZS)" 
+            placeholder="Amount (Cost)" 
             className="bg-white text-sm" 
             required
           />
           
           <Button type="submit" className="bg-red-800 text-white hover:bg-red-900 col-span-1 md:col-span-4 h-11 font-bold">
-            Record Expense
+            Record Cost
           </Button>
         </div>
       </form>

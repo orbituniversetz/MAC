@@ -178,7 +178,11 @@ export default async function JobSheetDetailPage({ params }: { params: Promise<{
                   )}
                 </TableBody>
               </Table>
-              <AddExpenseForm jobSheetId={job.id} recentExpenses={recentExpenses} />
+              <AddExpenseForm 
+                jobSheetId={job.id} 
+                recentExpenses={recentExpenses} 
+                jobItems={job.items} 
+              />
             </CardContent>
           </Card>
         </div>
