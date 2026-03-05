@@ -1,4 +1,3 @@
-
 'use client'
 
 import { useState, useEffect } from 'react';
@@ -10,7 +9,7 @@ import {
   DialogTrigger 
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Eye, Printer, Download, X, ZoomIn, ZoomOut, Maximize, Wrench } from 'lucide-react';
+import { Eye, Printer, Download, X, ZoomIn, ZoomOut, Maximize, Wrench, User, ShieldCheck } from 'lucide-react';
 import { JobCardDocument } from './JobCardDocument';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
@@ -18,9 +17,10 @@ import html2canvas from 'html2canvas';
 interface JobCardPreviewProps {
   job: any;
   settings: any;
+  mode: 'CUSTOMER' | 'INTERNAL';
 }
 
-export function JobCardPreview({ job, settings }: JobCardPreviewProps) {
+export function JobCardPreview({ job, settings, mode }: JobCardPreviewProps) {
   const [mounted, setMounted] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [zoom, setZoom] = useState(100);
@@ -33,8 +33,11 @@ export function JobCardPreview({ job, settings }: JobCardPreviewProps) {
     window.print();
   };
 
+  const isInternal = mode === 'INTERNAL';
+
   const handleDownloadPDF = async () => {
-    const element = document.getElementById('jobcard-document');
+    const docId = `jobcard-document-${isInternal ? 'internal' : 'customer'}`;
+    const element = document.getElementById(docId);
     if (!element) return;
 
     const canvas = await html2canvas(element, {
@@ -55,13 +58,14 @@ export function JobCardPreview({ job, settings }: JobCardPreviewProps) {
     const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
 
     pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
-    pdf.save(`JOB CARD ${job.jobNo}.pdf`);
+    pdf.save(`JOB CARD ${isInternal ? 'INTERNAL' : 'CUSTOMER'} ${job.jobNo}.pdf`);
   };
 
   if (!mounted) {
     return (
-      <Button variant="outline">
-        <Eye className="mr-2 h-4 w-4" /> Preview Job Card
+      <Button variant={isInternal ? "outline" : "default"} className={!isInternal ? "bg-[#c10d12]" : ""}>
+        {isInternal ? <ShieldCheck className="mr-2 h-4 w-4" /> : <User className="mr-2 h-4 w-4" />}
+        Preview {isInternal ? 'Internal' : 'Customer'} Copy
       </Button>
     );
   }
@@ -72,18 +76,19 @@ export function JobCardPreview({ job, settings }: JobCardPreviewProps) {
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+    <Dialog open={isOpen} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline" className="border-[#b0b2b5]" onClick={() => setIsOpen(true)}>
-          <Eye className="mr-2 h-4 w-4" /> Preview Job Card
+        <Button variant={isInternal ? "outline" : "default"} className={!isInternal ? "bg-[#c10d12] hover:bg-[#a00b0f]" : "border-gray-300"} onClick={() => setIsOpen(true)}>
+          {isInternal ? <ShieldCheck className="mr-2 h-4 w-4" /> : <User className="mr-2 h-4 w-4" />}
+          {isInternal ? 'Garage Internal Copy' : 'Customer Vehicle Receipt'}
         </Button>
       </DialogTrigger>
       <DialogContent className="max-w-none w-screen h-screen m-0 p-0 rounded-none bg-gray-500 overflow-hidden flex flex-col border-none">
         <div className="bg-white border-b px-6 py-3 flex items-center justify-between z-50 shadow-sm no-print">
           <div className="flex items-center gap-4">
             <DialogTitle className="text-lg font-bold flex items-center gap-2 text-black">
-              <Wrench className="h-5 w-5 text-[#c10d12]" />
-              Job Card Preview - {job.jobNo}
+              {isInternal ? <ShieldCheck className="h-5 w-5 text-blue-600" /> : <User className="h-5 w-5 text-[#c10d12]" />}
+              {isInternal ? 'Internal Management Copy' : 'Customer Receipt'} - {job.jobNo}
             </DialogTitle>
             <div className="flex items-center bg-gray-100 rounded-lg p-1 gap-1">
               <Button variant="ghost" size="icon" onClick={() => setZoom(Math.max(50, zoom - 10))} title="Zoom Out">
@@ -104,7 +109,7 @@ export function JobCardPreview({ job, settings }: JobCardPreviewProps) {
               <Download className="mr-2 h-4 w-4" /> Download PDF
             </Button>
             <Button onClick={handlePrint} className="bg-[#c10d12] hover:bg-[#a00b0f] text-white">
-              <Printer className="mr-2 h-4 w-4" /> Print Job Card
+              <Printer className="mr-2 h-4 w-4" /> Print Document
             </Button>
             <Button variant="ghost" size="icon" onClick={() => setIsOpen(false)}>
               <X className="h-4 w-4" />
@@ -114,7 +119,7 @@ export function JobCardPreview({ job, settings }: JobCardPreviewProps) {
 
         <div className="flex-1 overflow-auto p-8 flex justify-center bg-gray-600/50 scrollbar-hide">
           <div style={zoomStyles} className="transition-transform duration-200">
-            <JobCardDocument job={job} settings={settings} />
+            <JobCardDocument job={job} settings={settings} isInternal={isInternal} />
           </div>
         </div>
       </DialogContent>

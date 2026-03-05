@@ -11,7 +11,7 @@ import {
   TableHeader, 
   TableRow 
 } from '@/components/ui/table';
-import { ChevronLeft, Trash2, FilePlus, TrendingUp, TrendingDown, Banknote, FileBadge, Printer } from 'lucide-react';
+import { ChevronLeft, Trash2, FilePlus, TrendingUp, TrendingDown, Banknote, FileBadge, Printer, User, ShieldCheck } from 'lucide-react';
 import { redirect } from 'next/navigation';
 import { JobCardPreview } from '@/components/dashboard/JobCardPreview';
 import { AddItemForm } from '@/components/dashboard/AddItemForm';
@@ -67,13 +67,15 @@ export default async function JobSheetDetailPage({ params }: { params: Promise<{
         </Link>
       </div>
 
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 sticky top-0 bg-white/80 backdrop-blur-sm p-4 border rounded-xl shadow-sm z-20">
         <div className="flex items-center gap-4">
           <h2 className="text-3xl font-bold tracking-tight text-black">{job.jobNo}</h2>
           <Badge className="bg-[#c10d12]">{job.status}</Badge>
         </div>
         <div className="flex flex-wrap gap-2">
-          <JobCardPreview job={job} settings={settings} />
+          {/* Document Previews */}
+          <JobCardPreview job={job} settings={settings} mode="CUSTOMER" />
+          <JobCardPreview job={job} settings={settings} mode="INTERNAL" />
           
           <Separator orientation="vertical" className="h-10 hidden md:block mx-1" />
           
@@ -83,7 +85,7 @@ export default async function JobSheetDetailPage({ params }: { params: Promise<{
             </Button>
           </form>
           <form action={handleCreateProforma}>
-            <Button variant="outline" type="submit">
+            <Button variant="outline" type="submit" className="border-red-100 hover:bg-red-50">
               <FilePlus className="mr-2 h-4 w-4" /> Create Proforma
             </Button>
           </form>
@@ -232,6 +234,15 @@ export default async function JobSheetDetailPage({ params }: { params: Promise<{
                 <p className="text-xs text-muted-foreground uppercase font-bold">Complaint</p>
                 <p className="text-sm italic">"{job.complaint}"</p>
               </div>
+              {job.mechanicNotes && (
+                <>
+                  <Separator />
+                  <div>
+                    <p className="text-xs text-muted-foreground uppercase font-bold">Internal Notes</p>
+                    <p className="text-sm text-gray-600">{job.mechanicNotes}</p>
+                  </div>
+                </>
+              )}
             </CardContent>
           </Card>
         </div>
