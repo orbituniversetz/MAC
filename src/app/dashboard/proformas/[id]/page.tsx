@@ -11,7 +11,7 @@ import {
   TableHeader, 
   TableRow 
 } from '@/components/ui/table';
-import { Trash2, Save, Lock, FileCheck, Receipt, Percent } from 'lucide-react';
+import { Trash2, Save, Lock, FileCheck, Receipt, Banknote } from 'lucide-react';
 import { ProformaPreview } from '@/components/dashboard/ProformaPreview';
 import { AddItemForm } from '@/components/dashboard/AddItemForm';
 import { Label } from '@/components/ui/label';
@@ -208,10 +208,10 @@ export default async function ProformaDetailPage({ params }: { params: Promise<{
                 {!isFinalized && (
                   <form action={handleUpdateDiscount} className="bg-white p-3 border rounded-md shadow-sm">
                     <Label className="text-[10px] uppercase font-black text-muted-foreground flex items-center gap-1 mb-1.5">
-                      <Percent className="h-3 w-3" /> Set Total Discount (TZS)
+                      <Banknote className="h-3 w-3" /> Set Total Discount (TZS Cash)
                     </Label>
                     <div className="flex gap-2">
-                      <PriceInput name="discount" defaultValue={pf.discount} className="h-9 text-sm" placeholder="Discount Amount" />
+                      <PriceInput name="discount" defaultValue={pf.discount} className="h-9 text-sm" placeholder="Discount Amount (TZS)" />
                       <Button type="submit" size="sm" variant="outline" className="h-9">Apply</Button>
                     </div>
                   </form>
