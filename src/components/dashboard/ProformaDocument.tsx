@@ -13,7 +13,6 @@ export function ProformaDocument({ proforma, settings, className }: ProformaDocu
   const subtotal = proforma.items.reduce((acc: number, item: any) => acc + item.subtotal, 0);
   const discount = proforma.discount || 0;
   
-  // Conditionally calculate VAT
   const taxEnabled = proforma.taxEnabled === 1;
   const taxAmount = taxEnabled ? (subtotal - discount) * 0.18 : 0;
   const total = subtotal - discount + taxAmount;
@@ -23,48 +22,39 @@ export function ProformaDocument({ proforma, settings, className }: ProformaDocu
 
   return (
     <div id="proforma-document" className={`a4-page print-container text-black font-sans flex flex-col ${className || ''}`}>
-      {/* Main Content Wrapper */}
       <div className="flex-grow">
-        {/* Header */}
-        <div className="flex justify-between items-start mb-8">
-          {/* Invoice Details */}
-          <div className="text-left">
-            <h2 className="text-2xl font-black text-gray-900 mb-1">PROFORMA INVOICE</h2>
-            <div className="text-xs font-bold space-y-0.5">
-              <p>No: <span className="text-[#c10d12]">{proforma.proformaNo}</span></p>
-              <p className="text-gray-500 font-normal">Date: {new Date(proforma.createdAt).toLocaleDateString()}</p>
-              {proforma.jobNo && <p className="text-gray-500 font-normal">Ref: {proforma.jobNo}</p>}
+        <div className="flex flex-col items-center mb-8 text-center">
+          {settings.garage_logo ? (
+            <div className="relative h-48 w-48 mb-4 overflow-hidden shrink-0">
+              <Image src={settings.garage_logo} alt="Logo" fill className="object-contain" unoptimized />
             </div>
-          </div>
-
-          {/* Garage Details (Logo above) */}
-          <div className="flex flex-col items-end text-right">
-            {settings.garage_logo ? (
-              <div className="relative h-44 w-44 mb-3 overflow-hidden">
-                <Image src={settings.garage_logo} alt="Logo" fill className="object-contain object-right" unoptimized />
-              </div>
-            ) : (
-              <div className="h-20 w-20 mb-3 flex items-center justify-center">
-                <Wrench className="text-[#c10d12] h-14 w-14" />
-              </div>
-            )}
-            <div>
-              <h1 className="text-3xl font-black text-[#c10d12] uppercase leading-none mb-1">
-                {settings.garage_name || 'M. A. C. GARAGE'}
-              </h1>
-              <div className="text-[11px] font-medium text-gray-600 space-y-0.5">
-                <p>{settings.garage_mailbox}</p>
-                <p>{settings.garage_address}</p>
-                <p>Tel: {settings.garage_phone}</p>
-                <p className="font-bold text-gray-900 mt-1">TIN: {settings.garage_tin}</p>
-              </div>
+          ) : (
+            <div className="h-20 w-20 mb-4 flex items-center justify-center">
+              <Wrench className="text-[#c10d12] h-14 w-14" />
             </div>
+          )}
+          <div className="space-y-1">
+            <h1 className="text-3xl font-black text-[#c10d12] uppercase leading-none mb-1">
+              {settings.garage_name || 'M. A. C. GARAGE'}
+            </h1>
+            <div className="text-[11px] font-medium text-gray-600 flex justify-center gap-4">
+              <p>{settings.garage_mailbox}</p>
+              <p>{settings.garage_address}</p>
+              <p>Tel: {settings.garage_phone}</p>
+            </div>
+            <p className="font-bold text-gray-900 text-xs uppercase mt-1">TIN: {settings.garage_tin}</p>
           </div>
         </div>
 
-        <div className="h-0.5 bg-gray-100 mb-6" />
+        <div className="flex justify-between items-end mb-4 border-b-2 border-gray-900 pb-2">
+          <h2 className="text-2xl font-black text-gray-900 uppercase tracking-tighter">PROFORMA INVOICE</h2>
+          <div className="text-right text-xs font-bold">
+            <p>No: <span className="text-[#c10d12]">{proforma.proformaNo}</span></p>
+            <p className="text-gray-500 font-normal">Date: {new Date(proforma.createdAt).toLocaleDateString()}</p>
+            {proforma.jobNo && <p className="text-gray-500 font-normal">Ref: {proforma.jobNo}</p>}
+          </div>
+        </div>
 
-        {/* Bill To & Vehicle */}
         <div className="grid grid-cols-2 gap-8 mb-6">
           <div>
             <h3 className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-2">Bill To</h3>
@@ -84,7 +74,6 @@ export function ProformaDocument({ proforma, settings, className }: ProformaDocu
           </div>
         </div>
 
-        {/* Items Table */}
         <table className="w-full mb-6 border-collapse">
           <thead>
             <tr className="bg-[#c10d12] text-white">
@@ -105,15 +94,9 @@ export function ProformaDocument({ proforma, settings, className }: ProformaDocu
                 <td className="p-2 text-right font-bold">{item.subtotal.toLocaleString()}</td>
               </tr>
             ))}
-            {proforma.items.length === 0 && (
-              <tr>
-                <td colSpan={5} className="p-8 text-center text-gray-400 italic text-[10px]">No items added.</td>
-              </tr>
-            )}
           </tbody>
         </table>
 
-        {/* Totals Section */}
         <div className="flex justify-end mb-6">
           <div className="w-56 space-y-1.5 bg-gray-50 p-4 rounded-xl">
             <div className="flex justify-between text-[10px]">
@@ -147,7 +130,6 @@ export function ProformaDocument({ proforma, settings, className }: ProformaDocu
           </div>
         </div>
 
-        {/* Status Summary */}
         <div className={`p-4 rounded-xl mb-6 flex justify-between items-center ${isFullyPaid ? 'bg-green-600 text-white' : 'bg-gray-900 text-white'}`}>
           <div>
             <p className="text-[8px] font-black uppercase tracking-widest opacity-70">Payment Status</p>
@@ -160,7 +142,6 @@ export function ProformaDocument({ proforma, settings, className }: ProformaDocu
         </div>
       </div>
 
-      {/* Footer Content Wrapper */}
       <div className="mt-auto pt-6">
         <div className="grid grid-cols-2 gap-8 border-t pt-6">
           <div>
@@ -173,11 +154,9 @@ export function ProformaDocument({ proforma, settings, className }: ProformaDocu
               <p><span className="font-bold text-gray-600 w-24 inline-block">SWIFT:</span> {settings.bank_swift}</p>
             </div>
           </div>
-          <div>
-            <h3 className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-3">Payment Terms & Agreement</h3>
-            <div className="text-[8px] text-gray-500 space-y-1 italic leading-relaxed">
-              <p>Payment is due upon approval of this invoice unless otherwise agreed between both parties. The listed services include mechanical repairs, bodywork, painting, and parts replacements as detailed above. Any additional repairs discovered during servicing will be communicated before proceeding. Vehicle release conditions depend on payment agreement. Payments must be made via bank transfer using the details above.</p>
-            </div>
+          <div className="text-[8px] text-gray-500 italic leading-relaxed">
+            <h3 className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-3 not-italic">Payment Terms</h3>
+            <p>Payment is due upon approval of this invoice. Listed services include mechanical repairs and parts as detailed. Additional discoveries during servicing will be communicated before proceeding. Vehicles not collected within 48 hours may attract storage charges.</p>
           </div>
         </div>
       </div>

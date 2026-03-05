@@ -14,7 +14,6 @@ export function InvoiceDocument({ invoice, settings, className }: InvoiceDocumen
   const subtotal = snapshot.items?.reduce((acc: number, item: any) => acc + item.subtotal, 0) || 0;
   const discount = snapshot.discount || 0;
   
-  // Conditionally calculate VAT based on snapshot setting
   const taxEnabled = snapshot.taxEnabled === 1;
   const taxAmount = taxEnabled ? (subtotal - discount) * 0.18 : 0;
   const total = subtotal - discount + taxAmount;
@@ -22,41 +21,37 @@ export function InvoiceDocument({ invoice, settings, className }: InvoiceDocumen
   return (
     <div id="invoice-document" className={`a4-page print-container text-black font-sans flex flex-col ${className || ''}`}>
       <div className="flex-grow">
-        <div className="flex justify-between items-start mb-8">
-          <div className="text-left">
-            <h2 className="text-3xl font-black text-gray-900 mb-1">TAX INVOICE</h2>
-            <div className="text-xs font-bold space-y-0.5">
-              <p>No: <span className="text-[#c10d12]">{invoice.invoiceNo}</span></p>
-              <p className="text-gray-500 font-normal">Date: {new Date(invoice.createdAt).toLocaleDateString()}</p>
-              {invoice.jobNo && <p className="text-gray-500 font-normal">Ref: {invoice.jobNo}</p>}
+        <div className="flex flex-col items-center mb-8 text-center">
+          {settings.garage_logo ? (
+            <div className="relative h-48 w-48 mb-4 overflow-hidden shrink-0">
+              <Image src={settings.garage_logo} alt="Logo" fill className="object-contain" unoptimized />
             </div>
-          </div>
-
-          <div className="flex flex-col items-end text-right">
-            {settings.garage_logo ? (
-              <div className="relative h-40 w-40 mb-3 overflow-hidden">
-                <Image src={settings.garage_logo} alt="Logo" fill className="object-contain object-right" unoptimized />
-              </div>
-            ) : (
-              <div className="h-16 w-16 mb-3 flex items-center justify-center">
-                <Wrench className="text-[#c10d12] h-12 w-12" />
-              </div>
-            )}
-            <div>
-              <h1 className="text-2xl font-black text-[#c10d12] uppercase leading-none mb-1">
-                {settings.garage_name}
-              </h1>
-              <div className="text-[11px] font-medium text-gray-600 space-y-0.5">
-                <p>{settings.garage_mailbox}</p>
-                <p>{settings.garage_address}</p>
-                <p>Tel: {settings.garage_phone}</p>
-                <p className="font-bold text-gray-900 mt-1 uppercase">TIN: {settings.garage_tin}</p>
-              </div>
+          ) : (
+            <div className="h-16 w-16 mb-4 flex items-center justify-center">
+              <Wrench className="text-[#c10d12] h-12 w-12" />
             </div>
+          )}
+          <div className="space-y-1">
+            <h1 className="text-3xl font-black text-[#c10d12] uppercase leading-none mb-1">
+              {settings.garage_name}
+            </h1>
+            <div className="text-[11px] font-medium text-gray-600 flex justify-center gap-4">
+              <p>{settings.garage_mailbox}</p>
+              <p>{settings.garage_address}</p>
+              <p>Tel: {settings.garage_phone}</p>
+            </div>
+            <p className="font-bold text-gray-900 text-xs uppercase mt-1">TIN: {settings.garage_tin}</p>
           </div>
         </div>
 
-        <div className="h-0.5 bg-gray-900 mb-6" />
+        <div className="flex justify-between items-end mb-4 border-b-2 border-gray-900 pb-2">
+          <h2 className="text-2xl font-black text-gray-900 uppercase tracking-tighter">TAX INVOICE</h2>
+          <div className="text-right text-xs font-bold">
+            <p>No: <span className="text-[#c10d12]">{invoice.invoiceNo}</span></p>
+            <p className="text-gray-500 font-normal">Date: {new Date(invoice.createdAt).toLocaleDateString()}</p>
+            {invoice.jobNo && <p className="text-gray-500 font-normal">Ref: {invoice.jobNo}</p>}
+          </div>
+        </div>
 
         <div className="grid grid-cols-2 gap-8 mb-8">
           <div>

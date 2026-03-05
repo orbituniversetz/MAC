@@ -1,4 +1,3 @@
-
 'use client'
 
 import { useState, useEffect } from 'react';
@@ -44,7 +43,7 @@ export function ProformaPreview({ proforma, settings }: ProformaPreviewProps) {
       backgroundColor: '#ffffff'
     });
     
-    const imgData = canvas.toDataURL('image/jpeg', 0.8);
+    const imgData = canvas.toDataURL('image/jpeg', 0.75);
     const pdf = new jsPDF({
       orientation: 'portrait',
       unit: 'mm',
@@ -81,7 +80,7 @@ export function ProformaPreview({ proforma, settings }: ProformaPreviewProps) {
         </Button>
       </DialogTrigger>
       <DialogContent className="max-w-none w-screen h-screen m-0 p-0 rounded-none bg-gray-500 overflow-hidden flex flex-col border-none">
-        <div className="bg-white border-b px-6 py-3 flex items-center justify-between z-50 shadow-sm no-print">
+        <div className="bg-white border-b px-6 py-3 flex items-center justify-between z-50 shadow-sm no-print text-black">
           <div className="flex items-center gap-4">
             <DialogTitle className="text-lg font-bold flex items-center gap-2">
               <Eye className="h-5 w-5 text-[#c10d12]" />
@@ -102,10 +101,10 @@ export function ProformaPreview({ proforma, settings }: ProformaPreviewProps) {
           </div>
           
           <div className="flex gap-2">
-            <Button onClick={handleDownloadPDF} variant="outline">
+            <Button onClick={handleDownloadPDF} variant="outline" className="border-gray-300">
               <Download className="mr-2 h-4 w-4" /> Download PDF
             </Button>
-            <Button onClick={handlePrint} className="bg-[#c10d12] hover:bg-[#a00b0f]">
+            <Button onClick={handlePrint} className="bg-[#c10d12] hover:bg-[#a00b0f] text-white">
               <Printer className="mr-2 h-4 w-4" /> I want to print
             </Button>
             <Button variant="ghost" size="icon" onClick={() => setIsOpen(false)}>

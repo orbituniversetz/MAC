@@ -1,4 +1,3 @@
-
 'use client'
 
 import { useState, useEffect } from 'react';
@@ -48,7 +47,7 @@ export function JobCardPreview({ job, settings, mode }: JobCardPreviewProps) {
       backgroundColor: '#ffffff'
     });
     
-    const imgData = canvas.toDataURL('image/jpeg', 0.8);
+    const imgData = canvas.toDataURL('image/jpeg', 0.75);
     const pdf = new jsPDF({
       orientation: 'portrait',
       unit: 'mm',
@@ -87,9 +86,9 @@ export function JobCardPreview({ job, settings, mode }: JobCardPreviewProps) {
         </Button>
       </DialogTrigger>
       <DialogContent className="max-w-none w-screen h-screen m-0 p-0 rounded-none bg-gray-500 overflow-hidden flex flex-col border-none">
-        <div className="bg-white border-b px-6 py-3 flex items-center justify-between z-50 shadow-sm no-print">
+        <div className="bg-white border-b px-6 py-3 flex items-center justify-between z-50 shadow-sm no-print text-black">
           <div className="flex items-center gap-4">
-            <DialogTitle className="text-lg font-bold flex items-center gap-2 text-black">
+            <DialogTitle className="text-lg font-bold flex items-center gap-2">
               {isInternal ? <ShieldCheck className="h-5 w-5 text-blue-600" /> : <User className="h-5 w-5 text-[#c10d12]" />}
               {isInternal ? 'Internal Management Copy' : 'Customer Receipt'} - {job.jobNo}
             </DialogTitle>
@@ -97,11 +96,11 @@ export function JobCardPreview({ job, settings, mode }: JobCardPreviewProps) {
               <Button variant="ghost" size="icon" onClick={() => setZoom(Math.max(50, zoom - 10))} title="Zoom Out">
                 <ZoomOut className="h-4 w-4" />
               </Button>
-              <span className="text-xs font-mono w-12 text-center text-black">{zoom}%</span>
+              <span className="text-xs font-mono w-12 text-center">{zoom}%</span>
               <Button variant="ghost" size="icon" onClick={() => setZoom(Math.min(200, zoom + 10))} title="Zoom In">
                 <ZoomIn className="h-4 w-4" />
               </Button>
-              <Button variant="ghost" size="icon" onClick={() => setZoom(100)} title="Reset Zoom" className="text-black">
+              <Button variant="ghost" size="icon" onClick={() => setZoom(100)} title="Reset Zoom">
                 <Maximize className="h-4 w-4" />
               </Button>
             </div>

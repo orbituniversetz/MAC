@@ -13,44 +13,40 @@ export function DocumentPaper({ doc, settings, className }: DocumentPaperProps) 
   return (
     <div id="document-paper" className={`a4-page print-container text-black font-sans flex flex-col ${className || ''}`}>
       <div className="flex-grow">
-        {/* Document Header Branding */}
-        <div className="flex justify-between items-start mb-8">
-          <div className="flex flex-col items-start gap-2">
-            {settings.garage_logo && (
-              <div className="relative h-32 w-32 mb-2 overflow-hidden shrink-0">
-                <Image 
-                  src={settings.garage_logo} 
-                  alt="Garage Logo" 
-                  fill 
-                  className="object-contain object-left" 
-                  unoptimized 
-                />
-              </div>
-            )}
-            <div className="space-y-0.5">
-              <h1 className="text-2xl font-black text-[#c10d12] uppercase leading-tight">{settings.garage_name}</h1>
-              <div className="text-[10px] text-muted-foreground font-medium leading-normal">
-                <p>{settings.garage_mailbox}</p>
-                <p>{settings.garage_address}</p>
-                <p>Tel: {settings.garage_phone}</p>
-                <p className="font-bold text-black mt-1">TIN: {settings.garage_tin}</p>
-              </div>
+        <div className="flex flex-col items-center mb-8 text-center">
+          {settings.garage_logo && (
+            <div className="relative h-48 w-48 mb-4 overflow-hidden shrink-0">
+              <Image 
+                src={settings.garage_logo} 
+                alt="Garage Logo" 
+                fill 
+                className="object-contain" 
+                unoptimized 
+              />
             </div>
-          </div>
-          <div className="text-right">
-            <div className="inline-flex items-center gap-1 bg-black text-white px-2 py-0.5 rounded text-[10px] font-bold uppercase mb-2">
-              {doc.docType === 'LETTER' ? <Mail className="h-3 w-3" /> : <FileText className="h-3 w-3" />}
-              {doc.docType === 'LETTER' ? 'Official Letter' : 'Technical Report'}
+          )}
+          <div className="space-y-1">
+            <h1 className="text-3xl font-black text-[#c10d12] uppercase leading-tight">{settings.garage_name}</h1>
+            <div className="text-[11px] text-muted-foreground font-medium flex justify-center gap-4">
+              <p>{settings.garage_mailbox}</p>
+              <p>{settings.garage_address}</p>
+              <p>Tel: {settings.garage_phone}</p>
             </div>
-            <p className="font-bold text-lg leading-none">{doc.docNo}</p>
-            <p className="text-xs text-muted-foreground mt-1">{new Date(doc.createdAt).toLocaleDateString()}</p>
-            {doc.jobNo && <p className="text-[9px] font-bold text-gray-400 mt-1">REF: {doc.jobNo}</p>}
+            <p className="font-bold text-black text-xs uppercase mt-1">TIN: {settings.garage_tin}</p>
           </div>
         </div>
 
-        <div className="h-px bg-gray-200 mb-8" />
+        <div className="flex justify-between items-end mb-8 border-b-2 border-gray-900 pb-2">
+          <div className="inline-flex items-center gap-1 bg-black text-white px-2 py-0.5 rounded text-[10px] font-bold uppercase">
+            {doc.docType === 'LETTER' ? <Mail className="h-3 w-3" /> : <FileText className="h-3 w-3" />}
+            {doc.docType === 'LETTER' ? 'Official Letter' : 'Technical Report'}
+          </div>
+          <div className="text-right">
+            <p className="font-bold text-lg leading-none">{doc.docNo}</p>
+            <p className="text-xs text-muted-foreground mt-1">{new Date(doc.createdAt).toLocaleDateString()}</p>
+          </div>
+        </div>
 
-        {/* Recipient Section */}
         <div className="mb-10 space-y-4">
           <div className="space-y-0.5">
             <p className="text-[9px] font-black uppercase text-gray-400 tracking-widest">To:</p>
@@ -67,19 +63,16 @@ export function DocumentPaper({ doc, settings, className }: DocumentPaperProps) 
           )}
         </div>
 
-        {/* Document Subject/Title */}
         <div className="mb-8">
           <h2 className="text-xl font-black uppercase border-b-2 border-black inline-block pb-1">
             {doc.title}
           </h2>
         </div>
 
-        {/* Main Content Body */}
         <div className="prose prose-sm max-w-none whitespace-pre-wrap font-sans text-gray-800 leading-relaxed text-sm">
           {doc.content}
         </div>
 
-        {/* Signature Area */}
         <div className="mt-20 space-y-10">
           <p className="text-sm">Yours sincerely,</p>
           <div className="space-y-1">
