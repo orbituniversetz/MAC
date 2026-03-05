@@ -1,3 +1,4 @@
+
 import { getProformaById, getSettings, finalizeProforma, saveProformaDraft, getRecentItems, deleteJobItem, convertToInvoice, updateProformaDiscount, recordProformaPayment, updateProformaTaxStatus } from '@/lib/actions';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -41,8 +42,8 @@ export default async function ProformaDetailPage({ params }: { params: Promise<{
   const subtotal = pf.items.reduce((acc: number, item: any) => acc + item.subtotal, 0);
   const discount = pf.discount || 0;
   
-  // Conditionally calculate VAT
-  const taxEnabled = pf.taxEnabled === 1;
+  // Conditionally calculate VAT (Defaults to 1 if null)
+  const taxEnabled = pf.taxEnabled !== 0; 
   const taxAmount = taxEnabled ? (subtotal - discount) * 0.18 : 0;
   const total = subtotal - discount + taxAmount;
   const balanceDue = Math.max(0, total - (pf.totalPaid || 0));
@@ -83,7 +84,6 @@ export default async function ProformaDetailPage({ params }: { params: Promise<{
         </Link>
       </div>
 
-      {/* Action Bar */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-4 border rounded-lg shadow-sm sticky top-0 z-20">
         <div className="flex items-center gap-4">
           <div>
@@ -183,7 +183,6 @@ export default async function ProformaDetailPage({ params }: { params: Promise<{
             </CardContent>
           </Card>
 
-          {/* Payment History */}
           <Card>
             <CardHeader>
               <CardTitle className="text-lg flex items-center gap-2">
@@ -278,11 +277,10 @@ export default async function ProformaDetailPage({ params }: { params: Promise<{
                 )}
               </div>
 
-              {/* VAT Toggle Section */}
               <div className="flex items-center justify-between py-2 border-y border-dashed">
                 <div className="space-y-0.5">
                   <Label className="text-xs font-bold">Include VAT (18%)</Label>
-                  <p className="text-[10px] text-muted-foreground">Toggle to show/hide tax</p>
+                  <p className="text-[10px] text-muted-foreground">Always on by default</p>
                 </div>
                 {!isFinalized ? (
                   <form action={handleToggleTax}>
@@ -320,7 +318,6 @@ export default async function ProformaDetailPage({ params }: { params: Promise<{
               )}
             </div>
 
-            {/* Actions Section */}
             {!isFinalized && (
                <form action={handleFinalize}>
                 <Button className="w-full bg-black hover:bg-gray-800 py-6 text-lg font-bold">
