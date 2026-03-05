@@ -12,8 +12,10 @@ interface ProformaDocumentProps {
 export function ProformaDocument({ proforma, settings, className }: ProformaDocumentProps) {
   const subtotal = proforma.items.reduce((acc: number, item: any) => acc + item.subtotal, 0);
   const discount = proforma.discount || 0;
-  // Enforce 18% VAT
-  const taxAmount = (subtotal - discount) * 0.18;
+  
+  // Conditionally calculate VAT
+  const taxEnabled = proforma.taxEnabled === 1;
+  const taxAmount = taxEnabled ? (subtotal - discount) * 0.18 : 0;
   const total = subtotal - discount + taxAmount;
   const totalPaid = proforma.totalPaid || 0;
   const balanceDue = Math.max(0, total - totalPaid);
@@ -124,10 +126,12 @@ export function ProformaDocument({ proforma, settings, className }: ProformaDocu
                 <span className="font-medium">({discount.toLocaleString()})</span>
               </div>
             )}
-            <div className="flex justify-between text-[10px]">
-              <span className="text-gray-500">VAT (18%):</span>
-              <span className="font-medium">{taxAmount.toLocaleString()}</span>
-            </div>
+            {taxEnabled && (
+              <div className="flex justify-between text-[10px]">
+                <span className="text-gray-500">VAT (18%):</span>
+                <span className="font-medium">{taxAmount.toLocaleString()}</span>
+              </div>
+            )}
             <div className="pt-1.5 border-t border-gray-200 flex justify-between items-center mb-1">
               <span className="font-bold text-[11px]">GRAND TOTAL:</span>
               <span className="font-black text-sm text-[#c10d12]">TZS {total.toLocaleString()}</span>

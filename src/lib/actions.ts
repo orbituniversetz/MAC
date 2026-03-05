@@ -192,6 +192,11 @@ export async function updateProformaDiscount(id: number, discount: number) {
   revalidatePath(`/dashboard/proformas/${id}`);
 }
 
+export async function updateProformaTaxStatus(id: number, taxEnabled: boolean) {
+  db.prepare('UPDATE proformas SET taxEnabled = ? WHERE id = ?').run(taxEnabled ? 1 : 0, id);
+  revalidatePath(`/dashboard/proformas/${id}`);
+}
+
 export async function finalizeProforma(id: number) {
   const pf = await getProformaById(id);
   if (!pf) return;
@@ -417,7 +422,7 @@ export async function getDocumentById(id: number) {
     FROM documents d
     LEFT JOIN customers c ON d.customerId = c.id
     LEFT JOIN jobsheets js ON d.jobSheetId = js.id
-    LEFT JOIN vehicles v ON js.vehicleId = v.id
+    LEFT JOIN vehicles v ON d.vehicleId = v.id
     WHERE d.id = ?
   `).get(id) as any;
 }

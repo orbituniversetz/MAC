@@ -1,4 +1,4 @@
-import { getProformaById, getSettings, finalizeProforma, saveProformaDraft, getRecentItems, deleteJobItem, convertToInvoice, updateProformaDiscount, recordProformaPayment } from '@/lib/actions';
+import { getProformaById, getSettings, finalizeProforma, saveProformaDraft, getRecentItems, deleteJobItem, convertToInvoice, updateProformaDiscount, recordProformaPayment, updateProformaTaxStatus } from '@/lib/actions';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -16,6 +16,7 @@ import { ProformaPreview } from '@/components/dashboard/ProformaPreview';
 import { AddItemForm } from '@/components/dashboard/AddItemForm';
 import { Label } from '@/components/ui/label';
 import { PriceInput } from '@/components/dashboard/PriceInput';
+import { Switch } from '@/components/ui/switch';
 import Link from 'next/link';
 
 export default async function ProformaDetailPage({ params }: { params: Promise<{ id: string }> }) {
@@ -39,8 +40,10 @@ export default async function ProformaDetailPage({ params }: { params: Promise<{
   const isInvoiced = pf.status === 'Invoiced';
   const subtotal = pf.items.reduce((acc: number, item: any) => acc + item.subtotal, 0);
   const discount = pf.discount || 0;
-  // Enforce 18% VAT
-  const taxAmount = (subtotal - discount) * 0.18;
+  
+  // Conditionally calculate VAT
+  const taxEnabled = pf.taxEnabled === 1;
+  const taxAmount = taxEnabled ? (subtotal - discount) * 0.18 : 0;
   const total = subtotal - discount + taxAmount;
   const balanceDue = Math.max(0, total - (pf.totalPaid || 0));
   const isFullyPaid = balanceDue <= 0;
@@ -65,6 +68,11 @@ export default async function ProformaDetailPage({ params }: { params: Promise<{
     const discountRaw = (formData.get('discount') as string).replace(/,/g, '');
     const discountNum = parseFloat(discountRaw) || 0;
     await updateProformaDiscount(pf.id, discountNum);
+  }
+
+  async function handleToggleTax() {
+    'use server'
+    await updateProformaTaxStatus(pf.id, !taxEnabled);
   }
 
   return (
@@ -270,10 +278,31 @@ export default async function ProformaDetailPage({ params }: { params: Promise<{
                 )}
               </div>
 
-              <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">VAT (18%):</span>
-                <span>{taxAmount.toLocaleString()}</span>
+              {/* VAT Toggle Section */}
+              <div className="flex items-center justify-between py-2 border-y border-dashed">
+                <div className="space-y-0.5">
+                  <Label className="text-xs font-bold">Include VAT (18%)</Label>
+                  <p className="text-[10px] text-muted-foreground">Toggle to show/hide tax</p>
+                </div>
+                {!isFinalized ? (
+                  <form action={handleToggleTax}>
+                    <Switch 
+                      checked={taxEnabled} 
+                      onCheckedChange={() => {}} 
+                      type="submit"
+                    />
+                  </form>
+                ) : (
+                  <Switch checked={taxEnabled} disabled />
+                )}
               </div>
+
+              {taxEnabled && (
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">VAT (18%):</span>
+                  <span>{taxAmount.toLocaleString()}</span>
+                </div>
+              )}
 
               {isFinalized && (
                 <>
