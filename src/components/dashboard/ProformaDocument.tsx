@@ -23,29 +23,26 @@ export function ProformaDocument({ proforma, settings, className }: ProformaDocu
   return (
     <div id="proforma-document" className={`a4-page print-container text-black font-sans flex flex-col ${className || ''}`}>
       <div className="flex-grow">
-        {/* Header - Compact Version */}
-        <div className="flex flex-col items-center mb-4 text-center border-b pb-4">
-          {settings.garage_logo ? (
-            <div className="relative h-20 w-20 mb-1 overflow-hidden shrink-0">
-              <Image src={settings.garage_logo} alt="Logo" fill className="object-contain" unoptimized />
-            </div>
-          ) : (
-            <div className="h-10 w-10 mb-1 flex items-center justify-center">
-              <Wrench className="text-[#c10d12] h-8 w-8" />
-            </div>
-          )}
-          <div className="space-y-0">
+        {/* Header - Logo Left, Text Right */}
+        <div className="flex items-center justify-between mb-4 border-b pb-4">
+          <div className="flex items-center">
+            {settings.garage_logo ? (
+              <div className="relative h-20 w-20 overflow-hidden shrink-0">
+                <Image src={settings.garage_logo} alt="Logo" fill className="object-contain" unoptimized />
+              </div>
+            ) : (
+              <div className="h-10 w-10 flex items-center justify-center">
+                <Wrench className="text-[#c10d12] h-8 w-8" />
+              </div>
+            )}
+          </div>
+          <div className="text-right space-y-0.5">
             <h1 className="text-xl font-black text-[#c10d12] uppercase leading-none mb-1 tracking-tight">
               {settings.garage_name || 'M. A. C. GARAGE'}
             </h1>
-            <div className="text-[9px] font-bold text-gray-600 flex justify-center gap-x-3 items-center">
-              <span>{settings.garage_mailbox}</span>
-              <span className="text-gray-300">|</span>
-              <span>{settings.garage_address}</span>
-              <span className="text-gray-300">|</span>
-              <span>Tel: {settings.garage_phone}</span>
-              <span className="text-gray-300">|</span>
-              <span className="text-black uppercase">TIN: {settings.garage_tin}</span>
+            <div className="text-[9px] font-bold text-gray-600 flex flex-col items-end">
+              <span>{settings.garage_mailbox} | {settings.garage_address}</span>
+              <span>Tel: {settings.garage_phone} | TIN: {settings.garage_tin}</span>
             </div>
           </div>
         </div>

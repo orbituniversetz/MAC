@@ -16,29 +16,26 @@ export function JobCardDocument({ job, settings, isInternal = false, className }
   return (
     <div id={`jobcard-document-${isInternal ? 'internal' : 'customer'}`} className={`a4-page print-container text-black font-sans flex flex-col ${className || ''}`}>
       <div className="flex-grow">
-        {/* Header - Compact Version */}
-        <div className="flex flex-col items-center mb-2 text-center border-b pb-2">
-          {settings.garage_logo && (
-            <div className="relative h-20 w-20 mb-1 overflow-hidden shrink-0">
-              <Image 
-                src={settings.garage_logo} 
-                alt="Garage Logo" 
-                fill 
-                className="object-contain" 
-                unoptimized 
-              />
-            </div>
-          )}
-          <div className="space-y-0">
+        {/* Header - Logo Left, Text Right */}
+        <div className="flex items-center justify-between mb-4 border-b pb-2">
+          <div className="flex items-center">
+            {settings.garage_logo && (
+              <div className="relative h-20 w-20 overflow-hidden shrink-0">
+                <Image 
+                  src={settings.garage_logo} 
+                  alt="Garage Logo" 
+                  fill 
+                  className="object-contain" 
+                  unoptimized 
+                />
+              </div>
+            )}
+          </div>
+          <div className="text-right space-y-0">
             <h1 className="text-xl font-black text-[#c10d12] uppercase leading-tight tracking-tight">{settings.garage_name}</h1>
-            <div className="text-[9px] text-gray-600 font-bold flex flex-row justify-center gap-x-3 items-center whitespace-nowrap">
-              <span>{settings.garage_mailbox}</span>
-              <span className="text-gray-300">|</span>
-              <span>{settings.garage_address}</span>
-              <span className="text-gray-300">|</span>
-              <span>Tel: {settings.garage_phone}</span>
-              <span className="text-gray-300">|</span>
-              <span className="text-black uppercase">TIN: {settings.garage_tin}</span>
+            <div className="text-[9px] text-gray-600 font-bold flex flex-col items-end">
+              <span>{settings.garage_mailbox} | {settings.garage_address}</span>
+              <span>Tel: {settings.garage_phone} | TIN: {settings.garage_tin}</span>
             </div>
           </div>
         </div>
@@ -154,7 +151,7 @@ export function JobCardDocument({ job, settings, isInternal = false, className }
         )}
       </div>
 
-      {/* Signatures - Fixed to bottom of content area, but break-inside: avoid ensures it moves together */}
+      {/* Signatures - Fixed to bottom of content area */}
       <div className="mt-8 pt-4 grid grid-cols-2 gap-20 signature-block">
         <div className="space-y-4">
           <div className="border-t border-gray-400 pt-2">
