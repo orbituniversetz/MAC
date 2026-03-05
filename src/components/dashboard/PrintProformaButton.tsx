@@ -103,7 +103,10 @@ export function PrintProformaButton({ proforma, settings }: PrintProformaButtonP
     });
 
     const finalY = (doc as any).lastAutoTable.finalY || startY + 20;
-    const total = proforma.items.reduce((acc: number, item: any) => acc + item.subtotal, 0);
+    const subtotal = proforma.items.reduce((acc: number, item: any) => acc + item.subtotal, 0);
+    const taxRate = parseFloat(settings.tax_rate || '0') / 100;
+    const taxAmount = proforma.taxEnabled ? subtotal * taxRate : 0;
+    const total = subtotal + taxAmount;
 
     // Summary
     doc.setFont('helvetica', 'bold');
@@ -131,7 +134,7 @@ export function PrintProformaButton({ proforma, settings }: PrintProformaButtonP
 
   return (
     <Button className="bg-[#c10d12]" onClick={handlePrint}>
-      <Printer className="mr-2 h-4 w-4" /> Print Proforma
+      <Printer className="mr-2 h-4 w-4" /> I want to print
     </Button>
   );
 }

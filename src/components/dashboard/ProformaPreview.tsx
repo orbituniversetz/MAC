@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { 
   Dialog, 
   DialogContent, 
@@ -9,7 +9,7 @@ import {
   DialogTrigger 
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Eye, Printer, Download, X } from 'lucide-react';
+import { Eye, Printer, Download, X, Wrench } from 'lucide-react';
 import Image from 'next/image';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
@@ -20,7 +20,12 @@ interface ProformaPreviewProps {
 }
 
 export function ProformaPreview({ proforma, settings }: ProformaPreviewProps) {
+  const [mounted, setMounted] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const subtotal = proforma.items.reduce((acc: number, item: any) => acc + item.subtotal, 0);
   const discount = proforma.discount || 0;
@@ -111,6 +116,14 @@ export function ProformaPreview({ proforma, settings }: ProformaPreviewProps) {
     doc.save(`Proforma_${proforma.proformaNo}.pdf`);
   };
 
+  if (!mounted) {
+    return (
+      <Button variant="outline">
+        <Eye className="mr-2 h-4 w-4" /> Preview Proforma
+      </Button>
+    );
+  }
+
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
@@ -135,9 +148,13 @@ export function ProformaPreview({ proforma, settings }: ProformaPreviewProps) {
           <div className="bg-white shadow-2xl w-full max-w-[210mm] min-h-[297mm] p-[15mm] text-black font-sans leading-tight">
             <div className="flex justify-between items-start mb-8">
               <div className="flex gap-4 items-center">
-                {settings.garage_logo && (
+                {settings.garage_logo ? (
                   <div className="relative h-16 w-16">
                     <Image src={settings.garage_logo} alt="Logo" fill className="object-contain" unoptimized />
+                  </div>
+                ) : (
+                  <div className="h-16 w-16 bg-[#c10d12] rounded flex items-center justify-center">
+                    <Wrench className="text-white h-8 w-8" />
                   </div>
                 )}
                 <div>
