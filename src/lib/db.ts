@@ -95,11 +95,13 @@ db.exec(`
   CREATE TABLE IF NOT EXISTS expenses (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     jobSheetId INTEGER,
+    proformaId INTEGER,
     description TEXT NOT NULL,
     amount REAL NOT NULL,
     category TEXT DEFAULT 'OTHER',
     date DATETIME DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY(jobSheetId) REFERENCES jobsheets(id)
+    FOREIGN KEY(jobSheetId) REFERENCES jobsheets(id),
+    FOREIGN KEY(proformaId) REFERENCES proformas(id)
   );
 
   CREATE TABLE IF NOT EXISTS settings (
@@ -113,6 +115,7 @@ try { db.exec("ALTER TABLE customers ADD COLUMN tin TEXT;"); } catch (e) {}
 try { db.exec("ALTER TABLE proformas ADD COLUMN customerId INTEGER;"); } catch (e) {}
 try { db.exec("ALTER TABLE proformas ADD COLUMN vehicleId INTEGER;"); } catch (e) {}
 try { db.exec("ALTER TABLE job_items ADD COLUMN proformaId INTEGER;"); } catch (e) {}
+try { db.exec("ALTER TABLE expenses ADD COLUMN proformaId INTEGER;"); } catch (e) {}
 
 const customerCount = db.prepare('SELECT count(*) as count FROM customers').get() as { count: number };
 if (customerCount.count === 0) {

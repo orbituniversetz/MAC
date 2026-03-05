@@ -109,31 +109,35 @@ export async function deleteJobItem(itemId: number, jobId: number | null, profor
 
 export async function addExpense(formData: FormData) {
   const jobSheetId = formData.get('jobSheetId') ? parseInt(formData.get('jobSheetId') as string) : null;
+  const proformaId = formData.get('proformaId') ? parseInt(formData.get('proformaId') as string) : null;
   const description = formData.get('description') as string;
   const category = formData.get('category') as string;
   const amountRaw = (formData.get('amount') as string).replace(/,/g, '');
   const amount = parseFloat(amountRaw);
 
   db.prepare(`
-    INSERT INTO expenses (jobSheetId, description, category, amount)
-    VALUES (?, ?, ?, ?)
-  `).run(jobSheetId, description, category, amount);
+    INSERT INTO expenses (jobSheetId, proformaId, description, category, amount)
+    VALUES (?, ?, ?, ?, ?)
+  `).run(jobSheetId, proformaId, description, category, amount);
   
   if (jobSheetId) revalidatePath(`/dashboard/jobsheets/${jobSheetId}`);
+  if (proformaId) revalidatePath(`/dashboard/proformas/${proformaId}`);
   revalidatePath('/dashboard/expenses');
 }
 
-export async function deleteExpense(id: number, jobSheetId: number | null) {
+export async function deleteExpense(id: number, jobSheetId: number | null, proformaId: number | null) {
   db.prepare('DELETE FROM expenses WHERE id = ?').run(id);
   if (jobSheetId) revalidatePath(`/dashboard/jobsheets/${jobSheetId}`);
+  if (proformaId) revalidatePath(`/dashboard/proformas/${proformaId}`);
   revalidatePath('/dashboard/expenses');
 }
 
 export async function getExpenses() {
   return db.prepare(`
-    SELECT e.*, js.jobNo 
+    SELECT e.*, js.jobNo, p.proformaNo
     FROM expenses e
     LEFT JOIN jobsheets js ON e.jobSheetId = js.id
+    LEFT JOIN proformas p ON e.proformaId = p.id
     ORDER BY e.date DESC
   `).all() as any[];
 }
@@ -237,6 +241,7 @@ export async function getProformaById(id: number) {
     const itemsFromJob = pf.jobSheetId ? db.prepare('SELECT * FROM job_items WHERE jobSheetId = ?').all(pf.jobSheetId) : [];
     const itemsFromPF = db.prepare('SELECT * FROM job_items WHERE proformaId = ?').all(id);
     pf.items = [...itemsFromJob, ...itemsFromPF];
+    pf.expenses = db.prepare('SELECT * FROM expenses WHERE proformaId = ?').all(id);
   }
   return pf;
 }

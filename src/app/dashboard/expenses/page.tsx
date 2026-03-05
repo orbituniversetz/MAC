@@ -1,4 +1,5 @@
-import { getExpenses, deleteExpense } from '@/lib/actions';
+
+import { getExpenses, deleteExpense, getJobSheets, getProformas } from '@/lib/actions';
 import { 
   Table, 
   TableBody, 
@@ -10,11 +11,13 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Banknote, Trash2, Calendar } from 'lucide-react';
+import { Banknote, Trash2, Calendar, Link as LinkIcon } from 'lucide-react';
 import { AddExpenseForm } from '@/components/dashboard/AddExpenseForm';
 
 export default async function ExpensesPage() {
   const expenses = await getExpenses();
+  const jobs = await getJobSheets();
+  const proformas = await getProformas();
 
   const total = expenses.reduce((acc, curr) => acc + curr.amount, 0);
 
@@ -44,7 +47,7 @@ export default async function ExpensesPage() {
                     <TableHead>Date</TableHead>
                     <TableHead>Category</TableHead>
                     <TableHead>Description</TableHead>
-                    <TableHead>Ref Job</TableHead>
+                    <TableHead>Linked To</TableHead>
                     <TableHead>Amount</TableHead>
                     <TableHead className="text-right"></TableHead>
                   </TableRow>
@@ -69,10 +72,22 @@ export default async function ExpensesPage() {
                           <Badge variant="secondary" className="text-[10px]">{exp.category}</Badge>
                         </TableCell>
                         <TableCell className="font-medium">{exp.description}</TableCell>
-                        <TableCell className="text-xs">{exp.jobNo || 'General'}</TableCell>
+                        <TableCell className="text-xs">
+                          {exp.jobNo ? (
+                            <Badge variant="outline" className="flex items-center gap-1 w-fit bg-blue-50">
+                              <LinkIcon className="h-2 w-2" /> {exp.jobNo}
+                            </Badge>
+                          ) : exp.proformaNo ? (
+                            <Badge variant="outline" className="flex items-center gap-1 w-fit bg-purple-50">
+                              <LinkIcon className="h-2 w-2" /> {exp.proformaNo}
+                            </Badge>
+                          ) : (
+                            <span className="text-gray-400 italic">General</span>
+                          )}
+                        </TableCell>
                         <TableCell className="font-bold text-red-600">-{exp.amount.toLocaleString()}</TableCell>
                         <TableCell className="text-right">
-                          <form action={async () => { 'use server'; await deleteExpense(exp.id, null); }}>
+                          <form action={async () => { 'use server'; await deleteExpense(exp.id, exp.jobSheetId, exp.proformaId); }}>
                             <Button variant="ghost" size="icon" className="text-red-500 hover:text-red-700">
                               <Trash2 className="h-4 w-4" />
                             </Button>
@@ -93,9 +108,12 @@ export default async function ExpensesPage() {
               <CardTitle className="text-lg">Record New Expense</CardTitle>
             </CardHeader>
             <CardContent>
-              <AddExpenseForm jobSheetId={null} />
+              <AddExpenseForm 
+                allJobs={jobs} 
+                allProformas={proformas} 
+              />
               <p className="text-[10px] text-muted-foreground mt-4 italic">
-                Recording a general expense will not be linked to any specific job sheet.
+                Linking an expense helps track profit and loss for specific repair jobs or quotations.
               </p>
             </CardContent>
           </Card>
