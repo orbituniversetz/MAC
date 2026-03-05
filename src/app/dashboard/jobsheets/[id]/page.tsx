@@ -1,4 +1,3 @@
-
 import { getJobSheetById, getSettings, createProformaFromJob, createReportFromJob, deleteJobItem, getRecentItems, deleteExpense } from '@/lib/actions';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -14,7 +13,7 @@ import {
 } from '@/components/ui/table';
 import { Trash2, FilePlus, TrendingUp, TrendingDown, Banknote, FileBadge } from 'lucide-react';
 import { redirect } from 'next/navigation';
-import { PrintJobCardButton } from '@/components/dashboard/PrintJobCardButton';
+import { JobCardPreview } from '@/components/dashboard/JobCardPreview';
 import { AddItemForm } from '@/components/dashboard/AddItemForm';
 import { AddExpenseForm } from '@/components/dashboard/AddExpenseForm';
 import { cn } from '@/lib/utils';
@@ -60,15 +59,15 @@ export default async function JobSheetDetailPage({ params }: { params: Promise<{
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="flex items-center gap-4">
           <h2 className="text-3xl font-bold tracking-tight text-black">{job.jobNo}</h2>
           <Badge className="bg-[#c10d12]">{job.status}</Badge>
         </div>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
           <form action={handleCreateReport}>
-            <Button variant="outline" type="submit" className="border-blue-200 hover:bg-blue-50">
-              <FileBadge className="mr-2 h-4 w-4 text-blue-600" /> Technical Report
+            <Button variant="outline" type="submit" className="border-blue-200 hover:bg-blue-50 text-blue-700">
+              <FileBadge className="mr-2 h-4 w-4" /> Technical Report
             </Button>
           </form>
           <form action={handleCreateProforma}>
@@ -76,7 +75,7 @@ export default async function JobSheetDetailPage({ params }: { params: Promise<{
               <FilePlus className="mr-2 h-4 w-4" /> Create Proforma
             </Button>
           </form>
-          <PrintJobCardButton job={job} settings={settings} />
+          <JobCardPreview job={job} settings={settings} />
         </div>
       </div>
 
@@ -84,7 +83,7 @@ export default async function JobSheetDetailPage({ params }: { params: Promise<{
         <div className="md:col-span-2 space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle className="text-lg">Repair Items (Income)</CardTitle>
+              <CardTitle className="text-lg text-black">Repair Items (Income)</CardTitle>
             </CardHeader>
             <CardContent>
               <Table>
@@ -102,10 +101,10 @@ export default async function JobSheetDetailPage({ params }: { params: Promise<{
                   {job.items.map((item: any) => (
                     <TableRow key={item.id}>
                       <TableCell><Badge variant="outline">{item.type}</Badge></TableCell>
-                      <TableCell>{item.description}</TableCell>
-                      <TableCell>{item.qty}</TableCell>
-                      <TableCell>{item.unitPrice.toLocaleString()}</TableCell>
-                      <TableCell className="font-bold">{item.subtotal.toLocaleString()}</TableCell>
+                      <TableCell className="text-black">{item.description}</TableCell>
+                      <TableCell className="text-black">{item.qty}</TableCell>
+                      <TableCell className="text-black">{item.unitPrice.toLocaleString()}</TableCell>
+                      <TableCell className="font-bold text-black">{item.subtotal.toLocaleString()}</TableCell>
                       <TableCell>
                         <form action={async () => { 'use server'; await deleteJobItem(item.id, job.id, null); }}>
                           <Button variant="ghost" size="icon" className="text-red-500 hover:text-red-700">
@@ -129,7 +128,7 @@ export default async function JobSheetDetailPage({ params }: { params: Promise<{
 
           <Card>
             <CardHeader>
-              <CardTitle className="text-lg flex items-center gap-2">
+              <CardTitle className="text-lg flex items-center gap-2 text-black">
                 <Banknote className="h-5 w-5 text-red-600" />
                 Job Expenses (Costs)
               </CardTitle>
@@ -148,7 +147,7 @@ export default async function JobSheetDetailPage({ params }: { params: Promise<{
                   {job.expenses.map((exp: any) => (
                     <TableRow key={exp.id}>
                       <TableCell><Badge variant="outline" className="text-[10px]">{exp.category}</Badge></TableCell>
-                      <TableCell>{exp.description}</TableCell>
+                      <TableCell className="text-black">{exp.description}</TableCell>
                       <TableCell className="font-bold text-red-600">-{exp.amount.toLocaleString()}</TableCell>
                       <TableCell>
                         <form action={async () => { 'use server'; await deleteExpense(exp.id, job.id, null); }}>
@@ -174,7 +173,7 @@ export default async function JobSheetDetailPage({ params }: { params: Promise<{
         <div className="space-y-6">
           <Card className={cn("border-l-4 shadow-md", isProfit ? "border-green-500 bg-green-50/30" : "border-red-500 bg-red-50/30")}>
             <CardHeader>
-              <CardTitle className="text-lg flex items-center justify-between">
+              <CardTitle className="text-lg flex items-center justify-between text-black">
                 Profit / Loss
                 {isProfit ? <TrendingUp className="text-green-600" /> : <TrendingDown className="text-red-600" />}
               </CardTitle>
@@ -182,7 +181,7 @@ export default async function JobSheetDetailPage({ params }: { params: Promise<{
             <CardContent className="space-y-4">
               <div className="flex justify-between text-sm">
                 <span className="text-muted-foreground">Total Income:</span>
-                <span className="font-medium">TZS {income.toLocaleString()}</span>
+                <span className="font-medium text-black">TZS {income.toLocaleString()}</span>
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-muted-foreground">Total Expenses:</span>
@@ -203,18 +202,18 @@ export default async function JobSheetDetailPage({ params }: { params: Promise<{
 
           <Card>
             <CardHeader>
-              <CardTitle className="text-lg">Customer & Vehicle</CardTitle>
+              <CardTitle className="text-lg text-black">Customer & Vehicle</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="space-y-4 text-black">
               <div>
                 <p className="text-xs text-muted-foreground uppercase font-bold">Customer</p>
-                <p className="font-medium text-black">{job.customerName}</p>
+                <p className="font-medium">{job.customerName}</p>
                 <p className="text-sm">{job.customerPhone}</p>
               </div>
               <Separator />
               <div>
                 <p className="text-xs text-muted-foreground uppercase font-bold">Vehicle</p>
-                <p className="font-medium text-black">{job.vehiclePlate}</p>
+                <p className="font-medium">{job.vehiclePlate}</p>
                 <p className="text-sm">{job.vehicleModel}</p>
               </div>
               <Separator />

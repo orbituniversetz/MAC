@@ -1,0 +1,142 @@
+'use client'
+
+import { Wrench } from 'lucide-react';
+import Image from 'next/image';
+
+interface JobCardDocumentProps {
+  job: any;
+  settings: any;
+  className?: string;
+}
+
+export function JobCardDocument({ job, settings, className }: JobCardDocumentProps) {
+  return (
+    <div id="jobcard-document" className={`a4-page print-container text-black font-sans flex flex-col ${className || ''}`}>
+      {/* Header */}
+      <div className="flex justify-between items-start mb-8">
+        <div className="flex items-center gap-6">
+          {settings.garage_logo && (
+            <div className="relative h-24 w-24 overflow-hidden shrink-0">
+              <Image 
+                src={settings.garage_logo} 
+                alt="Garage Logo" 
+                fill 
+                className="object-contain" 
+                unoptimized 
+              />
+            </div>
+          )}
+          <div className="space-y-0.5">
+            <h1 className="text-3xl font-black text-[#c10d12] uppercase leading-tight">{settings.garage_name}</h1>
+            <div className="text-[11px] text-muted-foreground font-medium leading-normal">
+              <p>{settings.garage_mailbox}</p>
+              <p>{settings.garage_address}</p>
+              <p>Tel: {settings.garage_phone}</p>
+              <p className="font-bold text-black mt-1 uppercase">TIN: {settings.garage_tin}</p>
+            </div>
+          </div>
+        </div>
+        <div className="text-right">
+          <h2 className="text-2xl font-black text-gray-900 mb-1 uppercase tracking-tighter">Job Card</h2>
+          <div className="text-xs font-bold">
+            <p>No: <span className="text-[#c10d12]">{job.jobNo}</span></p>
+            <p className="text-gray-500 font-normal">Date: {new Date(job.openedAt).toLocaleDateString()}</p>
+          </div>
+        </div>
+      </div>
+
+      <div className="h-1 bg-gray-900 mb-8" />
+
+      {/* Info Section */}
+      <div className="grid grid-cols-2 gap-10 mb-10">
+        <div className="space-y-4">
+          <div>
+            <h3 className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Customer Details</h3>
+            <p className="font-bold text-base">{job.customerName}</p>
+            <p className="text-sm">{job.customerPhone}</p>
+            <p className="text-xs text-muted-foreground">{job.customerAddress}</p>
+          </div>
+        </div>
+        <div className="space-y-4 bg-gray-50 p-4 rounded-xl border border-gray-100">
+          <div>
+            <h3 className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Vehicle Details</h3>
+            <div className="flex justify-between items-end">
+              <div>
+                <p className="text-xl font-black text-gray-900 uppercase">{job.vehiclePlate}</p>
+                <p className="text-sm font-medium text-gray-600">{job.vehicleModel}</p>
+              </div>
+              <Wrench className="h-8 w-8 text-gray-200" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Complaint Section */}
+      <div className="mb-10">
+        <h3 className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Customer Complaint / Job Description</h3>
+        <div className="p-4 border-2 border-dashed border-gray-200 rounded-xl min-h-[80px] bg-white italic text-sm text-gray-700 leading-relaxed">
+          "{job.complaint || 'No complaint recorded.'}"
+        </div>
+      </div>
+
+      {/* Items Table */}
+      <div className="mb-10">
+        <h3 className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3 text-center">Work Performed & Parts Installed</h3>
+        <table className="w-full border-collapse">
+          <thead>
+            <tr className="border-b-2 border-gray-900">
+              <th className="py-2 text-left text-[10px] font-black uppercase w-8">#</th>
+              <th className="py-2 text-left text-[10px] font-black uppercase">Description</th>
+              <th className="py-2 text-center text-[10px] font-black uppercase w-20">Type</th>
+              <th className="py-2 text-center text-[10px] font-black uppercase w-16">Qty</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-gray-100">
+            {job.items.map((item: any, index: number) => (
+              <tr key={item.id} className="text-[11px]">
+                <td className="py-3 text-gray-400">{index + 1}</td>
+                <td className="py-3 font-bold">{item.description}</td>
+                <td className="py-3 text-center">
+                  <span className="bg-gray-100 px-2 py-0.5 rounded text-[9px] font-black text-gray-500 uppercase">
+                    {item.type}
+                  </span>
+                </td>
+                <td className="py-3 text-center font-bold">{item.qty}</td>
+              </tr>
+            ))}
+            {job.items.length === 0 && (
+              <tr>
+                <td colSpan={4} className="py-10 text-center text-gray-300 italic text-sm">
+                  Service items will be listed here as work progresses.
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+
+      {/* Signatures */}
+      <div className="mt-auto pt-10 grid grid-cols-2 gap-20">
+        <div className="space-y-6">
+          <div className="border-t border-gray-400 pt-3">
+            <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">Garage Supervisor</p>
+            <p className="text-xs font-bold mt-1 uppercase">{settings.garage_name}</p>
+          </div>
+        </div>
+        <div className="space-y-6">
+          <div className="border-t border-gray-400 pt-3">
+            <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">Customer Confirmation</p>
+            <p className="text-xs font-bold mt-1 italic">I confirm the work described above.</p>
+          </div>
+        </div>
+      </div>
+
+      {/* Footer */}
+      <div className="mt-16 text-center border-t pt-4">
+        <p className="text-[9px] text-gray-400 font-medium">
+          Computer generated Job Card. All repair work is subject to standard garage terms and conditions.
+        </p>
+      </div>
+    </div>
+  );
+}
