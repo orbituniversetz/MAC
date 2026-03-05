@@ -11,7 +11,7 @@ interface ProformaDocumentProps {
 }
 
 export function ProformaDocument({ proforma, settings, className }: ProformaDocumentProps) {
-  const subtotal = proforma.items.reduce((acc: number, item: any) => acc + item.subtotal, 0);
+  const subtotal = proforma.items?.reduce((acc: number, item: any) => acc + item.subtotal, 0) || 0;
   const discount = proforma.discount || 0;
   
   const taxEnabled = proforma.taxEnabled === 1;
@@ -86,7 +86,7 @@ export function ProformaDocument({ proforma, settings, className }: ProformaDocu
           </tr>
         </thead>
         <tbody className="divide-y divide-zinc-100">
-          {proforma.items.map((item: any) => (
+          {proforma.items?.map((item: any) => (
             <tr key={item.id} className="text-xs">
               <td className="p-3.5 font-black text-zinc-900 uppercase tracking-tight">{item.description}</td>
               <td className="p-3.5 text-center font-bold">{item.qty}</td>

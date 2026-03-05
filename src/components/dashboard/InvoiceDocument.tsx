@@ -130,7 +130,7 @@ export function InvoiceDocument({ invoice, settings, className }: InvoiceDocumen
               <p><span className="font-black text-zinc-400 uppercase text-[9px] w-28 inline-block tracking-widest">Bank:</span> <span className="font-black text-zinc-900">{settings.bank_name}</span></p>
               <p><span className="font-black text-zinc-400 uppercase text-[9px] w-28 inline-block tracking-widest">Account Name:</span> <span className="font-bold text-zinc-700">{settings.bank_account_name}</span></p>
               <p><span className="font-black text-zinc-400 uppercase text-[9px] w-28 inline-block tracking-widest">Account No:</span> <span className="font-black text-zinc-900">{settings.bank_account_number}</span></p>
-              <p><span className="font-black text-zinc-400 uppercase text-[9px] w-28 i-block tracking-widest">SWIFT Code:</span> <span className="font-bold text-zinc-700">{settings.bank_swift}</span></p>
+              <p><span className="font-black text-zinc-400 uppercase text-[9px] w-28 inline-block tracking-widest">SWIFT Code:</span> <span className="font-bold text-zinc-700">{settings.bank_swift}</span></p>
             </div>
           </div>
           <div className="text-right flex flex-col justify-end">

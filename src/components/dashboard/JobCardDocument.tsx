@@ -12,7 +12,7 @@ interface JobCardDocumentProps {
 }
 
 export function JobCardDocument({ job, settings, isInternal = false, className }: JobCardDocumentProps) {
-  const totalIncome = job.items.reduce((acc: number, item: any) => acc + item.subtotal, 0);
+  const totalIncome = job.items?.reduce((acc: number, item: any) => acc + item.subtotal, 0) || 0;
   const totalExpenses = job.expenses ? job.expenses.reduce((acc: number, exp: any) => acc + exp.amount, 0) : 0;
   const netProfit = totalIncome - totalExpenses;
   const isProfit = netProfit >= 0;
@@ -128,7 +128,7 @@ export function JobCardDocument({ job, settings, isInternal = false, className }
                 </tr>
               </thead>
               <tbody className="divide-y divide-zinc-100">
-                {job.items.map((item: any) => (
+                {job.items?.map((item: any) => (
                   <tr key={item.id}>
                     <td className="py-2 font-bold uppercase text-zinc-900 px-2">{item.description}</td>
                     <td className="py-2 text-center px-2">
