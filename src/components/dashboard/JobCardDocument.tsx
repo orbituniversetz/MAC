@@ -41,7 +41,7 @@ export function JobCardDocument({ job, settings, isInternal = false, className }
           </div>
           <div className="text-right flex flex-col justify-center">
             <h1 className="text-2xl font-black text-[#c10d12] uppercase leading-none tracking-tighter mb-1">{settings.garage_name}</h1>
-            <div className="text-[10px] text-zinc-500 font-bold leading-tight uppercase tracking-tight">
+            <div className="text-[10px] text-zinc-500 font-bold leading-tight uppercase tracking-tight flex flex-col items-end">
               <p>{settings.garage_mailbox}</p>
               <p>{settings.garage_address}</p>
               <p className="text-zinc-800 font-black">TEL: {settings.garage_phone} | TIN: {settings.garage_tin}</p>
@@ -114,7 +114,7 @@ export function JobCardDocument({ job, settings, isInternal = false, className }
           <div className="space-y-10">
             <div>
               <h3 className="text-[10px] font-black text-zinc-400 uppercase tracking-widest mb-4 text-center">
-                Estimated Parts & Labour Income
+                Detailed Parts & Labour Income
               </h3>
               <table className="w-full border-collapse">
                 <thead>
@@ -147,7 +147,7 @@ export function JobCardDocument({ job, settings, isInternal = false, className }
                 </tbody>
                 <tfoot>
                   <tr className="border-t-4 border-zinc-900 bg-zinc-50 font-black">
-                    <td colSpan={4} className="py-3 text-right uppercase text-[10px] px-2 tracking-widest">Total Estimated Income:</td>
+                    <td colSpan={4} className="py-3 text-right uppercase text-[10px] px-2 tracking-widest">Estimated Job Total (Income):</td>
                     <td className="py-3 text-right text-sm px-2 whitespace-nowrap">TZS {totalIncome.toLocaleString()}</td>
                   </tr>
                 </tfoot>
@@ -228,7 +228,7 @@ export function JobCardDocument({ job, settings, isInternal = false, className }
 
         {/* Footer Area */}
         <div className="mt-auto pt-12">
-          {/* Terms and Conditions - Always at the bottom */}
+          {/* Terms and Conditions - Always at the bottom of content */}
           <div className="mb-10 p-6 bg-zinc-50 rounded-2xl border-2 border-zinc-100 terms-block">
             <h3 className="text-[10px] font-black text-zinc-400 uppercase tracking-widest mb-3">Terms and Conditions</h3>
             <div className="text-[10px] text-zinc-600 whitespace-pre-wrap italic leading-relaxed font-medium">
@@ -241,7 +241,7 @@ export function JobCardDocument({ job, settings, isInternal = false, className }
             <div className="space-y-6">
               <div className="border-t border-gray-400 pt-3">
                 <p className="text-[9px] font-black uppercase tracking-widest text-gray-400 mb-1">
-                  {isInternal ? 'Technician / Supervisor' : 'Authorized Representative'}
+                  {isInternal ? 'Mechanic/Supervisor' : 'Garage Representative'}
                 </p>
                 <p className="text-sm font-black uppercase tracking-tight text-zinc-900">{settings.garage_name}</p>
               </div>
@@ -249,12 +249,12 @@ export function JobCardDocument({ job, settings, isInternal = false, className }
             <div className="space-y-6">
               <div className="border-t border-gray-400 pt-3">
                 <p className="text-[9px] font-black uppercase tracking-widest text-gray-400 mb-1">
-                  {isInternal ? 'Management Approval' : 'Customer Signature'}
+                  {isInternal ? 'Admin Approval' : 'Customer Signature'}
                 </p>
                 <p className="text-[10px] text-zinc-500 italic leading-snug font-bold">
                   {isInternal 
-                    ? 'I certify that the work described has been completed and costs verified.'
-                    : 'I hereby authorize the repair work and agree to the terms mentioned above.'}
+                    ? 'I verify the work performed and internal costs recorded above.'
+                    : 'I authorize the repair work and agree to the terms above.'}
                 </p>
               </div>
             </div>
