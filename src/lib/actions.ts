@@ -138,7 +138,6 @@ export async function finalizeProforma(id: number) {
 }
 
 export async function saveProformaDraft(id: number) {
-  // Currently just a trigger for revalidation, but could save extra fields
   revalidatePath(`/dashboard/proformas/${id}`);
 }
 
@@ -206,6 +205,17 @@ export async function getProformaById(id: number) {
   return pf;
 }
 
+export async function getRecentItems() {
+  return db.prepare(`
+    SELECT DISTINCT type, description, unitPrice 
+    FROM job_items 
+    WHERE description IS NOT NULL AND description != ''
+    GROUP BY description, type, unitPrice
+    ORDER BY description ASC
+    LIMIT 50
+  `).all() as any[];
+}
+
 export async function getInvoices() {
   return db.prepare(`
     SELECT i.*, js.jobNo, c.name as customerName 
@@ -234,5 +244,5 @@ export async function updateAllSettings(settings: Record<string, string>) {
   
   transaction(settings);
   revalidatePath('/dashboard/settings');
-  revalidatePath('/dashboard'); // For sidebar logo/name
+  revalidatePath('/dashboard');
 }

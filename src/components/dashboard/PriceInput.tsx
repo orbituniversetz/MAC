@@ -1,14 +1,14 @@
 'use client'
 
 import { Input } from '@/components/ui/input'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 interface PriceInputProps {
   name: string
   placeholder?: string
   className?: string
   required?: boolean
-  defaultValue?: number
+  defaultValue?: string | number
 }
 
 export function PriceInput({ name, placeholder, className, required, defaultValue }: PriceInputProps) {
@@ -20,7 +20,14 @@ export function PriceInput({ name, placeholder, className, required, defaultValu
     return parts.join('.')
   }
 
-  const [value, setValue] = useState(defaultValue ? format(defaultValue) : '')
+  const [value, setValue] = useState('')
+
+  // Sync internal state when defaultValue changes (e.g. from Quick Pick)
+  useEffect(() => {
+    if (defaultValue !== undefined) {
+      setValue(format(defaultValue))
+    }
+  }, [defaultValue])
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const rawValue = e.target.value.replace(/,/g, '')

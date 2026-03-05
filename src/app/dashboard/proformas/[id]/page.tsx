@@ -1,4 +1,4 @@
-import { getProformaById, addJobItem, deleteJobItem, getSettings, finalizeProforma, saveProformaDraft } from '@/lib/actions';
+import { getProformaById, getSettings, finalizeProforma, saveProformaDraft, getRecentItems, deleteJobItem } from '@/lib/actions';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -11,15 +11,15 @@ import {
   TableHeader, 
   TableRow 
 } from '@/components/ui/table';
-import { Trash2, Save, Lock, FileCheck, Receipt, Plus } from 'lucide-react';
+import { Trash2, Save, Lock, FileCheck, Receipt } from 'lucide-react';
 import { ProformaPreview } from '@/components/dashboard/ProformaPreview';
-import { redirect } from 'next/navigation';
-import { PriceInput } from '@/components/dashboard/PriceInput';
+import { AddItemForm } from '@/components/dashboard/AddItemForm';
 
 export default async function ProformaDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const pf = await getProformaById(parseInt(id));
   const settings = await getSettings();
+  const recentItems = await getRecentItems();
 
   if (!pf) {
     return (
@@ -38,16 +38,6 @@ export default async function ProformaDetailPage({ params }: { params: Promise<{
   const taxRate = parseFloat(settings.tax_rate || '0') / 100;
   const taxAmount = pf.taxEnabled ? (subtotal - discount) * taxRate : 0;
   const total = subtotal - discount + taxAmount;
-
-  async function handleAdd(formData: FormData) {
-    'use server'
-    const type = formData.get('type') as string;
-    const description = formData.get('description') as string;
-    const qty = parseFloat(formData.get('qty') as string);
-    const unitPriceRaw = (formData.get('unitPrice') as string).replace(/,/g, '');
-    const unitPrice = parseFloat(unitPriceRaw);
-    await addJobItem(pf.jobSheetId, pf.id, { type, description, qty, unitPrice });
-  }
 
   async function handleFinalize() {
     'use server'
@@ -147,21 +137,7 @@ export default async function ProformaDetailPage({ params }: { params: Promise<{
             </Table>
 
             {!isFinalized && (
-              <div className="mt-6 border-t pt-4 bg-gray-50/50 p-4 rounded-lg">
-                <h4 className="font-bold mb-4 text-sm flex items-center gap-2">
-                  <Plus className="h-4 w-4" /> Add New Item
-                </h4>
-                <form action={handleAdd} className="grid grid-cols-1 md:grid-cols-5 gap-3">
-                  <select name="type" className="border rounded p-2 text-sm bg-white">
-                    <option value="PART">Part</option>
-                    <option value="LABOUR">Labour</option>
-                  </select>
-                  <input name="description" placeholder="Item Description" required className="border rounded p-2 text-sm col-span-1 md:col-span-2 bg-white" />
-                  <input name="qty" type="number" step="0.1" placeholder="Qty" required className="border rounded p-2 text-sm bg-white" />
-                  <PriceInput name="unitPrice" placeholder="Unit Price" className="bg-white text-sm" />
-                  <Button type="submit" className="bg-black text-white col-span-1 md:col-span-5">Add Item to Proforma</Button>
-                </form>
-              </div>
+              <AddItemForm jobId={pf.jobSheetId} proformaId={pf.id} recentItems={recentItems} />
             )}
           </CardContent>
         </Card>

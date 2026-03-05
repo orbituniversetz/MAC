@@ -1,4 +1,4 @@
-import { getJobSheetById, addJobItem, deleteJobItem, createProformaFromJob, getSettings } from '@/lib/actions';
+import { getJobSheetById, getSettings, createProformaFromJob, deleteJobItem, getRecentItems } from '@/lib/actions';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -11,15 +11,16 @@ import {
   TableHeader, 
   TableRow 
 } from '@/components/ui/table';
-import { Trash2, FilePlus, Printer } from 'lucide-react';
+import { Trash2, FilePlus } from 'lucide-react';
 import { redirect } from 'next/navigation';
 import { PrintJobCardButton } from '@/components/dashboard/PrintJobCardButton';
-import { PriceInput } from '@/components/dashboard/PriceInput';
+import { AddItemForm } from '@/components/dashboard/AddItemForm';
 
 export default async function JobSheetDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const job = await getJobSheetById(parseInt(id));
   const settings = await getSettings();
+  const recentItems = await getRecentItems();
 
   if (!job) {
     return (
@@ -34,17 +35,6 @@ export default async function JobSheetDetailPage({ params }: { params: Promise<{
   }
 
   const total = job.items.reduce((acc: number, item: any) => acc + item.subtotal, 0);
-
-  async function handleAdd(formData: FormData) {
-    'use server'
-    const type = formData.get('type') as string;
-    const description = formData.get('description') as string;
-    const qty = parseFloat(formData.get('qty') as string);
-    const unitPriceRaw = (formData.get('unitPrice') as string).replace(/,/g, '');
-    const unitPrice = parseFloat(unitPriceRaw);
-    
-    await addJobItem(job.id, null, { type, description, qty, unitPrice });
-  }
 
   async function handleCreateProforma() {
     'use server'
@@ -113,19 +103,7 @@ export default async function JobSheetDetailPage({ params }: { params: Promise<{
               </TableBody>
             </Table>
 
-            <div className="mt-6 border-t pt-4">
-              <h4 className="font-semibold mb-4 text-sm">Add New Item</h4>
-              <form action={handleAdd} className="grid grid-cols-5 gap-2">
-                <select name="type" className="border rounded p-2 text-sm">
-                  <option value="PART">Part</option>
-                  <option value="LABOUR">Labour</option>
-                </select>
-                <input name="description" placeholder="Description" required className="border rounded p-2 text-sm col-span-2" />
-                <input name="qty" type="number" step="0.1" placeholder="Qty" required className="border rounded p-2 text-sm" />
-                <PriceInput name="unitPrice" placeholder="Unit Price" className="text-sm" />
-                <Button type="submit" className="bg-black text-white col-span-5 mt-2">Add Item</Button>
-              </form>
-            </div>
+            <AddItemForm jobId={job.id} proformaId={null} recentItems={recentItems} />
           </CardContent>
         </Card>
 
