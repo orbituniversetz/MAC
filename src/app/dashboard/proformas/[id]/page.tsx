@@ -36,8 +36,8 @@ export default async function ProformaDetailPage({ params }: { params: Promise<{
   const isInvoiced = pf.status === 'Invoiced';
   const subtotal = pf.items.reduce((acc: number, item: any) => acc + item.subtotal, 0);
   const discount = pf.discount || 0;
-  const taxRate = parseFloat(settings.tax_rate || '0') / 100;
-  const taxAmount = pf.taxEnabled ? (subtotal - discount) * taxRate : 0;
+  // Enforce 18% VAT
+  const taxAmount = (subtotal - discount) * 0.18;
   const total = subtotal - discount + taxAmount;
 
   async function handleFinalize() {
@@ -190,7 +190,7 @@ export default async function ProformaDetailPage({ params }: { params: Promise<{
                 <span className="font-medium">{subtotal.toLocaleString()}</span>
               </div>
               <div className="flex justify-between items-center text-sm">
-                <span className="text-muted-foreground">VAT ({settings.tax_rate}%):</span>
+                <span className="text-muted-foreground">VAT (18%):</span>
                 <span className="font-medium">{taxAmount.toLocaleString()}</span>
               </div>
               <Separator className="my-2" />

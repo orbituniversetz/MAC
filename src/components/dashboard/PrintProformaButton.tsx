@@ -1,4 +1,3 @@
-
 'use client'
 
 import { Button } from '@/components/ui/button';
@@ -107,38 +106,47 @@ export function PrintProformaButton({ proforma, settings }: PrintProformaButtonP
     const finalY = (doc as any).lastAutoTable.finalY || startY + 20;
     const subtotal = proforma.items.reduce((acc: number, item: any) => acc + item.subtotal, 0);
     const discount = proforma.discount || 0;
-    const taxRate = parseFloat(settings.tax_rate || '0') / 100;
-    const taxAmount = proforma.taxEnabled ? (subtotal - discount) * taxRate : 0;
+    // Enforce 18% VAT as requested
+    const taxAmount = (subtotal - discount) * 0.18;
     const total = subtotal - discount + taxAmount;
 
     // Summary
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(10);
-    doc.text('GRAND TOTAL (TZS):', pageWidth - 60, finalY + 15, { align: 'right' });
-    doc.text(total.toLocaleString(), pageWidth - 14, finalY + 15, { align: 'right' });
+    doc.text('SUBTOTAL (TZS):', pageWidth - 60, finalY + 10, { align: 'right' });
+    doc.text(subtotal.toLocaleString(), pageWidth - 14, finalY + 10, { align: 'right' });
+
+    doc.text('VAT (18%) (TZS):', pageWidth - 60, finalY + 15, { align: 'right' });
+    doc.text(taxAmount.toLocaleString(), pageWidth - 14, finalY + 15, { align: 'right' });
+
+    doc.setFontSize(12);
+    doc.setTextColor(193, 13, 18);
+    doc.text('GRAND TOTAL (TZS):', pageWidth - 60, finalY + 22, { align: 'right' });
+    doc.text(total.toLocaleString(), pageWidth - 14, finalY + 22, { align: 'right' });
 
     // Payment Info
+    doc.setTextColor(0);
     if (settings.bank_name) {
       doc.setFontSize(9);
       doc.setFont('helvetica', 'bold');
-      doc.text('BANK DETAILS:', 14, finalY + 30);
+      doc.text('BANK DETAILS:', 14, finalY + 35);
       doc.setFont('helvetica', 'normal');
       doc.setFontSize(8);
-      doc.text(`Bank: ${settings.bank_name} (${settings.bank_branch || ''})`, 14, finalY + 36);
-      doc.text(`Account Name: ${settings.bank_account_name}`, 14, finalY + 41);
-      doc.text(`Account Number: ${settings.bank_account_number}`, 14, finalY + 46);
-      doc.text(`SWIFT: ${settings.bank_swift || ''}`, 14, finalY + 51);
+      doc.text(`Bank: ${settings.bank_name} (${settings.bank_branch || ''})`, 14, finalY + 41);
+      doc.text(`Account Name: ${settings.bank_account_name}`, 14, finalY + 46);
+      doc.text(`Account Number: ${settings.bank_account_number}`, 14, finalY + 51);
+      doc.text(`SWIFT: ${settings.bank_swift || ''}`, 14, finalY + 56);
     }
 
     // Terms
     doc.setFontSize(9);
     doc.setFont('helvetica', 'bold');
-    doc.text('PAYMENT TERMS & AGREEMENT:', 14, finalY + 65);
+    doc.text('PAYMENT TERMS & AGREEMENT:', 14, finalY + 70);
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(8);
     const termsText = "Payment is due upon approval of this invoice unless otherwise agreed between both parties. The listed services include mechanical repairs, bodywork, painting, and parts replacements as detailed above. Any additional repairs discovered during servicing will be communicated before proceeding. Vehicle release conditions depend on payment agreement. Payments must be made via bank transfer using the details above.";
     const splitTerms = doc.splitTextToSize(termsText, pageWidth - 28);
-    doc.text(splitTerms, 14, finalY + 71);
+    doc.text(splitTerms, 14, finalY + 76);
 
     doc.setFontSize(8);
     doc.setTextColor(150);

@@ -22,8 +22,8 @@ export default async function InvoiceDetailPage({ params }: { params: Promise<{ 
   const snapshot = inv.snapshot || {};
   const subtotal = snapshot.items?.reduce((acc: number, item: any) => acc + item.subtotal, 0) || 0;
   const discount = snapshot.discount || 0;
-  const taxRate = parseFloat(settings.tax_rate || '0') / 100;
-  const taxAmount = snapshot.taxEnabled ? (subtotal - discount) * taxRate : 0;
+  // Enforce 18% VAT as requested
+  const taxAmount = (subtotal - discount) * 0.18;
   const total = subtotal - discount + taxAmount;
 
   return (
@@ -91,7 +91,7 @@ export default async function InvoiceDetailPage({ params }: { params: Promise<{ 
                 <span>{subtotal.toLocaleString()}</span>
               </div>
               <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">VAT ({settings.tax_rate}%):</span>
+                <span className="text-muted-foreground">VAT (18%):</span>
                 <span>{taxAmount.toLocaleString()}</span>
               </div>
               <div className="pt-2 border-t flex justify-between items-center font-black">

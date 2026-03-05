@@ -13,8 +13,8 @@ export function InvoiceDocument({ invoice, settings, className }: InvoiceDocumen
   const snapshot = invoice.snapshot || {};
   const subtotal = snapshot.items?.reduce((acc: number, item: any) => acc + item.subtotal, 0) || 0;
   const discount = snapshot.discount || 0;
-  const taxRate = parseFloat(settings.tax_rate || '0') / 100;
-  const taxAmount = snapshot.taxEnabled ? (subtotal - discount) * taxRate : 0;
+  // Enforce 18% VAT
+  const taxAmount = (subtotal - discount) * 0.18;
   const total = subtotal - discount + taxAmount;
 
   return (
@@ -105,7 +105,7 @@ export function InvoiceDocument({ invoice, settings, className }: InvoiceDocumen
               <span className="font-medium">{subtotal.toLocaleString()}</span>
             </div>
             <div className="flex justify-between text-[10px]">
-              <span className="text-gray-500">VAT ({settings.tax_rate}%):</span>
+              <span className="text-gray-500">VAT (18%):</span>
               <span className="font-medium">{taxAmount.toLocaleString()}</span>
             </div>
             <div className="pt-2 border-t border-gray-200 flex justify-between items-center">
