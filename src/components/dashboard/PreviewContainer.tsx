@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Printer, Download, X, ZoomIn, ZoomOut, Maximize } from 'lucide-react';
+import { Printer, Download, X, ZoomIn, ZoomOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
@@ -38,7 +38,9 @@ export function PreviewContainer({
           </div>
           <div className="hidden sm:block">
             <h2 className="text-sm font-bold tracking-tight uppercase tracking-widest leading-none">{title}</h2>
-            <p className="text-[10px] text-white/40 mt-1 uppercase font-bold">Standard A4 Format</p>
+            <p className="text-[10px] text-white/40 mt-1 uppercase font-bold">
+              Standard View Mode
+            </p>
           </div>
         </div>
 
@@ -86,15 +88,12 @@ export function PreviewContainer({
         </div>
       </div>
 
-      {/* Viewport - Enlarged height handling */}
-      <div className="flex-1 overflow-auto preview-scroll bg-zinc-900 flex justify-center p-4 sm:p-12 items-start">
+      {/* Viewport */}
+      <div className="flex-1 overflow-y-auto preview-scroll bg-zinc-900/50 flex flex-col items-center py-8">
         <div 
-          className="print-container transition-transform duration-200 origin-top shadow-2xl"
+          className="print-container transition-transform duration-200 origin-top shadow-2xl mb-20"
           style={{ 
             transform: `scale(${zoom / 100})`,
-            height: 'fit-content',
-            minHeight: zoom > 100 ? `calc(297mm * ${zoom / 100})` : '297mm',
-            marginBottom: '100px' // Extra space at bottom for scrolling
           }}
         >
           {children}

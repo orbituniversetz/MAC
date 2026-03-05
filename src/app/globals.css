@@ -48,17 +48,17 @@
   .a4-page {
     width: 210mm;
     min-height: 297mm;
-    height: fit-content;
+    height: auto;
     padding: 20mm;
     margin: 0 auto;
     background: white;
-    box-shadow: 0 10px 50px rgba(0,0,0,0.2), 0 0 0 1px rgba(0,0,0,0.05);
+    box-shadow: 0 0 20px rgba(0,0,0,0.15);
     position: relative;
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
     color: black;
-    overflow: hidden;
+    overflow: visible;
   }
 }
 
