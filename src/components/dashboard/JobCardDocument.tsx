@@ -14,14 +14,14 @@ export function JobCardDocument({ job, settings, className }: JobCardDocumentPro
     <div id="jobcard-document" className={`a4-page print-container text-black font-sans flex flex-col ${className || ''}`}>
       {/* Header */}
       <div className="flex justify-between items-start mb-8">
-        <div className="flex items-center gap-6">
+        <div className="flex flex-col items-start gap-2">
           {settings.garage_logo && (
-            <div className="relative h-24 w-24 overflow-hidden shrink-0">
+            <div className="relative h-40 w-40 overflow-hidden shrink-0">
               <Image 
                 src={settings.garage_logo} 
                 alt="Garage Logo" 
                 fill 
-                className="object-contain" 
+                className="object-contain object-left" 
                 unoptimized 
               />
             </div>
@@ -80,7 +80,7 @@ export function JobCardDocument({ job, settings, className }: JobCardDocumentPro
         </div>
       </div>
 
-      {/* Items Table - Show empty rows if no items yet to allow manual writing if printed for intake */}
+      {/* Items Table */}
       <div className="mb-10">
         <h3 className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3 text-center">Work Performed & Parts Installed</h3>
         <table className="w-full border-collapse">
@@ -107,7 +107,6 @@ export function JobCardDocument({ job, settings, className }: JobCardDocumentPro
                 </tr>
               ))
             ) : (
-              // Add empty rows for manual intake entry if printed empty
               Array.from({ length: 6 }).map((_, i) => (
                 <tr key={i} className="h-10">
                   <td className="py-3 text-gray-300">{i + 1}</td>

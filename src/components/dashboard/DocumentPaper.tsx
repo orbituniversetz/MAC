@@ -15,14 +15,14 @@ export function DocumentPaper({ doc, settings, className }: DocumentPaperProps) 
       <div className="flex-grow">
         {/* Document Header Branding */}
         <div className="flex justify-between items-start mb-8">
-          <div className="flex items-center gap-4">
+          <div className="flex flex-col items-start gap-2">
             {settings.garage_logo && (
-              <div className="relative h-20 w-20 overflow-hidden shrink-0">
+              <div className="relative h-32 w-32 mb-2 overflow-hidden shrink-0">
                 <Image 
                   src={settings.garage_logo} 
                   alt="Garage Logo" 
                   fill 
-                  className="object-contain" 
+                  className="object-contain object-left" 
                   unoptimized 
                 />
               </div>

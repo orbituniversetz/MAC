@@ -34,12 +34,12 @@ export function InvoiceDocument({ invoice, settings, className }: InvoiceDocumen
 
           <div className="flex flex-col items-end text-right">
             {settings.garage_logo ? (
-              <div className="relative h-28 w-28 mb-3">
-                <Image src={settings.garage_logo} alt="Logo" fill className="object-contain" unoptimized />
+              <div className="relative h-40 w-40 mb-3 overflow-hidden">
+                <Image src={settings.garage_logo} alt="Logo" fill className="object-contain object-right" unoptimized />
               </div>
             ) : (
-              <div className="h-16 w-16 bg-[#c10d12] rounded flex items-center justify-center mb-3">
-                <Wrench className="text-white h-8 w-8" />
+              <div className="h-16 w-16 mb-3 flex items-center justify-center">
+                <Wrench className="text-[#c10d12] h-12 w-12" />
               </div>
             )}
             <div>

@@ -1,4 +1,3 @@
-
 'use client'
 
 import Link from 'next/link';
@@ -38,23 +37,23 @@ export function SidebarNav({ garageName, logo }: { garageName: string, logo?: st
 
   return (
     <div className="flex flex-col h-full bg-white border-r border-[#b0b2b5] w-64">
-      <div className="p-6 flex items-center gap-3">
-        <div className="relative h-12 w-12 overflow-hidden rounded-lg border bg-gray-50 flex items-center justify-center shrink-0">
+      <div className="p-6 flex flex-col items-center gap-4 text-center">
+        <div className="relative h-20 w-20 overflow-hidden shrink-0">
           {logo ? (
             <Image 
               src={logo} 
               alt="Garage Logo" 
               fill
-              className="object-contain p-1"
+              className="object-contain"
               unoptimized
             />
           ) : (
-            <div className="bg-[#c10d12] h-full w-full flex items-center justify-center">
-              <Wrench className="text-white h-6 w-6" />
+            <div className="h-full w-full flex items-center justify-center">
+              <Wrench className="text-[#c10d12] h-10 w-10" />
             </div>
           )}
         </div>
-        <h1 className="text-sm font-bold tracking-tight text-black leading-tight uppercase line-clamp-2">
+        <h1 className="text-xs font-bold tracking-tight text-black leading-tight uppercase line-clamp-2 px-2">
           {garageName}
         </h1>
       </div>

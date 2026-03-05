@@ -37,15 +37,15 @@ export function ProformaDocument({ proforma, settings, className }: ProformaDocu
             </div>
           </div>
 
-          {/* Garage Details (Logo above, larger) */}
+          {/* Garage Details (Logo above) */}
           <div className="flex flex-col items-end text-right">
             {settings.garage_logo ? (
-              <div className="relative h-32 w-32 mb-3">
-                <Image src={settings.garage_logo} alt="Logo" fill className="object-contain" unoptimized />
+              <div className="relative h-44 w-44 mb-3 overflow-hidden">
+                <Image src={settings.garage_logo} alt="Logo" fill className="object-contain object-right" unoptimized />
               </div>
             ) : (
-              <div className="h-20 w-20 bg-[#c10d12] rounded flex items-center justify-center mb-3">
-                <Wrench className="text-white h-10 w-10" />
+              <div className="h-20 w-20 mb-3 flex items-center justify-center">
+                <Wrench className="text-[#c10d12] h-14 w-14" />
               </div>
             )}
             <div>
@@ -160,7 +160,7 @@ export function ProformaDocument({ proforma, settings, className }: ProformaDocu
         </div>
       </div>
 
-      {/* Footer Content Wrapper - Pushed to bottom */}
+      {/* Footer Content Wrapper */}
       <div className="mt-auto pt-6">
         <div className="grid grid-cols-2 gap-8 border-t pt-6">
           <div>
