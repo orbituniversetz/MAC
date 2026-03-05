@@ -38,7 +38,7 @@ export function PreviewContainer({
           </div>
           <div className="hidden sm:block">
             <h2 className="text-sm font-bold tracking-tight uppercase tracking-widest leading-none">{title}</h2>
-            <p className="text-[10px] text-white/40 mt-1 uppercase font-bold">A4 Document View</p>
+            <p className="text-[10px] text-white/40 mt-1 uppercase font-bold">Standard A4 Format</p>
           </div>
         </div>
 
@@ -86,19 +86,18 @@ export function PreviewContainer({
         </div>
       </div>
 
-      {/* Viewport */}
-      <div className="flex-1 overflow-auto preview-scroll bg-zinc-900">
-        <div className="min-h-full w-full flex flex-col items-center py-12 px-4">
-          <div 
-            className="print-container transition-transform duration-200 origin-top shadow-2xl ring-1 ring-white/10"
-            style={{ 
-              transform: `scale(${zoom / 100})`,
-              // Ensure the container expands to show the full content vertically even when zoomed
-              marginBottom: zoom > 100 ? `calc(297mm * ${(zoom - 100) / 100})` : '0px'
-            }}
-          >
-            {children}
-          </div>
+      {/* Viewport - Enlarged height handling */}
+      <div className="flex-1 overflow-auto preview-scroll bg-zinc-900 flex justify-center p-4 sm:p-12">
+        <div 
+          className="print-container transition-transform duration-200 origin-top shadow-2xl"
+          style={{ 
+            transform: `scale(${zoom / 100})`,
+            // Ensure the parent container height reflects the transformed content
+            height: 'max-content',
+            minHeight: zoom > 100 ? `calc(297mm * ${zoom / 100})` : 'auto'
+          }}
+        >
+          {children}
         </div>
       </div>
     </div>

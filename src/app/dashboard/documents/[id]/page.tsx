@@ -29,9 +29,11 @@ export default async function DocumentDetailPage({ params }: { params: Promise<{
         <DocumentPreview doc={doc} settings={settings} />
       </div>
 
-      <div className="max-w-4xl mx-auto">
-        <div className="bg-white border rounded-xl shadow-lg overflow-hidden p-8 flex justify-center bg-gray-50/50">
-          <DocumentPaper doc={doc} settings={settings} />
+      <div className="max-w-5xl mx-auto">
+        <div className="bg-white border rounded-xl shadow-2xl overflow-hidden p-4 sm:p-12 flex justify-center bg-gray-50/50 min-h-[800px]">
+          <div className="transform scale-90 sm:scale-100 origin-top">
+            <DocumentPaper doc={doc} settings={settings} />
+          </div>
         </div>
       </div>
     </div>
