@@ -1,4 +1,3 @@
-
 'use client'
 
 import { useState } from 'react';
@@ -47,11 +46,12 @@ export function AddExpenseForm({
 
   const handleJobItemPick = (item: any) => {
     // Map item type to expense category
-    const mappedCategory = item.type === 'PART' ? 'PART' : 'LABOUR';
+    let mappedCategory = 'PART';
+    if (item.type === 'LABOUR') mappedCategory = 'LABOUR';
+    if (item.type === 'CONSUMABLE') mappedCategory = 'PART'; // Consumables are usually parts
+    
     setCategory(mappedCategory);
     setDescription(`${item.description} (Cost)`);
-    // Note: User likely paid a different price than they charged, 
-    // but we use the selling price as a default starting point.
     setAmount(item.unitPrice * (item.qty || 1));
   };
 

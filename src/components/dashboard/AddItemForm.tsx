@@ -1,4 +1,3 @@
-
 'use client'
 
 import { useState } from 'react';
@@ -92,6 +91,7 @@ export function AddItemForm({ jobId, proformaId, recentItems }: AddItemFormProps
         >
           <option value="PART">Part</option>
           <option value="LABOUR">Labour</option>
+          <option value="CONSUMABLE">Consumables / Fluids</option>
         </select>
         
         <input 
