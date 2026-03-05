@@ -89,73 +89,63 @@ export function JobCardDocument({ job, settings, isInternal = false, className }
         </div>
       )}
 
-      {/* Items Table */}
-      <div className="mb-10">
-        <h3 className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3 text-center">
-          {isInternal ? 'Detailed Parts & Labour Costs' : 'Work Items Recorded'}
-        </h3>
-        <table className="w-full border-collapse">
-          <thead>
-            <tr className="border-b-2 border-gray-900 bg-gray-50">
-              <th className="py-2 text-left text-[10px] font-black uppercase w-8 px-2">#</th>
-              <th className="py-2 text-left text-[10px] font-black uppercase px-2">Description</th>
-              <th className="py-2 text-center text-[10px] font-black uppercase w-20 px-2">Type</th>
-              <th className="py-2 text-center text-[10px] font-black uppercase w-16 px-2">Qty</th>
-              {isInternal && (
-                <>
-                  <th className="py-2 text-right text-[10px] font-black uppercase w-24 px-2">Unit Price</th>
-                  <th className="py-2 text-right text-[10px] font-black uppercase w-24 px-2">Total</th>
-                </>
-              )}
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-100">
-            {job.items.length > 0 ? (
-              job.items.map((item: any, index: number) => (
-                <tr key={item.id} className="text-[11px]">
-                  <td className="py-3 text-gray-400 px-2">{index + 1}</td>
-                  <td className="py-3 font-bold px-2">{item.description}</td>
-                  <td className="py-3 text-center px-2">
-                    <span className="bg-gray-100 px-2 py-0.5 rounded text-[9px] font-black text-gray-500 uppercase">
-                      {item.type}
-                    </span>
-                  </td>
-                  <td className="py-3 text-center font-bold px-2">{item.qty}</td>
-                  {isInternal && (
-                    <>
-                      <td className="py-3 text-right px-2">{item.unitPrice.toLocaleString()}</td>
-                      <td className="py-3 text-right font-black px-2">{item.subtotal.toLocaleString()}</td>
-                    </>
-                  )}
-                </tr>
-              ))
-            ) : (
-              Array.from({ length: 4 }).map((_, i) => (
-                <tr key={i} className="h-10">
-                  <td className="py-3 text-gray-300 px-2">{i + 1}</td>
-                  <td className="py-3 px-2"></td>
-                  <td className="py-3 px-2"></td>
-                  <td className="py-3 px-2"></td>
-                  {isInternal && (
-                    <>
-                      <td className="py-3 px-2"></td>
-                      <td className="py-3 px-2"></td>
-                    </>
-                  )}
-                </tr>
-              ))
-            )}
-          </tbody>
-          {isInternal && job.items.length > 0 && (
-            <tfoot>
-              <tr className="border-t-2 border-gray-900 bg-gray-50">
-                <td colSpan={5} className="py-3 text-right font-black uppercase text-[10px] px-2">Estimated Job Total (Income):</td>
-                <td className="py-3 text-right font-black text-[#c10d12] text-sm px-2">TZS {total.toLocaleString()}</td>
+      {/* Items Table - Only visible on Internal Copy */}
+      {isInternal && (
+        <div className="mb-10">
+          <h3 className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3 text-center">
+            Detailed Parts & Labour Costs
+          </h3>
+          <table className="w-full border-collapse">
+            <thead>
+              <tr className="border-b-2 border-gray-900 bg-gray-50">
+                <th className="py-2 text-left text-[10px] font-black uppercase w-8 px-2">#</th>
+                <th className="py-2 text-left text-[10px] font-black uppercase px-2">Description</th>
+                <th className="py-2 text-center text-[10px] font-black uppercase w-20 px-2">Type</th>
+                <th className="py-2 text-center text-[10px] font-black uppercase w-16 px-2">Qty</th>
+                <th className="py-2 text-right text-[10px] font-black uppercase w-24 px-2">Unit Price</th>
+                <th className="py-2 text-right text-[10px] font-black uppercase w-24 px-2">Total</th>
               </tr>
-            </tfoot>
-          )}
-        </table>
-      </div>
+            </thead>
+            <tbody className="divide-y divide-gray-100">
+              {job.items.length > 0 ? (
+                job.items.map((item: any, index: number) => (
+                  <tr key={item.id} className="text-[11px]">
+                    <td className="py-3 text-gray-400 px-2">{index + 1}</td>
+                    <td className="py-3 font-bold px-2">{item.description}</td>
+                    <td className="py-3 text-center px-2">
+                      <span className="bg-gray-100 px-2 py-0.5 rounded text-[9px] font-black text-gray-500 uppercase">
+                        {item.type}
+                      </span>
+                    </td>
+                    <td className="py-3 text-center font-bold px-2">{item.qty}</td>
+                    <td className="py-3 text-right px-2">{item.unitPrice.toLocaleString()}</td>
+                    <td className="py-3 text-right font-black px-2">{item.subtotal.toLocaleString()}</td>
+                  </tr>
+                ))
+              ) : (
+                Array.from({ length: 4 }).map((_, i) => (
+                  <tr key={i} className="h-10">
+                    <td className="py-3 text-gray-300 px-2">{i + 1}</td>
+                    <td className="py-3 px-2"></td>
+                    <td className="py-3 px-2"></td>
+                    <td className="py-3 px-2"></td>
+                    <td className="py-3 px-2"></td>
+                    <td className="py-3 px-2"></td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+            {job.items.length > 0 && (
+              <tfoot>
+                <tr className="border-t-2 border-gray-900 bg-gray-50">
+                  <td colSpan={5} className="py-3 text-right font-black uppercase text-[10px] px-2">Estimated Job Total (Income):</td>
+                  <td className="py-3 text-right font-black text-[#c10d12] text-sm px-2">TZS {total.toLocaleString()}</td>
+                </tr>
+              </tfoot>
+            )}
+          </table>
+        </div>
+      )}
 
       {!isInternal && (
         <div className="mb-10 p-4 bg-gray-50 rounded-xl border border-gray-200">
