@@ -14,6 +14,7 @@ import {
 import { Trash2, Save, Lock, FileCheck, Receipt, Plus } from 'lucide-react';
 import { ProformaPreview } from '@/components/dashboard/ProformaPreview';
 import { redirect } from 'next/navigation';
+import { PriceInput } from '@/components/dashboard/PriceInput';
 
 export default async function ProformaDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -43,7 +44,8 @@ export default async function ProformaDetailPage({ params }: { params: Promise<{
     const type = formData.get('type') as string;
     const description = formData.get('description') as string;
     const qty = parseFloat(formData.get('qty') as string);
-    const unitPrice = parseFloat(formData.get('unitPrice') as string);
+    const unitPriceRaw = (formData.get('unitPrice') as string).replace(/,/g, '');
+    const unitPrice = parseFloat(unitPriceRaw);
     await addJobItem(pf.jobSheetId, pf.id, { type, description, qty, unitPrice });
   }
 
@@ -156,7 +158,7 @@ export default async function ProformaDetailPage({ params }: { params: Promise<{
                   </select>
                   <input name="description" placeholder="Item Description" required className="border rounded p-2 text-sm col-span-1 md:col-span-2 bg-white" />
                   <input name="qty" type="number" step="0.1" placeholder="Qty" required className="border rounded p-2 text-sm bg-white" />
-                  <input name="unitPrice" type="number" placeholder="Unit Price" required className="border rounded p-2 text-sm bg-white" />
+                  <PriceInput name="unitPrice" placeholder="Unit Price" className="bg-white text-sm" />
                   <Button type="submit" className="bg-black text-white col-span-1 md:col-span-5">Add Item to Proforma</Button>
                 </form>
               </div>
