@@ -20,7 +20,7 @@ export function ProformaDocument({ proforma, settings, className }: ProformaDocu
     <div id="proforma-document" className={`a4-page print-container text-black font-sans ${className || ''}`}>
       {/* Header */}
       <div className="flex justify-between items-start mb-8">
-        {/* Invoice Details (Now on the Left) */}
+        {/* Invoice Details */}
         <div className="text-left">
           <h2 className="text-2xl font-black text-gray-900 mb-1">PROFORMA INVOICE</h2>
           <div className="text-xs font-bold space-y-0.5">
@@ -30,26 +30,26 @@ export function ProformaDocument({ proforma, settings, className }: ProformaDocu
           </div>
         </div>
 
-        {/* Garage Details (Now on the Right) */}
-        <div className="flex gap-4 items-center flex-row-reverse text-right">
+        {/* Garage Details (Logo above, larger) */}
+        <div className="flex flex-col items-end text-right">
           {settings.garage_logo ? (
-            <div className="relative h-16 w-16">
+            <div className="relative h-24 w-24 mb-3">
               <Image src={settings.garage_logo} alt="Logo" fill className="object-contain" unoptimized />
             </div>
           ) : (
-            <div className="h-16 w-16 bg-[#c10d12] rounded flex items-center justify-center">
-              <Wrench className="text-white h-8 w-8" />
+            <div className="h-20 w-20 bg-[#c10d12] rounded flex items-center justify-center mb-3">
+              <Wrench className="text-white h-10 w-10" />
             </div>
           )}
           <div>
-            <h1 className="text-2xl font-bold text-[#c10d12] uppercase leading-none mb-1">
+            <h1 className="text-3xl font-black text-[#c10d12] uppercase leading-none mb-1">
               {settings.garage_name || 'M. A. C. GARAGE'}
             </h1>
-            <div className="text-[10px] font-medium text-gray-600 space-y-0.5">
+            <div className="text-[11px] font-medium text-gray-600 space-y-0.5">
               <p>{settings.garage_mailbox}</p>
               <p>{settings.garage_address}</p>
               <p>Tel: {settings.garage_phone}</p>
-              <p className="font-bold text-gray-800">TIN: {settings.garage_tin}</p>
+              <p className="font-bold text-gray-900 mt-1">TIN: {settings.garage_tin}</p>
             </div>
           </div>
         </div>
