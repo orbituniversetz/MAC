@@ -200,6 +200,34 @@ export async function saveProformaDraft(id: number) {
   revalidatePath(`/dashboard/proformas/${id}`);
 }
 
+export async function convertToInvoice(proformaId: number) {
+  const pf = await getProformaById(proformaId);
+  if (!pf) return;
+
+  const currentYear = new Date().getFullYear().toString().slice(-2);
+  const prefix = 'INV';
+  const countObj = db.prepare("SELECT COUNT(*) as count FROM invoices WHERE invoiceNo LIKE ?").get(`${prefix}-${currentYear}%`) as any;
+  const nextNo = (countObj?.count || 0) + 1;
+  const invoiceNo = `${prefix}-${currentYear}${nextNo.toString().padStart(4, '0')}`;
+
+  const snapshotJson = JSON.stringify(pf);
+  
+  db.prepare(`
+    INSERT INTO invoices (invoiceNo, jobSheetId, proformaId, snapshotJson, status)
+    VALUES (?, ?, ?, ?, ?)
+  `).run(invoiceNo, pf.jobSheetId, proformaId, snapshotJson, 'Unpaid');
+
+  db.prepare("UPDATE proformas SET status = 'Invoiced' WHERE id = ?").run(proformaId);
+  if (pf.jobSheetId) {
+    db.prepare("UPDATE jobsheets SET status = 'Completed' WHERE id = ?").run(pf.jobSheetId);
+  }
+
+  revalidatePath('/dashboard/invoices');
+  revalidatePath('/dashboard/proformas');
+  revalidatePath(`/dashboard/proformas/${proformaId}`);
+  redirect('/dashboard/invoices');
+}
+
 export async function createProformaDirect(formData: FormData) {
   let customerId = formData.get('customerId') ? parseInt(formData.get('customerId') as string) : null;
   const newCustomerName = formData.get('newCustomerName') as string;

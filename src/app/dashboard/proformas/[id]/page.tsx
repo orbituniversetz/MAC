@@ -1,4 +1,4 @@
-import { getProformaById, getSettings, finalizeProforma, saveProformaDraft, getRecentItems, deleteJobItem } from '@/lib/actions';
+import { getProformaById, getSettings, finalizeProforma, saveProformaDraft, getRecentItems, deleteJobItem, convertToInvoice } from '@/lib/actions';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -33,6 +33,7 @@ export default async function ProformaDetailPage({ params }: { params: Promise<{
   }
 
   const isFinalized = pf.status === 'Finalized' || pf.status === 'Invoiced';
+  const isInvoiced = pf.status === 'Invoiced';
   const subtotal = pf.items.reduce((acc: number, item: any) => acc + item.subtotal, 0);
   const discount = pf.discount || 0;
   const taxRate = parseFloat(settings.tax_rate || '0') / 100;
@@ -49,6 +50,11 @@ export default async function ProformaDetailPage({ params }: { params: Promise<{
     await saveProformaDraft(pf.id);
   }
 
+  async function handleConvertToInvoice() {
+    'use server'
+    await convertToInvoice(pf.id);
+  }
+
   return (
     <div className="space-y-6">
       {/* Action Bar */}
@@ -57,7 +63,7 @@ export default async function ProformaDetailPage({ params }: { params: Promise<{
           <div>
             <h2 className="text-2xl font-bold tracking-tight text-black">{pf.proformaNo}</h2>
             <div className="flex gap-2 mt-1">
-              <Badge variant={isFinalized ? 'default' : 'outline'} className={isFinalized ? "bg-green-600" : ""}>
+              <Badge variant={isFinalized ? 'default' : 'outline'} className={isInvoiced ? "bg-blue-600" : isFinalized ? "bg-green-600" : ""}>
                 {pf.status}
               </Badge>
               {pf.jobNo && <Badge variant="secondary">Linked to {pf.jobNo}</Badge>}
@@ -83,9 +89,17 @@ export default async function ProformaDetailPage({ params }: { params: Promise<{
           
           <ProformaPreview proforma={pf} settings={settings} />
           
-          {isFinalized && pf.status !== 'Invoiced' && (
-            <Button className="bg-[#c10d12]">
-              <Receipt className="mr-2 h-4 w-4" /> Convert to Invoice
+          {isFinalized && !isInvoiced && (
+            <form action={handleConvertToInvoice}>
+              <Button className="bg-[#c10d12]" type="submit">
+                <Receipt className="mr-2 h-4 w-4" /> Convert to Invoice
+              </Button>
+            </form>
+          )}
+
+          {isInvoiced && (
+            <Button variant="outline" disabled className="bg-blue-50 text-blue-700 border-blue-200">
+              <FileCheck className="mr-2 h-4 w-4" /> Already Invoiced
             </Button>
           )}
         </div>
@@ -194,6 +208,13 @@ export default async function ProformaDetailPage({ params }: { params: Promise<{
             <div className="p-4 border rounded-lg bg-green-50 text-green-800 flex items-center gap-3">
               <FileCheck className="h-5 w-5" />
               <p className="text-xs font-medium">This document is finalized and locked for editing.</p>
+            </div>
+          )}
+          
+          {isInvoiced && (
+            <div className="p-4 border rounded-lg bg-blue-50 text-blue-800 flex items-center gap-3">
+              <Receipt className="h-5 w-5" />
+              <p className="text-xs font-medium">This proforma has been converted to an official Invoice.</p>
             </div>
           )}
         </div>
