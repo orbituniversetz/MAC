@@ -75,7 +75,13 @@ export default function NewProformaPage() {
               ) : (
                 <div className="grid gap-3">
                   <Input name="newCustomerName" placeholder="Customer Full Name" required={isNewCustomer} />
-                  <Input name="newCustomerPhone" placeholder="Phone Number" required={isNewCustomer} />
+                  <Input 
+                    name="newCustomerPhone" 
+                    placeholder="+255 765 000 000" 
+                    required={isNewCustomer} 
+                    pattern="^\+255\d{9}$"
+                    title="Phone number must start with +255 followed by 9 digits (e.g., +255765000000)"
+                  />
                   <Input name="newCustomerAddress" placeholder="Physical Address" />
                   <Input name="newCustomerTin" placeholder="TIN Number" />
                 </div>
