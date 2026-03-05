@@ -70,12 +70,10 @@ export async function createJobSheet(formData: FormData) {
 
   const complaint = formData.get('complaint') as string;
 
-  const lastJob = db.prepare('SELECT jobNo FROM jobsheets ORDER BY id DESC LIMIT 1').get() as any;
-  let nextNo = 1;
-  if (lastJob && lastJob.jobNo.includes('-')) {
-    nextNo = parseInt(lastJob.jobNo.split('-')[1]) + 1;
-  }
-  const jobNo = `JS-${nextNo.toString().padStart(4, '0')}`;
+  const currentYear = new Date().getFullYear().toString().slice(-2);
+  const countObj = db.prepare("SELECT COUNT(*) as count FROM jobsheets WHERE jobNo LIKE ?").get(`${currentYear}%`) as any;
+  const nextNo = (countObj?.count || 0) + 1;
+  const jobNo = `${currentYear}${nextNo.toString().padStart(4, '0')}`;
 
   const info = db.prepare(`
     INSERT INTO jobsheets (jobNo, customerId, vehicleId, complaint, status)
@@ -116,12 +114,10 @@ export async function createProformaFromJob(jobId: number) {
   const job = await getJobSheetById(jobId);
   if (!job) return null;
 
-  const lastPF = db.prepare('SELECT proformaNo FROM proformas ORDER BY id DESC LIMIT 1').get() as any;
-  let nextNo = 1;
-  if (lastPF && lastPF.proformaNo.includes('-')) {
-    nextNo = parseInt(lastPF.proformaNo.split('-')[1]) + 1;
-  }
-  const proformaNo = `PF-${nextNo.toString().padStart(4, '0')}`;
+  const currentYear = new Date().getFullYear().toString().slice(-2);
+  const countObj = db.prepare("SELECT COUNT(*) as count FROM proformas WHERE proformaNo LIKE ?").get(`${currentYear}%`) as any;
+  const nextNo = (countObj?.count || 0) + 1;
+  const proformaNo = `${currentYear}${nextNo.toString().padStart(4, '0')}`;
 
   const info = db.prepare(`
     INSERT INTO proformas (proformaNo, jobSheetId, customerId, vehicleId, status)
@@ -167,12 +163,10 @@ export async function createProformaDirect(formData: FormData) {
     vehicleId = info.lastInsertRowid as number;
   }
 
-  const lastPF = db.prepare('SELECT proformaNo FROM proformas ORDER BY id DESC LIMIT 1').get() as any;
-  let nextNo = 1;
-  if (lastPF && lastPF.proformaNo.includes('-')) {
-    nextNo = parseInt(lastPF.proformaNo.split('-')[1]) + 1;
-  }
-  const proformaNo = `PF-${nextNo.toString().padStart(4, '0')}`;
+  const currentYear = new Date().getFullYear().toString().slice(-2);
+  const countObj = db.prepare("SELECT COUNT(*) as count FROM proformas WHERE proformaNo LIKE ?").get(`${currentYear}%`) as any;
+  const nextNo = (countObj?.count || 0) + 1;
+  const proformaNo = `${currentYear}${nextNo.toString().padStart(4, '0')}`;
 
   const info = db.prepare(`
     INSERT INTO proformas (proformaNo, customerId, vehicleId, status)

@@ -2,7 +2,7 @@
 
 import { Button } from '@/components/ui/button';
 import { Printer } from 'lucide-react';
-import jsPDF from 'jspdf';
+import jsPDF from 'jsPDF';
 import autoTable from 'jspdf-autotable';
 
 interface PrintJobCardButtonProps {
@@ -99,7 +99,7 @@ export function PrintJobCardButton({ job, settings }: PrintJobCardButtonProps) {
     doc.text('__________________________', pageWidth - 70, finalY + 40);
     doc.text('Customer Signature', pageWidth - 70, finalY + 46);
 
-    doc.save(`JobCard_${job.jobNo}.pdf`);
+    doc.save(`JOB CARD ${job.jobNo}.pdf`);
   };
 
   return (

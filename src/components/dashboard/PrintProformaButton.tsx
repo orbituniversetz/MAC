@@ -2,7 +2,7 @@
 
 import { Button } from '@/components/ui/button';
 import { Printer } from 'lucide-react';
-import jsPDF from 'jspdf';
+import jsPDF from 'jsPDF';
 import autoTable from 'jspdf-autotable';
 
 interface PrintProformaButtonProps {
@@ -143,7 +143,7 @@ export function PrintProformaButton({ proforma, settings }: PrintProformaButtonP
     doc.setTextColor(150);
     doc.text('Thank you for your business!', pageWidth / 2, 285, { align: 'center' });
 
-    doc.save(`Proforma_${proforma.proformaNo}.pdf`);
+    doc.save(`PROFORMA INVOICE ${proforma.proformaNo}.pdf`);
   };
 
   return (

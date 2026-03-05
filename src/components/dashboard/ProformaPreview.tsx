@@ -11,7 +11,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Eye, Printer, Download, X, ZoomIn, ZoomOut, Maximize } from 'lucide-react';
 import { ProformaDocument } from './ProformaDocument';
-import jsPDF from 'jspdf';
+import jsPDF from 'jsPDF';
 import html2canvas from 'html2canvas';
 
 interface ProformaPreviewProps {
@@ -54,7 +54,7 @@ export function ProformaPreview({ proforma, settings }: ProformaPreviewProps) {
     const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
 
     pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
-    pdf.save(`Proforma_${proforma.proformaNo}.pdf`);
+    pdf.save(`PROFORMA INVOICE ${proforma.proformaNo}.pdf`);
   };
 
   if (!mounted) {
