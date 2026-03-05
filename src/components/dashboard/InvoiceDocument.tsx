@@ -21,8 +21,8 @@ export function InvoiceDocument({ invoice, settings, className }: InvoiceDocumen
 
   return (
     <div id="invoice-document" className={className}>
-      <div className="a4-page text-black font-sans">
-        {/* Header */}
+      <div className="a4-page text-black font-sans bg-white">
+        {/* Header - Logo Left, Text Right */}
         <div className="flex items-center justify-between mb-4 border-b pb-4">
           <div className="flex items-center">
             {settings.garage_logo && (

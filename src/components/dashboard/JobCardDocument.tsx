@@ -19,7 +19,7 @@ export function JobCardDocument({ job, settings, isInternal = false, className }
 
   return (
     <div id={`jobcard-document-${isInternal ? 'internal' : 'customer'}`} className={className}>
-      <div className="a4-page text-black font-sans">
+      <div className="a4-page text-black font-sans bg-white">
         {/* Header - Logo Left, Text Right */}
         <div className="flex items-center justify-between mb-4 border-b pb-4">
           <div className="flex items-center">
@@ -134,7 +134,7 @@ export function JobCardDocument({ job, settings, isInternal = false, className }
                 </tbody>
                 <tfoot>
                   <tr className="border-t-2 border-gray-900 bg-gray-50 font-black">
-                    <td colSpan={5} className="py-2.5 text-right uppercase text-[10px] px-2">Total Job Income:</td>
+                    <td colSpan={5} className="py-2.5 text-right uppercase text-[10px] px-2">Estimated Job Total (Income):</td>
                     <td className="py-2.5 text-right text-xs px-2 whitespace-nowrap">TZS {totalIncome.toLocaleString()}</td>
                   </tr>
                 </tfoot>
@@ -175,7 +175,7 @@ export function JobCardDocument({ job, settings, isInternal = false, className }
                 </tbody>
                 <tfoot>
                   <tr className="border-t-2 border-red-900 bg-red-50 font-black">
-                    <td colSpan={3} className="py-2.5 text-right uppercase text-[10px] px-2">Total Job Expenses:</td>
+                    <td colSpan={3} className="py-2.5 text-right uppercase text-[10px] px-2">Total Job Expenses (Costs):</td>
                     <td className="py-2.5 text-right text-xs px-2 whitespace-nowrap text-red-600">TZS {totalExpenses.toLocaleString()}</td>
                   </tr>
                 </tfoot>
@@ -210,7 +210,7 @@ export function JobCardDocument({ job, settings, isInternal = false, className }
           </div>
         )}
 
-        <div className="mt-auto">
+        <div className="mt-auto pt-8">
           {/* Terms and Conditions */}
           <div className="mb-8 p-4 bg-gray-50 rounded-xl border border-gray-200 terms-block">
             <h3 className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-2">Terms and Conditions</h3>

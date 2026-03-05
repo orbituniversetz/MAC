@@ -13,7 +13,7 @@ interface DocumentPaperProps {
 export function DocumentPaper({ doc, settings, className }: DocumentPaperProps) {
   return (
     <div id="document-paper" className={className}>
-      <div className="a4-page text-black font-sans">
+      <div className="a4-page text-black font-sans bg-white">
         {/* Header - Logo Left, Text Right */}
         <div className="flex items-center justify-between mb-4 border-b pb-4">
           <div className="flex items-center">

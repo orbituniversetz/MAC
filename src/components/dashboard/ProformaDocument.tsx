@@ -23,8 +23,8 @@ export function ProformaDocument({ proforma, settings, className }: ProformaDocu
 
   return (
     <div id="proforma-document" className={className}>
-      <div className="a4-page text-black font-sans">
-        {/* Header */}
+      <div className="a4-page text-black font-sans bg-white">
+        {/* Header - Logo Left, Text Right */}
         <div className="flex items-center justify-between mb-4 border-b pb-4">
           <div className="flex items-center">
             {settings.garage_logo && (
@@ -123,7 +123,7 @@ export function ProformaDocument({ proforma, settings, className }: ProformaDocu
             </div>
             <div className="flex justify-between text-sm text-red-700 font-black pt-1">
               <span>BALANCE DUE:</span>
-              <span className="whitespace-nowrap font-black">TZS {balanceDue.toLocaleString()}</span>
+              <span className="whitespace-nowrap font-black text-red-700">TZS {balanceDue.toLocaleString()}</span>
             </div>
           </div>
         </div>
@@ -142,18 +142,20 @@ export function ProformaDocument({ proforma, settings, className }: ProformaDocu
           </div>
         </div>
 
-        <div className="mt-auto pt-8 border-t grid grid-cols-2 gap-12">
-          <div>
-            <h3 className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-3">Bank Details</h3>
-            <div className="space-y-1 text-xs">
-              <p><span className="font-bold text-gray-500 w-24 inline-block uppercase text-[9px]">Bank:</span> {settings.bank_name}</p>
-              <p><span className="font-bold text-gray-500 w-24 inline-block uppercase text-[9px]">Account Name:</span> {settings.bank_account_name}</p>
-              <p><span className="font-bold text-gray-500 w-24 inline-block uppercase text-[9px]">Account No:</span> {settings.bank_account_number}</p>
+        <div className="mt-auto pt-8">
+          <div className="grid grid-cols-2 gap-12 border-t pt-8">
+            <div>
+              <h3 className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-3">Bank Details</h3>
+              <div className="space-y-1 text-xs">
+                <p><span className="font-bold text-gray-500 w-24 inline-block uppercase text-[9px]">Bank:</span> {settings.bank_name}</p>
+                <p><span className="font-bold text-gray-500 w-24 inline-block uppercase text-[9px]">Account Name:</span> {settings.bank_account_name}</p>
+                <p><span className="font-bold text-gray-500 w-24 inline-block uppercase text-[9px]">Account No:</span> {settings.bank_account_number}</p>
+              </div>
             </div>
-          </div>
-          <div className="text-[9px] text-gray-500 italic leading-relaxed">
-            <h3 className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-2 not-italic">Payment Terms</h3>
-            <p>Payment is due upon approval of this invoice. Listed services include mechanical repairs and parts as detailed. Additional discoveries during servicing will be communicated before proceeding.</p>
+            <div className="text-[9px] text-gray-500 italic leading-relaxed">
+              <h3 className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-2 not-italic">Payment Terms</h3>
+              <p>Payment is due upon approval of this invoice. Listed services include mechanical repairs and parts as detailed. Additional discoveries during servicing will be communicated before proceeding.</p>
+            </div>
           </div>
         </div>
       </div>
