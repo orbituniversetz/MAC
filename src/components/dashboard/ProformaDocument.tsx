@@ -20,7 +20,18 @@ export function ProformaDocument({ proforma, settings, className }: ProformaDocu
     <div id="proforma-document" className={`a4-page print-container text-black font-sans ${className || ''}`}>
       {/* Header */}
       <div className="flex justify-between items-start mb-8">
-        <div className="flex gap-4 items-center">
+        {/* Invoice Details (Now on the Left) */}
+        <div className="text-left">
+          <h2 className="text-2xl font-black text-gray-900 mb-1">PROFORMA INVOICE</h2>
+          <div className="text-xs font-bold space-y-0.5">
+            <p>No: <span className="text-[#c10d12]">{proforma.proformaNo}</span></p>
+            <p className="text-gray-500 font-normal">Date: {new Date(proforma.createdAt).toLocaleDateString()}</p>
+            {proforma.jobNo && <p className="text-gray-500 font-normal">Ref: {proforma.jobNo}</p>}
+          </div>
+        </div>
+
+        {/* Garage Details (Now on the Right) */}
+        <div className="flex gap-4 items-center flex-row-reverse text-right">
           {settings.garage_logo ? (
             <div className="relative h-16 w-16">
               <Image src={settings.garage_logo} alt="Logo" fill className="object-contain" unoptimized />
@@ -40,14 +51,6 @@ export function ProformaDocument({ proforma, settings, className }: ProformaDocu
               <p>Tel: {settings.garage_phone}</p>
               <p className="font-bold text-gray-800">TIN: {settings.garage_tin}</p>
             </div>
-          </div>
-        </div>
-        <div className="text-right">
-          <h2 className="text-2xl font-black text-gray-900 mb-1">PROFORMA INVOICE</h2>
-          <div className="text-xs font-bold space-y-0.5">
-            <p>No: <span className="text-[#c10d12]">{proforma.proformaNo}</span></p>
-            <p className="text-gray-500 font-normal">Date: {new Date(proforma.createdAt).toLocaleDateString()}</p>
-            {proforma.jobNo && <p className="text-gray-500 font-normal">Ref: {proforma.jobNo}</p>}
           </div>
         </div>
       </div>
