@@ -1,3 +1,4 @@
+
 'use client'
 
 import { useState, useEffect } from 'react';
@@ -36,21 +37,21 @@ export function DocumentPreview({ doc, settings }: DocumentPreviewProps) {
     const element = document.getElementById('document-paper');
     if (!element) return;
 
-    // Optimized canvas for smaller file size
+    // Scale 2.0 provides sharp text for printing/zooming
     const canvas = await html2canvas(element, {
-      scale: 1.5, // Reduced scale for better performance/size balance
+      scale: 2.0,
       useCORS: true,
       logging: false,
       backgroundColor: '#ffffff'
     });
     
-    // Using JPEG at 0.75 quality significantly reduces file size compared to PNG
-    const imgData = canvas.toDataURL('image/jpeg', 0.75);
+    // JPEG 0.8 is the sweet spot for high readability and low file size (~400KB)
+    const imgData = canvas.toDataURL('image/jpeg', 0.8);
     const pdf = new jsPDF({
       orientation: 'portrait',
       unit: 'mm',
       format: 'a4',
-      compress: true // Enable internal PDF compression
+      compress: true
     });
 
     const imgProps = pdf.getImageProperties(imgData);

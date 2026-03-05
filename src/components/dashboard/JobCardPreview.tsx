@@ -1,3 +1,4 @@
+
 'use client'
 
 import { useState, useEffect } from 'react';
@@ -40,16 +41,14 @@ export function JobCardPreview({ job, settings, mode }: JobCardPreviewProps) {
     const element = document.getElementById(docId);
     if (!element) return;
 
-    // Optimized canvas for smaller file size
     const canvas = await html2canvas(element, {
-      scale: 1.5,
+      scale: 2.0,
       useCORS: true,
       logging: false,
       backgroundColor: '#ffffff'
     });
     
-    // Using JPEG at 0.75 quality for massive file size savings
-    const imgData = canvas.toDataURL('image/jpeg', 0.75);
+    const imgData = canvas.toDataURL('image/jpeg', 0.8);
     const pdf = new jsPDF({
       orientation: 'portrait',
       unit: 'mm',
