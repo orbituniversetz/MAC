@@ -1,3 +1,4 @@
+
 'use client'
 
 import { useState, useEffect } from 'react';
@@ -11,7 +12,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Eye, Printer, Download, X, ZoomIn, ZoomOut, Maximize } from 'lucide-react';
 import { ProformaDocument } from './ProformaDocument';
-import jsPDF from 'jsPDF';
+import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 
 interface ProformaPreviewProps {
