@@ -11,8 +11,8 @@ interface DocumentPaperProps {
 
 export function DocumentPaper({ doc, settings, className }: DocumentPaperProps) {
   return (
-    <div id="document-paper" className={`a4-page print-container text-black font-sans flex flex-col ${className || ''}`}>
-      <div className="flex-grow">
+    <div id="document-paper" className={className}>
+      <div className="a4-page text-black font-sans">
         {/* Header - Logo Left, Text Right */}
         <div className="flex items-center justify-between mb-4 border-b pb-4">
           <div className="flex items-center">
@@ -37,19 +37,19 @@ export function DocumentPaper({ doc, settings, className }: DocumentPaperProps) 
           </div>
         </div>
 
-        <div className="flex justify-between items-end mb-6 border-b-2 border-gray-900 pb-1">
-          <div className="inline-flex items-center gap-1 bg-black text-white px-2 py-0.5 rounded text-[9px] font-bold uppercase">
+        <div className="flex justify-between items-end mb-8 border-b-2 border-gray-900 pb-1">
+          <div className="inline-flex items-center gap-1 bg-black text-white px-3 py-1 rounded text-[10px] font-bold uppercase tracking-tight">
             {doc.docType === 'LETTER' ? <Mail className="h-3 w-3" /> : <FileText className="h-3 w-3" />}
             {doc.docType === 'LETTER' ? 'Official Letter' : 'Technical Report'}
           </div>
           <div className="text-right">
-            <p className="font-bold text-base leading-none">{doc.docNo}</p>
-            <p className="text-[10px] text-muted-foreground mt-1">{new Date(doc.createdAt).toLocaleDateString()}</p>
+            <p className="font-bold text-lg tracking-tighter leading-none">{doc.docNo}</p>
+            <p className="text-[10px] text-muted-foreground mt-1 uppercase font-bold">{new Date(doc.createdAt).toLocaleDateString()}</p>
           </div>
         </div>
 
-        <div className="mb-8 space-y-4">
-          <div className="space-y-0.5">
+        <div className="mb-10 space-y-6">
+          <div className="space-y-1">
             <p className="text-[9px] font-black uppercase text-gray-400 tracking-widest">To:</p>
             <p className="font-bold text-base">{doc.customerName}</p>
             <p className="text-sm">{doc.customerAddress || 'No Address Provided'}</p>
@@ -57,28 +57,28 @@ export function DocumentPaper({ doc, settings, className }: DocumentPaperProps) 
           </div>
 
           {doc.vehiclePlate && (
-            <div className="bg-gray-50 p-3 rounded border border-gray-100 inline-block min-w-[300px]">
-              <p className="text-[9px] font-black uppercase text-gray-400 tracking-widest mb-1">Vehicle Reference</p>
-              <p className="text-sm font-bold">{doc.vehiclePlate} ({doc.vehicleModel})</p>
+            <div className="bg-gray-50 p-4 rounded-xl border border-gray-100 inline-block min-w-[350px]">
+              <p className="text-[9px] font-black uppercase text-gray-400 tracking-widest mb-1.5">Vehicle Reference</p>
+              <p className="text-base font-bold tracking-tight">{doc.vehiclePlate} ({doc.vehicleModel})</p>
             </div>
           )}
         </div>
 
-        <div className="mb-6">
-          <h2 className="text-xl font-black uppercase border-b-2 border-black inline-block pb-1">
+        <div className="mb-8">
+          <h2 className="text-2xl font-black uppercase border-b-4 border-black inline-block pb-1 tracking-tighter">
             {doc.title}
           </h2>
         </div>
 
-        <div className="prose prose-sm max-w-none whitespace-pre-wrap font-sans text-gray-800 leading-relaxed text-sm">
+        <div className="prose prose-sm max-w-none whitespace-pre-wrap font-sans text-zinc-800 leading-relaxed text-base flex-1">
           {doc.content}
         </div>
 
-        <div className="mt-12 space-y-8">
-          <p className="text-sm">Yours sincerely,</p>
-          <div className="space-y-1">
-            <div className="w-48 border-b border-gray-400 pb-1" />
-            <p className="text-sm font-bold uppercase">{settings.garage_name} Management</p>
+        <div className="mt-12 space-y-10 signature-block">
+          <p className="text-base">Yours sincerely,</p>
+          <div className="space-y-2">
+            <div className="w-64 border-b-2 border-gray-400" />
+            <p className="text-sm font-bold uppercase tracking-widest">{settings.garage_name} Management</p>
           </div>
         </div>
       </div>
