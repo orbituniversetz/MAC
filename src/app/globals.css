@@ -48,7 +48,7 @@
   .a4-page {
     width: 210mm;
     min-height: 297mm;
-    height: auto;
+    height: fit-content;
     padding: 20mm;
     margin: 0 auto;
     background: white;
@@ -89,6 +89,7 @@
 
   .a4-page {
     width: 210mm !important;
+    height: 297mm !important;
     margin: 0 !important;
     box-shadow: none !important;
     padding: 20mm !important;

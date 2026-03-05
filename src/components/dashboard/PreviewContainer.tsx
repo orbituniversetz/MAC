@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Printer, Download, X, ZoomIn, ZoomOut } from 'lucide-react';
+import { Printer, Download, X, ZoomIn, ZoomOut, Maximize } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
@@ -87,14 +87,14 @@ export function PreviewContainer({
       </div>
 
       {/* Viewport - Enlarged height handling */}
-      <div className="flex-1 overflow-auto preview-scroll bg-zinc-900 flex justify-center p-4 sm:p-12">
+      <div className="flex-1 overflow-auto preview-scroll bg-zinc-900 flex justify-center p-4 sm:p-12 items-start">
         <div 
           className="print-container transition-transform duration-200 origin-top shadow-2xl"
           style={{ 
             transform: `scale(${zoom / 100})`,
-            // Ensure the parent container height reflects the transformed content
-            height: 'max-content',
-            minHeight: zoom > 100 ? `calc(297mm * ${zoom / 100})` : 'auto'
+            height: 'fit-content',
+            minHeight: zoom > 100 ? `calc(297mm * ${zoom / 100})` : '297mm',
+            marginBottom: '100px' // Extra space at bottom for scrolling
           }}
         >
           {children}

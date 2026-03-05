@@ -30,8 +30,8 @@ export default async function DocumentDetailPage({ params }: { params: Promise<{
       </div>
 
       <div className="max-w-5xl mx-auto">
-        <div className="bg-white border rounded-xl shadow-2xl overflow-hidden p-4 sm:p-12 flex justify-center bg-gray-50/50 min-h-[800px]">
-          <div className="transform scale-90 sm:scale-100 origin-top">
+        <div className="bg-white border rounded-xl shadow-2xl overflow-hidden p-4 sm:p-12 flex justify-center bg-gray-50/50 min-h-[1200px]">
+          <div className="transform scale-90 sm:scale-100 origin-top h-fit">
             <DocumentPaper doc={doc} settings={settings} />
           </div>
         </div>
