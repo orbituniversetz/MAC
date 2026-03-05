@@ -1,4 +1,3 @@
-
 import { getProformaById, getSettings, finalizeProforma, saveProformaDraft, getRecentItems, deleteJobItem, convertToInvoice, updateProformaDiscount, recordProformaPayment, updateProformaTaxStatus } from '@/lib/actions';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -17,7 +16,7 @@ import { ProformaPreview } from '@/components/dashboard/ProformaPreview';
 import { AddItemForm } from '@/components/dashboard/AddItemForm';
 import { Label } from '@/components/ui/label';
 import { PriceInput } from '@/components/dashboard/PriceInput';
-import { Switch } from '@/components/ui/switch';
+import { TaxToggle } from '@/components/dashboard/TaxToggle';
 import Link from 'next/link';
 
 export default async function ProformaDetailPage({ params }: { params: Promise<{ id: string }> }) {
@@ -69,11 +68,6 @@ export default async function ProformaDetailPage({ params }: { params: Promise<{
     const discountRaw = (formData.get('discount') as string).replace(/,/g, '');
     const discountNum = parseFloat(discountRaw) || 0;
     await updateProformaDiscount(pf.id, discountNum);
-  }
-
-  async function handleToggleTax() {
-    'use server'
-    await updateProformaTaxStatus(pf.id, !taxEnabled);
   }
 
   return (
@@ -282,17 +276,11 @@ export default async function ProformaDetailPage({ params }: { params: Promise<{
                   <Label className="text-xs font-bold">Include VAT (18%)</Label>
                   <p className="text-[10px] text-muted-foreground">Always on by default</p>
                 </div>
-                {!isFinalized ? (
-                  <form action={handleToggleTax}>
-                    <Switch 
-                      checked={taxEnabled} 
-                      onCheckedChange={() => {}} 
-                      type="submit"
-                    />
-                  </form>
-                ) : (
-                  <Switch checked={taxEnabled} disabled />
-                )}
+                <TaxToggle 
+                  proformaId={pf.id} 
+                  enabled={taxEnabled} 
+                  disabled={isFinalized} 
+                />
               </div>
 
               {taxEnabled && (
