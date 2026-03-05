@@ -305,7 +305,7 @@ export async function getProformaById(id: number) {
   const pf = db.prepare(`
     SELECT p.*, c.name as customerName, c.phone as customerPhone, c.address as customerAddress, c.tin as customerTin, v.plateNumber as vehiclePlate, v.makeModel as vehicleModel, js.jobNo
     FROM proformas p
-    LEFT JOIN customers c ON p.customerId = c.id
+    LEFT JOIN customers c ON p.customerId = id
     LEFT JOIN vehicles v ON p.vehicleId = v.id
     LEFT JOIN jobsheets js ON p.jobSheetId = js.id
     WHERE p.id = ?
