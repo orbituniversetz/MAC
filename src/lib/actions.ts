@@ -422,7 +422,7 @@ export const getDocumentById = cache(async (id: number) => {
     FROM documents d
     LEFT JOIN customers c ON d.customerId = c.id
     LEFT JOIN jobsheets js ON d.jobSheetId = js.id
-    LEFT JOIN vehicles v ON d.vehicleId = v.id
+    LEFT JOIN vehicles v ON js.vehicleId = v.id
     WHERE d.id = ?
   `).get(id) as any;
 });
