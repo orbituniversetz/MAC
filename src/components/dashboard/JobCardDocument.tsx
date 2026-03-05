@@ -16,9 +16,9 @@ export function JobCardDocument({ job, settings, isInternal = false, className }
   return (
     <div id={`jobcard-document-${isInternal ? 'internal' : 'customer'}`} className={`a4-page print-container text-black font-sans flex flex-col ${className || ''}`}>
       {/* Header */}
-      <div className="flex flex-col items-center mb-8 text-center">
+      <div className="flex flex-col items-center mb-4 text-center">
         {settings.garage_logo && (
-          <div className="relative h-48 w-48 mb-4 overflow-hidden shrink-0">
+          <div className="relative h-32 w-32 mb-2 overflow-hidden shrink-0">
             <Image 
               src={settings.garage_logo} 
               alt="Garage Logo" 
@@ -28,9 +28,9 @@ export function JobCardDocument({ job, settings, isInternal = false, className }
             />
           </div>
         )}
-        <div className="space-y-1">
-          <h1 className="text-3xl font-black text-[#c10d12] uppercase leading-tight">{settings.garage_name}</h1>
-          <div className="text-[11px] text-muted-foreground font-medium leading-normal flex flex-wrap justify-center gap-x-4">
+        <div className="space-y-0.5">
+          <h1 className="text-2xl font-black text-[#c10d12] uppercase leading-tight">{settings.garage_name}</h1>
+          <div className="text-[10px] text-muted-foreground font-medium leading-normal flex flex-wrap justify-center gap-x-4">
             <p>{settings.garage_mailbox}</p>
             <p>{settings.garage_address}</p>
             <p>Tel: {settings.garage_phone}</p>
@@ -50,7 +50,7 @@ export function JobCardDocument({ job, settings, isInternal = false, className }
       </div>
 
       {/* Info Section */}
-      <div className="grid grid-cols-2 gap-10 mb-8">
+      <div className="grid grid-cols-2 gap-8 mb-6">
         <div className="space-y-4">
           <div>
             <h3 className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Customer Information</h3>
@@ -75,15 +75,15 @@ export function JobCardDocument({ job, settings, isInternal = false, className }
       </div>
 
       {/* Complaint Section */}
-      <div className="mb-8">
+      <div className="mb-6">
         <h3 className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Customer Complaint / Service Request</h3>
-        <div className="p-4 border-2 border-dashed border-gray-200 rounded-xl min-h-[80px] bg-white italic text-sm text-gray-700 leading-relaxed">
+        <div className="p-4 border-2 border-dashed border-gray-200 rounded-xl min-h-[60px] bg-white italic text-sm text-gray-700 leading-relaxed">
           {job.complaint || 'No complaint recorded.'}
         </div>
       </div>
 
       {isInternal && job.mechanicNotes && (
-        <div className="mb-8 bg-blue-50/50 p-4 rounded-xl border border-blue-100">
+        <div className="mb-6 bg-blue-50/50 p-4 rounded-xl border border-blue-100">
           <h3 className="text-[10px] font-black text-blue-400 uppercase tracking-widest mb-2">Mechanic Notes / Internal Observations</h3>
           <p className="text-sm text-blue-900 leading-relaxed">{job.mechanicNotes}</p>
         </div>
@@ -91,7 +91,7 @@ export function JobCardDocument({ job, settings, isInternal = false, className }
 
       {/* Items Table - Only visible on Internal Copy */}
       {isInternal && (
-        <div className="mb-10">
+        <div className="mb-8">
           <h3 className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3 text-center">
             Detailed Parts & Labour Costs
           </h3>
@@ -148,7 +148,7 @@ export function JobCardDocument({ job, settings, isInternal = false, className }
       )}
 
       {!isInternal && (
-        <div className="mb-10 p-4 bg-gray-50 rounded-xl border border-gray-200">
+        <div className="mb-8 p-4 bg-gray-50 rounded-xl border border-gray-200">
           <h3 className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Terms and Conditions</h3>
           <div className="text-[9px] text-gray-600 whitespace-pre-wrap italic leading-relaxed">
             {settings.garage_terms || 'No terms and conditions defined.'}
@@ -157,7 +157,7 @@ export function JobCardDocument({ job, settings, isInternal = false, className }
       )}
 
       {/* Signatures */}
-      <div className="mt-auto pt-10 grid grid-cols-2 gap-20">
+      <div className="mt-auto pt-6 grid grid-cols-2 gap-20">
         <div className="space-y-6">
           <div className="border-t border-gray-400 pt-3">
             <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">

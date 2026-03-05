@@ -13,9 +13,9 @@ export function DocumentPaper({ doc, settings, className }: DocumentPaperProps) 
   return (
     <div id="document-paper" className={`a4-page print-container text-black font-sans flex flex-col ${className || ''}`}>
       <div className="flex-grow">
-        <div className="flex flex-col items-center mb-8 text-center">
+        <div className="flex flex-col items-center mb-4 text-center">
           {settings.garage_logo && (
-            <div className="relative h-48 w-48 mb-4 overflow-hidden shrink-0">
+            <div className="relative h-32 w-32 mb-2 overflow-hidden shrink-0">
               <Image 
                 src={settings.garage_logo} 
                 alt="Garage Logo" 
@@ -25,18 +25,18 @@ export function DocumentPaper({ doc, settings, className }: DocumentPaperProps) 
               />
             </div>
           )}
-          <div className="space-y-1">
-            <h1 className="text-3xl font-black text-[#c10d12] uppercase leading-tight">{settings.garage_name}</h1>
-            <div className="text-[11px] text-muted-foreground font-medium flex justify-center gap-4">
+          <div className="space-y-0.5">
+            <h1 className="text-2xl font-black text-[#c10d12] uppercase leading-tight">{settings.garage_name}</h1>
+            <div className="text-[10px] text-muted-foreground font-medium flex justify-center flex-wrap gap-x-4">
               <p>{settings.garage_mailbox}</p>
               <p>{settings.garage_address}</p>
               <p>Tel: {settings.garage_phone}</p>
+              <p className="font-bold text-black uppercase">TIN: {settings.garage_tin}</p>
             </div>
-            <p className="font-bold text-black text-xs uppercase mt-1">TIN: {settings.garage_tin}</p>
           </div>
         </div>
 
-        <div className="flex justify-between items-end mb-8 border-b-2 border-gray-900 pb-2">
+        <div className="flex justify-between items-end mb-6 border-b-2 border-gray-900 pb-2">
           <div className="inline-flex items-center gap-1 bg-black text-white px-2 py-0.5 rounded text-[10px] font-bold uppercase">
             {doc.docType === 'LETTER' ? <Mail className="h-3 w-3" /> : <FileText className="h-3 w-3" />}
             {doc.docType === 'LETTER' ? 'Official Letter' : 'Technical Report'}
@@ -47,7 +47,7 @@ export function DocumentPaper({ doc, settings, className }: DocumentPaperProps) 
           </div>
         </div>
 
-        <div className="mb-10 space-y-4">
+        <div className="mb-8 space-y-4">
           <div className="space-y-0.5">
             <p className="text-[9px] font-black uppercase text-gray-400 tracking-widest">To:</p>
             <p className="font-bold text-base">{doc.customerName}</p>
@@ -63,7 +63,7 @@ export function DocumentPaper({ doc, settings, className }: DocumentPaperProps) 
           )}
         </div>
 
-        <div className="mb-8">
+        <div className="mb-6">
           <h2 className="text-xl font-black uppercase border-b-2 border-black inline-block pb-1">
             {doc.title}
           </h2>
@@ -73,7 +73,7 @@ export function DocumentPaper({ doc, settings, className }: DocumentPaperProps) 
           {doc.content}
         </div>
 
-        <div className="mt-20 space-y-10">
+        <div className="mt-12 space-y-8">
           <p className="text-sm">Yours sincerely,</p>
           <div className="space-y-1">
             <div className="w-48 border-b border-gray-400 pb-1" />

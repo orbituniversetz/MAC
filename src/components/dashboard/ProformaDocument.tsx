@@ -23,26 +23,26 @@ export function ProformaDocument({ proforma, settings, className }: ProformaDocu
   return (
     <div id="proforma-document" className={`a4-page print-container text-black font-sans flex flex-col ${className || ''}`}>
       <div className="flex-grow">
-        <div className="flex flex-col items-center mb-8 text-center">
+        <div className="flex flex-col items-center mb-4 text-center">
           {settings.garage_logo ? (
-            <div className="relative h-48 w-48 mb-4 overflow-hidden shrink-0">
+            <div className="relative h-32 w-32 mb-2 overflow-hidden shrink-0">
               <Image src={settings.garage_logo} alt="Logo" fill className="object-contain" unoptimized />
             </div>
           ) : (
-            <div className="h-20 w-20 mb-4 flex items-center justify-center">
-              <Wrench className="text-[#c10d12] h-14 w-14" />
+            <div className="h-12 w-12 mb-2 flex items-center justify-center">
+              <Wrench className="text-[#c10d12] h-10 w-10" />
             </div>
           )}
-          <div className="space-y-1">
-            <h1 className="text-3xl font-black text-[#c10d12] uppercase leading-none mb-1">
+          <div className="space-y-0.5">
+            <h1 className="text-2xl font-black text-[#c10d12] uppercase leading-none mb-1">
               {settings.garage_name || 'M. A. C. GARAGE'}
             </h1>
-            <div className="text-[11px] font-medium text-gray-600 flex justify-center gap-4">
+            <div className="text-[10px] font-medium text-gray-600 flex justify-center flex-wrap gap-x-4">
               <p>{settings.garage_mailbox}</p>
               <p>{settings.garage_address}</p>
               <p>Tel: {settings.garage_phone}</p>
+              <p className="font-bold text-gray-900 uppercase">TIN: {settings.garage_tin}</p>
             </div>
-            <p className="font-bold text-gray-900 text-xs uppercase mt-1">TIN: {settings.garage_tin}</p>
           </div>
         </div>
 
@@ -142,10 +142,10 @@ export function ProformaDocument({ proforma, settings, className }: ProformaDocu
         </div>
       </div>
 
-      <div className="mt-auto pt-6">
-        <div className="grid grid-cols-2 gap-8 border-t pt-6">
+      <div className="mt-auto pt-4">
+        <div className="grid grid-cols-2 gap-8 border-t pt-4">
           <div>
-            <h3 className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-3">Bank Details</h3>
+            <h3 className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-2">Bank Details</h3>
             <div className="space-y-0.5 text-[9px]">
               <p><span className="font-bold text-gray-600 w-24 inline-block">Bank:</span> {settings.bank_name}</p>
               <p><span className="font-bold text-gray-600 w-24 inline-block">Branch:</span> {settings.bank_branch}</p>
@@ -155,7 +155,7 @@ export function ProformaDocument({ proforma, settings, className }: ProformaDocu
             </div>
           </div>
           <div className="text-[8px] text-gray-500 italic leading-relaxed">
-            <h3 className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-3 not-italic">Payment Terms</h3>
+            <h3 className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-2 not-italic">Payment Terms</h3>
             <p>Payment is due upon approval of this invoice. Listed services include mechanical repairs and parts as detailed. Additional discoveries during servicing will be communicated before proceeding. Vehicles not collected within 48 hours may attract storage charges.</p>
           </div>
         </div>
