@@ -155,6 +155,7 @@ export async function createProformaDirect(formData: FormData) {
   
   let vehicleId = formData.get('vehicleId') ? parseInt(formData.get('vehicleId') as string) : null;
   const newVehiclePlate = formData.get('newVehiclePlate') as string;
+  const newVehicleModel = formData.get('newVehicleModel') as string;
 
   if (!customerId && newCustomerName) {
     const info = db.prepare('INSERT INTO customers (name, phone, address, tin) VALUES (?, ?, ?, ?)').run(newCustomerName, newCustomerPhone, newCustomerAddress, newCustomerTin);
@@ -162,7 +163,7 @@ export async function createProformaDirect(formData: FormData) {
   }
 
   if (!vehicleId && newVehiclePlate && customerId) {
-    const info = db.prepare('INSERT INTO vehicles (customerId, plateNumber) VALUES (?, ?)').run(customerId, newVehiclePlate);
+    const info = db.prepare('INSERT INTO vehicles (customerId, plateNumber, makeModel) VALUES (?, ?, ?)').run(customerId, newVehiclePlate, newVehicleModel);
     vehicleId = info.lastInsertRowid as number;
   }
 

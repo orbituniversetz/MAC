@@ -65,7 +65,7 @@ export default function NewProformaPage() {
                 <select 
                   name="customerId" 
                   required={!isNewCustomer}
-                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   <option value="">Select a customer...</option>
                   {customers.map((c) => (
@@ -104,7 +104,7 @@ export default function NewProformaPage() {
               {!isNewVehicle && !isNewCustomer ? (
                 <select 
                   name="vehicleId" 
-                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   <option value="">None / Select a vehicle...</option>
                   {vehicles.map((v) => (
@@ -114,6 +114,7 @@ export default function NewProformaPage() {
               ) : (
                 <div className="grid gap-3">
                   <Input name="newVehiclePlate" placeholder="Plate Number" required={isNewVehicle || isNewCustomer} />
+                  <Input name="newVehicleModel" placeholder="Make & Model (e.g. Toyota Hilux)" />
                 </div>
               )}
             </div>
