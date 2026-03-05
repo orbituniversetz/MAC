@@ -1,8 +1,7 @@
-
 'use client';
 
 import React, { useState } from 'react';
-import { Printer, Download, X, ZoomIn, ZoomOut, Maximize } from 'lucide-react';
+import { Printer, Download, X, ZoomIn, ZoomOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
@@ -25,7 +24,7 @@ export function PreviewContainer({
 }: PreviewContainerProps) {
   const [zoom, setZoom] = useState(100);
 
-  const handleZoomIn = () => setZoom(prev => Math.min(prev + 10, 200));
+  const handleZoomIn = () => setZoom(prev => Math.min(prev + 10, 150));
   const handleZoomOut = () => setZoom(prev => Math.max(prev - 10, 50));
   const handleResetZoom = () => setZoom(100);
 
@@ -39,12 +38,12 @@ export function PreviewContainer({
           </div>
           <div>
             <h2 className="text-sm font-bold tracking-tight uppercase tracking-widest leading-none">{title}</h2>
-            <p className="text-[10px] text-white/40 mt-1 uppercase font-bold">Document Preview Mode</p>
+            <p className="text-[10px] text-white/40 mt-1 uppercase font-bold">A4 Document View</p>
           </div>
         </div>
 
         {/* Zoom Controls */}
-        <div className="hidden md:flex items-center gap-1 bg-zinc-900 p-1 rounded-lg border border-white/5 mx-4">
+        <div className="flex items-center gap-1 bg-zinc-900 p-1 rounded-lg border border-white/5 mx-4">
           <Button variant="ghost" size="icon" onClick={handleZoomOut} className="h-8 w-8 text-white/70 hover:text-white">
             <ZoomOut className="h-4 w-4" />
           </Button>
@@ -88,9 +87,9 @@ export function PreviewContainer({
       </div>
 
       {/* Viewport */}
-      <div className="flex-1 overflow-auto preview-scroll bg-zinc-900 flex justify-center items-start p-4 sm:p-8">
+      <div className="flex-1 overflow-auto preview-scroll bg-zinc-900 flex justify-center items-start py-12 px-4">
         <div 
-          className="print-container relative shadow-2xl transition-transform duration-200 origin-top"
+          className="print-container transition-transform duration-200 origin-top"
           style={{ transform: `scale(${zoom / 100})` }}
         >
           {children}
