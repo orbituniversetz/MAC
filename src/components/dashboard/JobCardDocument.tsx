@@ -1,6 +1,6 @@
 'use client'
 
-import { Wrench } from 'lucide-react';
+import { Wrench, Banknote, TrendingUp, TrendingDown } from 'lucide-react';
 import Image from 'next/image';
 
 interface JobCardDocumentProps {
@@ -11,7 +11,10 @@ interface JobCardDocumentProps {
 }
 
 export function JobCardDocument({ job, settings, isInternal = false, className }: JobCardDocumentProps) {
-  const total = job.items.reduce((acc: number, item: any) => acc + item.subtotal, 0);
+  const totalIncome = job.items.reduce((acc: number, item: any) => acc + item.subtotal, 0);
+  const totalExpenses = job.expenses ? job.expenses.reduce((acc: number, exp: any) => acc + exp.amount, 0) : 0;
+  const netProfit = totalIncome - totalExpenses;
+  const isProfit = netProfit >= 0;
 
   return (
     <div id={`jobcard-document-${isInternal ? 'internal' : 'customer'}`} className={`a4-page print-container text-black font-sans flex flex-col ${className || ''}`}>
@@ -92,52 +95,121 @@ export function JobCardDocument({ job, settings, isInternal = false, className }
 
         {/* Items Table - Only visible on Internal Copy */}
         {isInternal && (
-          <div className="mb-6">
-            <h3 className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-2 text-center">
-              Detailed Parts & Labour Costs
-            </h3>
-            <table className="w-full border-collapse">
-              <thead>
-                <tr className="border-b-2 border-gray-900 bg-gray-50">
-                  <th className="py-1.5 text-left text-[9px] font-black uppercase w-8 px-2">#</th>
-                  <th className="py-1.5 text-left text-[9px] font-black uppercase px-2">Description</th>
-                  <th className="py-1.5 text-center text-[9px] font-black uppercase w-20 px-2">Type</th>
-                  <th className="py-1.5 text-center text-[9px] font-black uppercase w-16 px-2">Qty</th>
-                  <th className="py-1.5 text-right text-[9px] font-black uppercase w-24 px-2">Unit Price</th>
-                  <th className="py-1.5 text-right text-[9px] font-black uppercase w-24 px-2">Total</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-100">
-                {job.items.length > 0 ? (
-                  job.items.map((item: any, index: number) => (
-                    <tr key={item.id} className="text-[10px]">
-                      <td className="py-2 text-gray-400 px-2">{index + 1}</td>
-                      <td className="py-2 font-bold px-2">{item.description}</td>
-                      <td className="py-2 text-center px-2">
-                        <span className="bg-gray-100 px-2 py-0.5 rounded text-[8px] font-black text-gray-500 uppercase">
-                          {item.type}
-                        </span>
-                      </td>
-                      <td className="py-2 text-center font-bold px-2">{item.qty}</td>
-                      <td className="py-2 text-right px-2 whitespace-nowrap">{item.unitPrice.toLocaleString()}</td>
-                      <td className="py-2 text-right font-black px-2 whitespace-nowrap">{item.subtotal.toLocaleString()}</td>
-                    </tr>
-                  ))
-                ) : (
-                  <tr className="h-10">
-                    <td colSpan={6} className="py-2 text-center text-gray-300 italic text-[10px]">No items recorded.</td>
+          <div className="space-y-6">
+            <div>
+              <h3 className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-2 text-center">
+                Detailed Parts & Labour Income
+              </h3>
+              <table className="w-full border-collapse">
+                <thead>
+                  <tr className="border-b-2 border-gray-900 bg-gray-50">
+                    <th className="py-1.5 text-left text-[9px] font-black uppercase w-8 px-2">#</th>
+                    <th className="py-1.5 text-left text-[9px] font-black uppercase px-2">Description</th>
+                    <th className="py-1.5 text-center text-[9px] font-black uppercase w-20 px-2">Type</th>
+                    <th className="py-1.5 text-center text-[9px] font-black uppercase w-16 px-2">Qty</th>
+                    <th className="py-1.5 text-right text-[9px] font-black uppercase w-24 px-2">Unit Price</th>
+                    <th className="py-1.5 text-right text-[9px] font-black uppercase w-24 px-2">Total</th>
                   </tr>
-                )}
-              </tbody>
-              {job.items.length > 0 && (
+                </thead>
+                <tbody className="divide-y divide-gray-100">
+                  {job.items.length > 0 ? (
+                    job.items.map((item: any, index: number) => (
+                      <tr key={item.id} className="text-[10px]">
+                        <td className="py-2 text-gray-400 px-2">{index + 1}</td>
+                        <td className="py-2 font-bold px-2">{item.description}</td>
+                        <td className="py-2 text-center px-2">
+                          <span className="bg-gray-100 px-2 py-0.5 rounded text-[8px] font-black text-gray-500 uppercase">
+                            {item.type}
+                          </span>
+                        </td>
+                        <td className="py-2 text-center font-bold px-2">{item.qty}</td>
+                        <td className="py-2 text-right px-2 whitespace-nowrap">{item.unitPrice.toLocaleString()}</td>
+                        <td className="py-2 text-right font-black px-2 whitespace-nowrap">{item.subtotal.toLocaleString()}</td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr className="h-10">
+                      <td colSpan={6} className="py-2 text-center text-gray-300 italic text-[10px]">No income items recorded.</td>
+                    </tr>
+                  )}
+                </tbody>
                 <tfoot>
                   <tr className="border-t-2 border-gray-900 bg-gray-50">
-                    <td colSpan={5} className="py-2 text-right font-black uppercase text-[9px] px-2">Estimated Job Total (Income):</td>
-                    <td className="py-2 text-right font-black text-[#c10d12] text-xs px-2 whitespace-nowrap">TZS {total.toLocaleString()}</td>
+                    <td colSpan={5} className="py-2 text-right font-black uppercase text-[9px] px-2">Total Job Income:</td>
+                    <td className="py-2 text-right font-black text-black text-xs px-2 whitespace-nowrap">TZS {totalIncome.toLocaleString()}</td>
                   </tr>
                 </tfoot>
-              )}
-            </table>
+              </table>
+            </div>
+
+            {/* Expenses Table */}
+            <div>
+              <h3 className="text-[9px] font-black text-red-400 uppercase tracking-widest mb-2 text-center">
+                Job Expenses (Actual Costs)
+              </h3>
+              <table className="w-full border-collapse">
+                <thead>
+                  <tr className="border-b-2 border-red-900 bg-red-50">
+                    <th className="py-1.5 text-left text-[9px] font-black uppercase w-8 px-2">#</th>
+                    <th className="py-1.5 text-left text-[9px] font-black uppercase px-2">Description</th>
+                    <th className="py-1.5 text-center text-[9px] font-black uppercase w-24 px-2">Category</th>
+                    <th className="py-1.5 text-right text-[9px] font-black uppercase w-24 px-2">Amount</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-red-100">
+                  {job.expenses && job.expenses.length > 0 ? (
+                    job.expenses.map((exp: any, index: number) => (
+                      <tr key={exp.id} className="text-[10px]">
+                        <td className="py-2 text-gray-400 px-2">{index + 1}</td>
+                        <td className="py-2 font-bold px-2">{exp.description}</td>
+                        <td className="py-2 text-center px-2">
+                          <span className="bg-red-100 px-2 py-0.5 rounded text-[8px] font-black text-red-500 uppercase">
+                            {exp.category}
+                          </span>
+                        </td>
+                        <td className="py-2 text-right font-black px-2 whitespace-nowrap">TZS {exp.amount.toLocaleString()}</td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr className="h-10">
+                      <td colSpan={4} className="py-2 text-center text-gray-300 italic text-[10px]">No expenses recorded for this job.</td>
+                    </tr>
+                  )}
+                </tbody>
+                <tfoot>
+                  <tr className="border-t-2 border-red-900 bg-red-50">
+                    <td colSpan={3} className="py-2 text-right font-black uppercase text-[9px] px-2">Total Job Expenses:</td>
+                    <td className="py-2 text-right font-black text-red-600 text-xs px-2 whitespace-nowrap">TZS {totalExpenses.toLocaleString()}</td>
+                  </tr>
+                </tfoot>
+              </table>
+            </div>
+
+            {/* Profit/Loss Summary for Internal Copy */}
+            <div className="flex justify-end pt-4">
+              <div className={`border-2 p-4 rounded-xl min-w-[250px] shadow-sm ${isProfit ? 'border-green-600 bg-green-50' : 'border-red-600 bg-red-50'}`}>
+                <div className="flex items-center justify-between gap-4 mb-2">
+                  <span className="text-[10px] font-black uppercase tracking-widest text-gray-500">Job Profitability</span>
+                  {isProfit ? <TrendingUp className="h-4 w-4 text-green-600" /> : <TrendingDown className="h-4 w-4 text-red-600" />}
+                </div>
+                <div className="space-y-1">
+                  <div className="flex justify-between text-xs">
+                    <span className="text-gray-600">Total Income:</span>
+                    <span className="font-bold">{totalIncome.toLocaleString()}</span>
+                  </div>
+                  <div className="flex justify-between text-xs">
+                    <span className="text-gray-600">Total Expenses:</span>
+                    <span className="font-bold text-red-600">-{totalExpenses.toLocaleString()}</span>
+                  </div>
+                  <div className="border-t border-gray-300 pt-2 mt-2 flex justify-between items-center">
+                    <span className="font-black text-xs uppercase">Net {isProfit ? 'Profit' : 'Loss'}:</span>
+                    <span className={`text-lg font-black ${isProfit ? 'text-green-700' : 'text-red-700'}`}>
+                      TZS {Math.abs(netProfit).toLocaleString()}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         )}
 
