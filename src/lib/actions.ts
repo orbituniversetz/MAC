@@ -187,6 +187,11 @@ export async function createProformaFromJob(jobId: number) {
   return info.lastInsertRowid;
 }
 
+export async function updateProformaDiscount(id: number, discount: number) {
+  db.prepare('UPDATE proformas SET discount = ? WHERE id = ?').run(discount, id);
+  revalidatePath(`/dashboard/proformas/${id}`);
+}
+
 export async function finalizeProforma(id: number) {
   const pf = await getProformaById(id);
   if (!pf) return;

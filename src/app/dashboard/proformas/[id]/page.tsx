@@ -1,4 +1,4 @@
-import { getProformaById, getSettings, finalizeProforma, saveProformaDraft, getRecentItems, deleteJobItem, convertToInvoice } from '@/lib/actions';
+import { getProformaById, getSettings, finalizeProforma, saveProformaDraft, getRecentItems, deleteJobItem, convertToInvoice, updateProformaDiscount } from '@/lib/actions';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -11,9 +11,11 @@ import {
   TableHeader, 
   TableRow 
 } from '@/components/ui/table';
-import { Trash2, Save, Lock, FileCheck, Receipt } from 'lucide-react';
+import { Trash2, Save, Lock, FileCheck, Receipt, Percent } from 'lucide-react';
 import { ProformaPreview } from '@/components/dashboard/ProformaPreview';
 import { AddItemForm } from '@/components/dashboard/AddItemForm';
+import { Label } from '@/components/ui/label';
+import { PriceInput } from '@/components/dashboard/PriceInput';
 
 export default async function ProformaDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -53,6 +55,13 @@ export default async function ProformaDetailPage({ params }: { params: Promise<{
   async function handleConvertToInvoice() {
     'use server'
     await convertToInvoice(pf.id);
+  }
+
+  async function handleUpdateDiscount(formData: FormData) {
+    'use server'
+    const discountRaw = (formData.get('discount') as string).replace(/,/g, '');
+    const discountNum = parseFloat(discountRaw) || 0;
+    await updateProformaDiscount(pf.id, discountNum);
   }
 
   return (
@@ -189,6 +198,26 @@ export default async function ProformaDetailPage({ params }: { params: Promise<{
                 <span className="text-muted-foreground">Subtotal:</span>
                 <span className="font-medium">{subtotal.toLocaleString()}</span>
               </div>
+              
+              <div className="py-2 space-y-2">
+                <div className="flex justify-between items-center text-sm">
+                  <span className="text-muted-foreground">Discount:</span>
+                  <span className="font-medium text-red-600">({discount.toLocaleString()})</span>
+                </div>
+                
+                {!isFinalized && (
+                  <form action={handleUpdateDiscount} className="bg-white p-3 border rounded-md shadow-sm">
+                    <Label className="text-[10px] uppercase font-black text-muted-foreground flex items-center gap-1 mb-1.5">
+                      <Percent className="h-3 w-3" /> Set Total Discount (TZS)
+                    </Label>
+                    <div className="flex gap-2">
+                      <PriceInput name="discount" defaultValue={pf.discount} className="h-9 text-sm" placeholder="Discount Amount" />
+                      <Button type="submit" size="sm" variant="outline" className="h-9">Apply</Button>
+                    </div>
+                  </form>
+                )}
+              </div>
+
               <div className="flex justify-between items-center text-sm">
                 <span className="text-muted-foreground">VAT (18%):</span>
                 <span className="font-medium">{taxAmount.toLocaleString()}</span>
