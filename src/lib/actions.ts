@@ -47,13 +47,15 @@ export async function createJobSheet(formData: FormData) {
   let customerId = formData.get('customerId') ? parseInt(formData.get('customerId') as string) : null;
   const newCustomerName = formData.get('newCustomerName') as string;
   const newCustomerPhone = formData.get('newCustomerPhone') as string;
+  const newCustomerAddress = formData.get('newCustomerAddress') as string;
+  const newCustomerTin = formData.get('newCustomerTin') as string;
   
   let vehicleId = formData.get('vehicleId') ? parseInt(formData.get('vehicleId') as string) : null;
   const newVehiclePlate = formData.get('newVehiclePlate') as string;
   const newVehicleModel = formData.get('newVehicleModel') as string;
 
   if (!customerId && newCustomerName) {
-    const info = db.prepare('INSERT INTO customers (name, phone) VALUES (?, ?)').run(newCustomerName, newCustomerPhone);
+    const info = db.prepare('INSERT INTO customers (name, phone, address, tin) VALUES (?, ?, ?, ?)').run(newCustomerName, newCustomerPhone, newCustomerAddress, newCustomerTin);
     customerId = info.lastInsertRowid as number;
   }
 
@@ -148,12 +150,14 @@ export async function createProformaDirect(formData: FormData) {
   let customerId = formData.get('customerId') ? parseInt(formData.get('customerId') as string) : null;
   const newCustomerName = formData.get('newCustomerName') as string;
   const newCustomerPhone = formData.get('newCustomerPhone') as string;
+  const newCustomerAddress = formData.get('newCustomerAddress') as string;
+  const newCustomerTin = formData.get('newCustomerTin') as string;
   
   let vehicleId = formData.get('vehicleId') ? parseInt(formData.get('vehicleId') as string) : null;
   const newVehiclePlate = formData.get('newVehiclePlate') as string;
 
   if (!customerId && newCustomerName) {
-    const info = db.prepare('INSERT INTO customers (name, phone) VALUES (?, ?)').run(newCustomerName, newCustomerPhone);
+    const info = db.prepare('INSERT INTO customers (name, phone, address, tin) VALUES (?, ?, ?, ?)').run(newCustomerName, newCustomerPhone, newCustomerAddress, newCustomerTin);
     customerId = info.lastInsertRowid as number;
   }
 
