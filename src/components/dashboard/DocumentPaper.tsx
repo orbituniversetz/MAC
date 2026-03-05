@@ -13,9 +13,10 @@ export function DocumentPaper({ doc, settings, className }: DocumentPaperProps) 
   return (
     <div id="document-paper" className={`a4-page print-container text-black font-sans flex flex-col ${className || ''}`}>
       <div className="flex-grow">
-        <div className="flex flex-col items-center mb-4 text-center">
+        {/* Header - Compact Version */}
+        <div className="flex flex-col items-center mb-4 text-center border-b pb-4">
           {settings.garage_logo && (
-            <div className="relative h-32 w-32 mb-2 overflow-hidden shrink-0">
+            <div className="relative h-20 w-20 mb-1 overflow-hidden shrink-0">
               <Image 
                 src={settings.garage_logo} 
                 alt="Garage Logo" 
@@ -25,25 +26,28 @@ export function DocumentPaper({ doc, settings, className }: DocumentPaperProps) 
               />
             </div>
           )}
-          <div className="space-y-0.5">
-            <h1 className="text-2xl font-black text-[#c10d12] uppercase leading-tight">{settings.garage_name}</h1>
-            <div className="text-[10px] text-muted-foreground font-medium flex justify-center flex-wrap gap-x-4">
-              <p>{settings.garage_mailbox}</p>
-              <p>{settings.garage_address}</p>
-              <p>Tel: {settings.garage_phone}</p>
-              <p className="font-bold text-black uppercase">TIN: {settings.garage_tin}</p>
+          <div className="space-y-0">
+            <h1 className="text-xl font-black text-[#c10d12] uppercase leading-tight tracking-tight">{settings.garage_name}</h1>
+            <div className="text-[9px] text-gray-600 font-bold flex justify-center gap-x-3 items-center">
+              <span>{settings.garage_mailbox}</span>
+              <span className="text-gray-300">|</span>
+              <span>{settings.garage_address}</span>
+              <span className="text-gray-300">|</span>
+              <span>Tel: {settings.garage_phone}</span>
+              <span className="text-gray-300">|</span>
+              <span className="text-black uppercase">TIN: {settings.garage_tin}</span>
             </div>
           </div>
         </div>
 
-        <div className="flex justify-between items-end mb-6 border-b-2 border-gray-900 pb-2">
-          <div className="inline-flex items-center gap-1 bg-black text-white px-2 py-0.5 rounded text-[10px] font-bold uppercase">
+        <div className="flex justify-between items-end mb-6 border-b-2 border-gray-900 pb-1">
+          <div className="inline-flex items-center gap-1 bg-black text-white px-2 py-0.5 rounded text-[9px] font-bold uppercase">
             {doc.docType === 'LETTER' ? <Mail className="h-3 w-3" /> : <FileText className="h-3 w-3" />}
             {doc.docType === 'LETTER' ? 'Official Letter' : 'Technical Report'}
           </div>
           <div className="text-right">
-            <p className="font-bold text-lg leading-none">{doc.docNo}</p>
-            <p className="text-xs text-muted-foreground mt-1">{new Date(doc.createdAt).toLocaleDateString()}</p>
+            <p className="font-bold text-base leading-none">{doc.docNo}</p>
+            <p className="text-[10px] text-muted-foreground mt-1">{new Date(doc.createdAt).toLocaleDateString()}</p>
           </div>
         </div>
 
