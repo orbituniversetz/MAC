@@ -1,12 +1,12 @@
-
 'use client'
 
 import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
-import { Building, Save, CreditCard, Upload, Image as ImageIcon } from 'lucide-react';
+import { Building, Save, CreditCard, Upload, Image as ImageIcon, FileText } from 'lucide-react';
 import Image from 'next/image';
 import { updateAllSettings } from '@/lib/actions';
 import { useToast } from '@/hooks/use-toast';
@@ -153,6 +153,28 @@ export function SettingsForm({ settings }: SettingsFormProps) {
               <div className="grid gap-2">
                 <Label htmlFor="bank_swift">SWIFT Code</Label>
                 <Input id="bank_swift" name="bank_swift" defaultValue={settings.bank_swift} />
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-lg">
+                <FileText className="h-5 w-5 text-orange-600" />
+                Document Terms & Conditions
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid gap-2">
+                <Label htmlFor="garage_terms">Job Sheet Terms (Customer Copy)</Label>
+                <Textarea 
+                  id="garage_terms" 
+                  name="garage_terms" 
+                  defaultValue={settings.garage_terms} 
+                  placeholder="Enter terms and conditions, one per line or as a paragraph..."
+                  className="min-h-[150px] text-xs"
+                />
+                <p className="text-[10px] text-muted-foreground italic">These terms appear at the bottom of the Customer Copy Vehicle Receipt.</p>
               </div>
             </CardContent>
           </Card>

@@ -41,7 +41,7 @@ export function JobCardDocument({ job, settings, isInternal = false, className }
 
       <div className="flex justify-between items-end mb-4 border-b-2 border-gray-900 pb-2">
         <h2 className="text-2xl font-black text-gray-900 uppercase tracking-tighter">
-          {isInternal ? 'Internal Garage Copy' : 'Customer Copy – Vehicle Receipt'}
+          {isInternal ? 'Internal Garage Copy' : 'CUSTOMER COPY – VEHICLE RECEIPT'}
         </h2>
         <div className="text-right text-xs font-bold">
           <p>Job No: <span className="text-[#c10d12]">{job.jobNo}</span></p>
@@ -150,12 +150,9 @@ export function JobCardDocument({ job, settings, isInternal = false, className }
       {!isInternal && (
         <div className="mb-10 p-4 bg-gray-50 rounded-xl border border-gray-200">
           <h3 className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Terms and Conditions</h3>
-          <ul className="text-[9px] text-gray-600 space-y-1 list-disc pl-4 italic">
-            <li>Vehicle received for repair/service as per customer complaint.</li>
-            <li>Garage is not responsible for loss of personal valuables left inside the vehicle.</li>
-            <li>All repairs are subject to official approval and invoicing.</li>
-            <li>Vehicles not collected within 48 hours after completion may attract storage charges.</li>
-          </ul>
+          <div className="text-[9px] text-gray-600 whitespace-pre-wrap italic leading-relaxed">
+            {settings.garage_terms || 'No terms and conditions defined.'}
+          </div>
         </div>
       )}
 

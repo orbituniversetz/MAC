@@ -152,6 +152,7 @@ if (customerCount.count === 0) {
   db.prepare('INSERT INTO settings (key, value) VALUES (?, ?)').run('bank_account_number', '0150457890500');
   db.prepare('INSERT INTO settings (key, value) VALUES (?, ?)').run('bank_swift', 'CORUTZTZ');
   db.prepare('INSERT INTO settings (key, value) VALUES (?, ?)').run('tax_rate', '18');
+  db.prepare('INSERT INTO settings (key, value) VALUES (?, ?)').run('garage_terms', '1. Vehicle received for repair/service as per customer complaint.\n2. Garage is not responsible for loss of personal valuables left inside the vehicle.\n3. All repairs are subject to official approval and invoicing.\n4. Vehicles not collected within 48 hours after completion may attract storage charges.');
 }
 
 export default db;
