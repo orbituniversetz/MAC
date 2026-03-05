@@ -47,7 +47,7 @@ export function JobCardPreview({ job, settings, mode }: JobCardPreviewProps) {
       backgroundColor: '#ffffff'
     });
     
-    const imgData = canvas.toDataURL('image/jpeg', 0.85);
+    const imgData = canvas.toDataURL('image/jpeg', 0.80);
     const pdf = new jsPDF({
       orientation: 'portrait',
       unit: 'mm',

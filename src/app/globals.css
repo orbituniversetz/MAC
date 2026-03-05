@@ -51,11 +51,13 @@
   .a4-page {
     width: 210mm;
     min-height: 297mm;
-    padding: 15mm;
+    /* 0.5 inch margin requirement */
+    padding: 12.7mm; 
     margin: 0 auto;
     background: white;
     box-shadow: 0 0 10px rgba(0,0,0,0.1);
     position: relative;
+    box-sizing: border-box;
   }
 }
 
@@ -70,38 +72,39 @@
     position: absolute;
     left: 0;
     top: 0;
-    width: 210mm;
+    width: 100%;
     margin: 0;
     padding: 0;
     box-shadow: none !important;
   }
   .a4-page {
-    width: 210mm !important;
+    width: 100% !important;
     height: auto !important;
-    min-height: 297mm !important;
-    padding: 10mm !important;
+    min-height: 0 !important;
+    /* Page margin handles the 0.5in space in browser print */
+    padding: 0 !important; 
     margin: 0 !important;
     box-shadow: none !important;
     display: block !important;
-    page-break-after: always;
   }
   @page {
     size: A4;
-    margin: 0;
+    margin: 0.5in;
   }
   .no-print {
     display: none !important;
   }
-  tr {
+  
+  /* Prevent breaking in the middle of content */
+  tr, p, h1, h2, h3, .badge, blockquote, .card, .signature-block {
     page-break-inside: avoid !important;
+    break-inside: avoid !important;
   }
+  
   thead {
     display: table-header-group !important;
   }
   tfoot {
     display: table-footer-group !important;
-  }
-  h1, h2, h3, .badge {
-    break-after: avoid;
   }
 }
