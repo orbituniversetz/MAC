@@ -91,7 +91,7 @@ export function ProformaDocument({ proforma, settings, className }: ProformaDocu
             {proforma.items.map((item: any, index: number) => (
               <tr key={item.id} className="text-xs group hover:bg-zinc-50">
                 <td className="p-3.5 text-center text-zinc-400 font-bold">{index + 1}</td>
-                <td className="p-3.5 font-black text-zinc-900">{item.description}</td>
+                <td className="p-3.5 font-black text-zinc-900 uppercase tracking-tight">{item.description}</td>
                 <td className="p-3.5 text-center font-bold">{item.qty}</td>
                 <td className="p-3.5 text-right font-medium whitespace-nowrap text-zinc-600">{item.unitPrice.toLocaleString()}</td>
                 <td className="p-3.5 text-right font-black whitespace-nowrap text-zinc-900">TZS {item.subtotal.toLocaleString()}</td>
@@ -120,7 +120,7 @@ export function ProformaDocument({ proforma, settings, className }: ProformaDocu
             )}
             <div className="pt-4 border-t-2 border-zinc-200 flex justify-between items-center mb-2">
               <span className="font-black text-xs uppercase tracking-widest">Grand Total:</span>
-              <span className="font-black text-2xl text-[#c10d12] whitespace-nowrap">TZS {total.toLocaleString()}</span>
+              <span className="font-black text-2xl text-[#c10d12] whitespace-nowrap tracking-tighter">TZS {total.toLocaleString()}</span>
             </div>
             <div className="flex justify-between text-[10px] pt-3 text-green-700 font-black border-t border-dashed border-zinc-300">
               <span>PAID TO DATE:</span>

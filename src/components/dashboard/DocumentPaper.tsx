@@ -58,7 +58,7 @@ export function DocumentPaper({ doc, settings, className }: DocumentPaperProps) 
         <div className="mb-12 space-y-8">
           <div className="space-y-1">
             <p className="text-[10px] font-black uppercase text-zinc-400 tracking-widest mb-1">Recipient Address</p>
-            <p className="font-black text-lg text-zinc-900">{doc.customerName}</p>
+            <p className="font-black text-lg text-zinc-900 leading-tight">{doc.customerName}</p>
             <p className="text-sm font-bold text-zinc-600 leading-snug">{doc.customerAddress || 'No Address Provided'}</p>
             {doc.customerPhone && <p className="text-sm font-black text-zinc-800">TEL: {doc.customerPhone}</p>}
           </div>
