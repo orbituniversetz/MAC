@@ -2,6 +2,7 @@
 
 import { Wrench, Banknote, TrendingUp, TrendingDown } from 'lucide-react';
 import Image from 'next/image';
+import { cn } from '@/lib/utils';
 
 interface JobCardDocumentProps {
   job: any;
@@ -147,7 +148,7 @@ export function JobCardDocument({ job, settings, isInternal = false, className }
               </h3>
               <table className="w-full border-collapse">
                 <thead>
-                  <tr className="border-b-2 border-red-900 bg-red-50">
+                  <tr className="border-red-900 bg-red-50 border-b-2">
                     <th className="py-2 text-left text-[10px] font-black uppercase w-10 px-2">#</th>
                     <th className="py-2 text-left text-[10px] font-black uppercase px-2">Description</th>
                     <th className="py-2 text-center text-[10px] font-black uppercase w-32 px-2">Category</th>
@@ -191,15 +192,15 @@ export function JobCardDocument({ job, settings, isInternal = false, className }
                 <div className="space-y-1.5">
                   <div className="flex justify-between text-xs">
                     <span className="text-gray-600">Total Income:</span>
-                    <span className="font-bold">{totalIncome.toLocaleString()}</span>
+                    <span className="font-bold whitespace-nowrap">{totalIncome.toLocaleString()}</span>
                   </div>
                   <div className="flex justify-between text-xs">
                     <span className="text-gray-600">Total Expenses:</span>
-                    <span className="font-bold text-red-600">-{totalExpenses.toLocaleString()}</span>
+                    <span className="font-bold text-red-600 whitespace-nowrap">-{totalExpenses.toLocaleString()}</span>
                   </div>
                   <div className="border-t border-gray-300 pt-3 mt-3 flex justify-between items-center">
                     <span className="font-black text-xs uppercase tracking-tight">Net {isProfit ? 'Profit' : 'Loss'}:</span>
-                    <span className={`text-xl font-black ${isProfit ? 'text-green-700' : 'text-red-700'}`}>
+                    <span className={`text-xl font-black whitespace-nowrap ${isProfit ? 'text-green-700' : 'text-red-700'}`}>
                       TZS {Math.abs(netProfit).toLocaleString()}
                     </span>
                   </div>
@@ -209,36 +210,36 @@ export function JobCardDocument({ job, settings, isInternal = false, className }
           </div>
         )}
 
-        {/* Terms and Conditions */}
-        {!isInternal && (
-          <div className="mt-auto mb-8 p-4 bg-gray-50 rounded-xl border border-gray-200 terms-block">
+        <div className="mt-auto">
+          {/* Terms and Conditions */}
+          <div className="mb-8 p-4 bg-gray-50 rounded-xl border border-gray-200 terms-block">
             <h3 className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-2">Terms and Conditions</h3>
             <div className="text-[9px] text-gray-600 whitespace-pre-wrap italic leading-relaxed">
               {settings.garage_terms || 'No terms and conditions defined.'}
             </div>
           </div>
-        )}
 
-        {/* Signatures */}
-        <div className={cn("grid grid-cols-2 gap-20 signature-block pt-8", !isInternal && "mt-0")}>
-          <div className="space-y-6">
-            <div className="border-t border-gray-400 pt-3">
-              <p className="text-[9px] font-black uppercase tracking-widest text-gray-400 mb-1">
-                {isInternal ? 'Mechanic/Supervisor' : 'Garage Representative'}
-              </p>
-              <p className="text-sm font-bold uppercase tracking-tight">{settings.garage_name}</p>
+          {/* Signatures */}
+          <div className={cn("grid grid-cols-2 gap-20 signature-block pt-8", !isInternal && "mt-0")}>
+            <div className="space-y-6">
+              <div className="border-t border-gray-400 pt-3">
+                <p className="text-[9px] font-black uppercase tracking-widest text-gray-400 mb-1">
+                  {isInternal ? 'Mechanic/Supervisor' : 'Garage Representative'}
+                </p>
+                <p className="text-sm font-bold uppercase tracking-tight">{settings.garage_name}</p>
+              </div>
             </div>
-          </div>
-          <div className="space-y-6">
-            <div className="border-t border-gray-400 pt-3">
-              <p className="text-[9px] font-black uppercase tracking-widest text-gray-400 mb-1">
-                {isInternal ? 'Admin Approval' : 'Customer Signature'}
-              </p>
-              <p className="text-[9px] text-gray-500 italic leading-tight">
-                {isInternal 
-                  ? 'I verify the work performed and internal costs recorded above.'
-                  : 'I authorize the repair work and agree to the terms above.'}
-              </p>
+            <div className="space-y-6">
+              <div className="border-t border-gray-400 pt-3">
+                <p className="text-[9px] font-black uppercase tracking-widest text-gray-400 mb-1">
+                  {isInternal ? 'Admin Approval' : 'Customer Signature'}
+                </p>
+                <p className="text-[9px] text-gray-500 italic leading-tight">
+                  {isInternal 
+                    ? 'I verify the work performed and internal costs recorded above.'
+                    : 'I authorize the repair work and agree to the terms above.'}
+                </p>
+              </div>
             </div>
           </div>
         </div>

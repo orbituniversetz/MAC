@@ -2,6 +2,7 @@
 
 import { Wrench } from 'lucide-react';
 import Image from 'next/image';
+import { cn } from '@/lib/utils';
 
 interface ProformaDocumentProps {
   proforma: any;
