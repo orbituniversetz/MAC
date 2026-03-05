@@ -76,7 +76,7 @@ export function JobCardPreview({ job, settings, mode }: JobCardPreviewProps) {
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={setOpen}>
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
         <Button variant={isInternal ? "outline" : "default"} className={!isInternal ? "bg-[#c10d12] hover:bg-[#a00b0f]" : "border-gray-300"} onClick={() => setIsOpen(true)}>
           {isInternal ? <ShieldCheck className="mr-2 h-4 w-4" /> : <User className="mr-2 h-4 w-4" />}
@@ -98,7 +98,7 @@ export function JobCardPreview({ job, settings, mode }: JobCardPreviewProps) {
               <Button variant="ghost" size="icon" onClick={() => setZoom(Math.min(200, zoom + 10))} title="Zoom In">
                 <ZoomIn className="h-4 w-4" />
               </Button>
-              <Button variant="ghost" size="icon" onClick={() => setZoom(100)} title="Reset Zoom">
+              <Button variant="ghost" size="icon" onClick={() => setZoom(100)} title="Reset Zoom" className="text-black">
                 <Maximize className="h-4 w-4" />
               </Button>
             </div>
