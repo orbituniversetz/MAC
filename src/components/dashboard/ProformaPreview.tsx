@@ -113,6 +113,17 @@ export function ProformaPreview({ proforma, settings }: ProformaPreviewProps) {
     doc.text('TOTAL:', pageWidth - 60, finalY + 28);
     doc.text(total.toLocaleString(), pageWidth - 14, finalY + 28, { align: 'right' });
 
+    // Terms
+    const termsY = finalY + 45;
+    doc.setFontSize(9);
+    doc.setFont('helvetica', 'bold');
+    doc.text('PAYMENT TERMS & AGREEMENT:', 14, termsY);
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(8);
+    const termsText = "Payment is due upon approval of this invoice unless otherwise agreed between both parties. The listed services include mechanical repairs, bodywork, painting, and parts replacements as detailed above. Any additional repairs discovered during servicing will be communicated before proceeding. Vehicle release conditions depend on payment agreement. Payments must be made via bank transfer using the details above.";
+    const splitTerms = doc.splitTextToSize(termsText, pageWidth - 28);
+    doc.text(splitTerms, 14, termsY + 6);
+
     doc.save(`Proforma_${proforma.proformaNo}.pdf`);
   };
 
@@ -265,11 +276,9 @@ export function ProformaPreview({ proforma, settings }: ProformaPreviewProps) {
                 </div>
               </div>
               <div>
-                <h3 className="text-xs font-black text-gray-400 uppercase tracking-widest mb-4">Terms & Conditions</h3>
+                <h3 className="text-xs font-black text-gray-400 uppercase tracking-widest mb-4">Payment Terms & Agreement</h3>
                 <div className="text-[10px] text-gray-500 space-y-2 italic">
-                  <p>1. This proforma invoice is valid for 14 days from the date of issue.</p>
-                  <p>2. Goods remain the property of {settings.garage_name} until full payment is received.</p>
-                  <p>3. Please use the Proforma No. <span className="font-bold text-black">{proforma.proformaNo}</span> as your payment reference.</p>
+                  <p>Payment is due upon approval of this invoice unless otherwise agreed between both parties. The listed services include mechanical repairs, bodywork, painting, and parts replacements as detailed above. Any additional repairs discovered during servicing will be communicated before proceeding. Vehicle release conditions depend on payment agreement. Payments must be made via bank transfer using the details above.</p>
                 </div>
               </div>
             </div>

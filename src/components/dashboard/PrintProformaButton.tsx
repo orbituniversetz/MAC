@@ -66,10 +66,11 @@ export function PrintProformaButton({ proforma, settings }: PrintProformaButtonP
     // Customer & Vehicle Section
     doc.setFontSize(10);
     doc.setFont('helvetica', 'bold');
-    doc.text('CUSTOMER DETAILS:', 14, startY);
+    doc.text('BILL TO:', 14, startY);
     doc.setFont('helvetica', 'normal');
     doc.text(proforma.customerName, 14, startY + 6);
     doc.text(proforma.customerPhone || '', 14, startY + 11);
+    doc.text(`TIN: ${proforma.customerTin || 'N/A'}`, 14, startY + 16);
 
     if (proforma.vehiclePlate) {
       doc.setFont('helvetica', 'bold');
@@ -79,11 +80,11 @@ export function PrintProformaButton({ proforma, settings }: PrintProformaButtonP
       doc.text(`Model: ${proforma.vehicleModel || 'N/A'}`, 110, startY + 11);
     }
 
-    startY += 25;
+    startY += 30;
 
     // Items Table
-    const tableData = proforma.items.map((item: any) => [
-      item.type,
+    const tableData = proforma.items.map((item: any, index: number) => [
+      index + 1,
       item.description,
       item.qty,
       item.unitPrice.toLocaleString(),
@@ -92,7 +93,7 @@ export function PrintProformaButton({ proforma, settings }: PrintProformaButtonP
 
     autoTable(doc, {
       startY: startY,
-      head: [['Type', 'Description', 'Qty', 'Unit Price', 'Subtotal']],
+      head: [['No.', 'Description', 'Qty', 'Unit Price', 'Subtotal']],
       body: tableData,
       headStyles: { fillColor: [193, 13, 18], textColor: [255, 255, 255] },
       columnStyles: {
@@ -104,12 +105,14 @@ export function PrintProformaButton({ proforma, settings }: PrintProformaButtonP
 
     const finalY = (doc as any).lastAutoTable.finalY || startY + 20;
     const subtotal = proforma.items.reduce((acc: number, item: any) => acc + item.subtotal, 0);
+    const discount = proforma.discount || 0;
     const taxRate = parseFloat(settings.tax_rate || '0') / 100;
-    const taxAmount = proforma.taxEnabled ? subtotal * taxRate : 0;
-    const total = subtotal + taxAmount;
+    const taxAmount = proforma.taxEnabled ? (subtotal - discount) * taxRate : 0;
+    const total = subtotal - discount + taxAmount;
 
     // Summary
     doc.setFont('helvetica', 'bold');
+    doc.setFontSize(10);
     doc.text('GRAND TOTAL (TZS):', pageWidth - 60, finalY + 15, { align: 'right' });
     doc.text(total.toLocaleString(), pageWidth - 14, finalY + 15, { align: 'right' });
 
@@ -117,17 +120,28 @@ export function PrintProformaButton({ proforma, settings }: PrintProformaButtonP
     if (settings.bank_name) {
       doc.setFontSize(9);
       doc.setFont('helvetica', 'bold');
-      doc.text('PAYMENT INFORMATION:', 14, finalY + 30);
+      doc.text('BANK DETAILS:', 14, finalY + 30);
       doc.setFont('helvetica', 'normal');
+      doc.setFontSize(8);
       doc.text(`Bank: ${settings.bank_name} (${settings.bank_branch || ''})`, 14, finalY + 36);
       doc.text(`Account Name: ${settings.bank_account_name}`, 14, finalY + 41);
       doc.text(`Account Number: ${settings.bank_account_number}`, 14, finalY + 46);
       doc.text(`SWIFT: ${settings.bank_swift || ''}`, 14, finalY + 51);
     }
 
+    // Terms
+    doc.setFontSize(9);
+    doc.setFont('helvetica', 'bold');
+    doc.text('PAYMENT TERMS & AGREEMENT:', 14, finalY + 65);
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(8);
+    const termsText = "Payment is due upon approval of this invoice unless otherwise agreed between both parties. The listed services include mechanical repairs, bodywork, painting, and parts replacements as detailed above. Any additional repairs discovered during servicing will be communicated before proceeding. Vehicle release conditions depend on payment agreement. Payments must be made via bank transfer using the details above.";
+    const splitTerms = doc.splitTextToSize(termsText, pageWidth - 28);
+    doc.text(splitTerms, 14, finalY + 71);
+
     doc.setFontSize(8);
     doc.setTextColor(150);
-    doc.text('Thank you for your business!', pageWidth / 2, pageWidth > 250 ? 280 : 285, { align: 'center' });
+    doc.text('Thank you for your business!', pageWidth / 2, 285, { align: 'center' });
 
     doc.save(`Proforma_${proforma.proformaNo}.pdf`);
   };
