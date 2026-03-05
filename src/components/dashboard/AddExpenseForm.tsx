@@ -1,3 +1,4 @@
+
 'use client'
 
 import { useState } from 'react';
@@ -225,6 +226,7 @@ export function AddExpenseForm({
           <PriceInput 
             name="amount" 
             defaultValue={amount}
+            onValueChange={(val) => setAmount(val)}
             placeholder="Amount (Cost)" 
             className="bg-white text-sm" 
             required

@@ -1,3 +1,4 @@
+
 'use client'
 
 import { useState } from 'react';
@@ -116,6 +117,7 @@ export function AddItemForm({ jobId, proformaId, recentItems }: AddItemFormProps
         <PriceInput 
           name="unitPrice" 
           defaultValue={unitPrice}
+          onValueChange={(val) => setUnitPrice(val)}
           placeholder="Unit Price" 
           className="bg-white text-sm" 
           required
