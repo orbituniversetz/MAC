@@ -43,7 +43,7 @@ export function DocumentPreview({ doc, settings }: DocumentPreviewProps) {
       backgroundColor: '#ffffff'
     });
     
-    const imgData = canvas.toDataURL('image/jpeg', 0.80);
+    const imgData = canvas.toDataURL('image/jpeg', 0.85);
     const pdf = new jsPDF({
       orientation: 'portrait',
       unit: 'mm',
@@ -53,22 +53,31 @@ export function DocumentPreview({ doc, settings }: DocumentPreviewProps) {
 
     const pdfWidth = pdf.internal.pageSize.getWidth();
     const pdfHeight = pdf.internal.pageSize.getHeight();
-    const imgProps = pdf.getImageProperties(imgData);
-    const canvasHeightInPdf = (imgProps.height * pdfWidth) / imgProps.width;
+    const margin = 25.4; // 1 inch
+    const usableHeight = pdfHeight - (2 * margin);
     
-    let heightLeft = canvasHeightInPdf;
+    const imgWidth = canvas.width;
+    const imgHeight = canvas.height;
+    const ratio = pdfWidth / imgWidth;
+    const imgHeightInPdf = imgHeight * ratio;
+    
+    let heightLeft = imgHeightInPdf;
     let position = 0;
+    let page = 1;
 
-    // Add first page
-    pdf.addImage(imgData, 'JPEG', 0, position, pdfWidth, canvasHeightInPdf, undefined, 'FAST');
-    heightLeft -= pdfHeight;
-
-    // Add subsequent pages if content overflows
     while (heightLeft > 0) {
-      position = heightLeft - canvasHeightInPdf;
-      pdf.addPage();
-      pdf.addImage(imgData, 'JPEG', 0, position, pdfWidth, canvasHeightInPdf, undefined, 'FAST');
-      heightLeft -= pdfHeight;
+      if (page > 1) pdf.addPage();
+      
+      pdf.addImage(imgData, 'JPEG', 0, -position, pdfWidth, imgHeightInPdf, undefined, 'FAST');
+      
+      // Mask margins
+      pdf.setFillColor(255, 255, 255);
+      pdf.rect(0, 0, pdfWidth, margin, 'F');
+      pdf.rect(0, pdfHeight - margin, pdfWidth, margin, 'F');
+      
+      heightLeft -= usableHeight;
+      position += usableHeight;
+      page++;
     }
 
     pdf.save(`${doc.docType} ${doc.docNo}.pdf`);

@@ -40,7 +40,6 @@ export function JobCardPreview({ job, settings, mode }: JobCardPreviewProps) {
     const element = document.getElementById(docId);
     if (!element) return;
 
-    // Use scale 2 for high quality text, but JPEG 0.8 for file size efficiency
     const canvas = await html2canvas(element, {
       scale: 2.0,
       useCORS: true,
@@ -48,7 +47,7 @@ export function JobCardPreview({ job, settings, mode }: JobCardPreviewProps) {
       backgroundColor: '#ffffff'
     });
     
-    const imgData = canvas.toDataURL('image/jpeg', 0.80);
+    const imgData = canvas.toDataURL('image/jpeg', 0.85);
     const pdf = new jsPDF({
       orientation: 'portrait',
       unit: 'mm',
@@ -58,22 +57,34 @@ export function JobCardPreview({ job, settings, mode }: JobCardPreviewProps) {
 
     const pdfWidth = pdf.internal.pageSize.getWidth();
     const pdfHeight = pdf.internal.pageSize.getHeight();
-    const imgProps = pdf.getImageProperties(imgData);
-    const canvasHeightInPdf = (imgProps.height * pdfWidth) / imgProps.width;
+    const margin = 25.4; // 1 inch
+    const usableHeight = pdfHeight - (2 * margin);
     
-    let heightLeft = canvasHeightInPdf;
+    const imgWidth = canvas.width;
+    const imgHeight = canvas.height;
+    const ratio = pdfWidth / imgWidth;
+    const imgHeightInPdf = imgHeight * ratio;
+    
+    let heightLeft = imgHeightInPdf;
     let position = 0;
+    let page = 1;
 
-    // Add first page
-    pdf.addImage(imgData, 'JPEG', 0, position, pdfWidth, canvasHeightInPdf, undefined, 'FAST');
-    heightLeft -= pdfHeight;
-
-    // Add subsequent pages if content overflows the A4 height
     while (heightLeft > 0) {
-      position = heightLeft - canvasHeightInPdf;
-      pdf.addPage();
-      pdf.addImage(imgData, 'JPEG', 0, position, pdfWidth, canvasHeightInPdf, undefined, 'FAST');
-      heightLeft -= pdfHeight;
+      if (page > 1) pdf.addPage();
+      
+      // Position is 0 for first page. Image has 1-inch padding built-in from CSS.
+      // We draw the image shifted upwards by 'position'
+      // On page 1, position is 0, so content starts at 1-inch from top.
+      pdf.addImage(imgData, 'JPEG', 0, -position, pdfWidth, imgHeightInPdf, undefined, 'FAST');
+      
+      // Mask header/footer areas to enforce white 1-inch margins
+      pdf.setFillColor(255, 255, 255);
+      pdf.rect(0, 0, pdfWidth, margin, 'F');
+      pdf.rect(0, pdfHeight - margin, pdfWidth, margin, 'F');
+      
+      heightLeft -= usableHeight;
+      position += usableHeight;
+      page++;
     }
 
     pdf.save(`JOB CARD ${isInternal ? 'INTERNAL' : 'CUSTOMER'} ${job.jobNo}.pdf`);
@@ -127,7 +138,7 @@ export function JobCardPreview({ job, settings, mode }: JobCardPreviewProps) {
               <Download className="mr-2 h-4 w-4" /> Download PDF
             </Button>
             <Button onClick={handlePrint} className="bg-[#c10d12] hover:bg-[#a00b0f] text-white">
-              <Printer className="mr-2 h-4 w-4" /> Print Document
+              <Printer className="mr-2 h-4 w-4" /> Print Now
             </Button>
             <Button variant="ghost" size="icon" onClick={() => setIsOpen(false)}>
               <X className="h-4 w-4" />

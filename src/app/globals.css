@@ -51,13 +51,14 @@
   .a4-page {
     width: 210mm;
     min-height: 297mm;
-    /* 1 inch margin (25.4mm) requirement for header/footer and sides */
     padding: 25.4mm; 
     margin: 0 auto;
     background: white;
     box-shadow: 0 0 10px rgba(0,0,0,0.1);
     position: relative;
     box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
   }
 }
 
@@ -88,14 +89,12 @@
   }
   @page {
     size: A4;
-    /* 1 inch margin at the page level for printing correspondence */
     margin: 1in;
   }
   .no-print {
     display: none !important;
   }
   
-  /* Prevent breaking in the middle of content */
   tr, p, h1, h2, h3, .badge, blockquote, .card, .signature-block {
     page-break-inside: avoid !important;
     break-inside: avoid !important;
