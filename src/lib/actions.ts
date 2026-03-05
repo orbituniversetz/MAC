@@ -1,3 +1,4 @@
+
 'use server'
 
 import db from './db';
@@ -7,14 +8,17 @@ import { redirect } from 'next/navigation';
 export async function getDashboardStats() {
   const openJobs = db.prepare("SELECT COUNT(*) as count FROM jobsheets WHERE status != 'Closed'").get() as any;
   const completedJobs = db.prepare("SELECT COUNT(*) as count FROM jobsheets WHERE status = 'Completed'").get() as any;
-  const totalSales = db.prepare("SELECT SUM(amount) as total FROM payments").get() as any;
+  const totalSales = db.prepare("SELECT SUM(subtotal) as total FROM job_items").get() as any;
+  const totalExpenses = db.prepare("SELECT SUM(amount) as total FROM expenses").get() as any;
   
   return {
     openJobs: openJobs?.count || 0,
     completedJobs: completedJobs?.count || 0,
     pendingPayments: 0,
     todaySales: 0,
-    monthlySales: totalSales?.total || 0
+    monthlySales: totalSales?.total || 0,
+    totalExpenses: totalExpenses?.total || 0,
+    netProfit: (totalSales?.total || 0) - (totalExpenses?.total || 0)
   };
 }
 
@@ -39,6 +43,7 @@ export async function getJobSheetById(id: number) {
 
   if (job) {
     job.items = db.prepare('SELECT * FROM job_items WHERE jobSheetId = ?').all(id);
+    job.expenses = db.prepare('SELECT * FROM expenses WHERE jobSheetId = ?').all(id);
   }
   return job;
 }
@@ -100,6 +105,37 @@ export async function deleteJobItem(itemId: number, jobId: number | null, profor
   db.prepare('DELETE FROM job_items WHERE id = ?').run(itemId);
   if (jobId) revalidatePath(`/dashboard/jobsheets/${jobId}`);
   if (proformaId) revalidatePath(`/dashboard/proformas/${proformaId}`);
+}
+
+export async function addExpense(formData: FormData) {
+  const jobSheetId = formData.get('jobSheetId') ? parseInt(formData.get('jobSheetId') as string) : null;
+  const description = formData.get('description') as string;
+  const category = formData.get('category') as string;
+  const amountRaw = (formData.get('amount') as string).replace(/,/g, '');
+  const amount = parseFloat(amountRaw);
+
+  db.prepare(`
+    INSERT INTO expenses (jobSheetId, description, category, amount)
+    VALUES (?, ?, ?, ?)
+  `).run(jobSheetId, description, category, amount);
+  
+  if (jobSheetId) revalidatePath(`/dashboard/jobsheets/${jobSheetId}`);
+  revalidatePath('/dashboard/expenses');
+}
+
+export async function deleteExpense(id: number, jobSheetId: number | null) {
+  db.prepare('DELETE FROM expenses WHERE id = ?').run(id);
+  if (jobSheetId) revalidatePath(`/dashboard/jobsheets/${jobSheetId}`);
+  revalidatePath('/dashboard/expenses');
+}
+
+export async function getExpenses() {
+  return db.prepare(`
+    SELECT e.*, js.jobNo 
+    FROM expenses e
+    LEFT JOIN jobsheets js ON e.jobSheetId = js.id
+    ORDER BY e.date DESC
+  `).all() as any[];
 }
 
 export async function getCustomers() {

@@ -92,6 +92,16 @@ db.exec(`
     FOREIGN KEY(invoiceId) REFERENCES invoices(id)
   );
 
+  CREATE TABLE IF NOT EXISTS expenses (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    jobSheetId INTEGER,
+    description TEXT NOT NULL,
+    amount REAL NOT NULL,
+    category TEXT DEFAULT 'OTHER',
+    date DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY(jobSheetId) REFERENCES jobsheets(id)
+  );
+
   CREATE TABLE IF NOT EXISTS settings (
     key TEXT PRIMARY KEY,
     value TEXT

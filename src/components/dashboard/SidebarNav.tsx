@@ -14,12 +14,14 @@ import {
   BarChart3, 
   Settings, 
   Database,
-  Wrench
+  Wrench,
+  Banknote
 } from 'lucide-react';
 
 const navItems = [
   { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
   { name: 'Job Sheets', href: '/dashboard/jobsheets', icon: Wrench },
+  { name: 'Expenses', href: '/dashboard/expenses', icon: Banknote },
   { name: 'Proforma Invoices', href: '/dashboard/proformas', icon: FileText },
   { name: 'Invoices / Receipts', href: '/dashboard/invoices', icon: Receipt },
   { name: 'Customers', href: '/dashboard/customers', icon: Users },

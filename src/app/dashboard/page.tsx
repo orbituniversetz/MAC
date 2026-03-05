@@ -1,9 +1,10 @@
+
 import { getDashboardStats } from '@/lib/actions';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { 
   Wrench, 
   CheckCircle2, 
-  Clock, 
+  TrendingDown, 
   CircleDollarSign,
   TrendingUp 
 } from 'lucide-react';
@@ -16,9 +17,9 @@ export default async function DashboardPage() {
   const cards = [
     { title: 'Open Jobs', value: stats.openJobs, icon: Wrench, color: 'text-blue-600' },
     { title: 'Completed Jobs', value: stats.completedJobs, icon: CheckCircle2, color: 'text-green-600' },
-    { title: 'Pending Payments', value: `TZS ${stats.pendingPayments}`, icon: Clock, color: 'text-orange-600' },
-    { title: 'Today\'s Sales', value: `TZS ${stats.todaySales}`, icon: CircleDollarSign, color: 'text-[#c10d12]' },
-    { title: 'Monthly Sales', value: `TZS ${stats.monthlySales}`, icon: TrendingUp, color: 'text-[#c10d12]' },
+    { title: 'Total Sales', value: `TZS ${stats.monthlySales.toLocaleString()}`, icon: CircleDollarSign, color: 'text-[#c10d12]' },
+    { title: 'Total Expenses', value: `TZS ${stats.totalExpenses.toLocaleString()}`, icon: TrendingDown, color: 'text-red-600' },
+    { title: 'Net Profit', value: `TZS ${stats.netProfit.toLocaleString()}`, icon: TrendingUp, color: 'text-green-700' },
   ];
 
   return (
@@ -36,7 +37,7 @@ export default async function DashboardPage() {
               <card.icon className={cn("h-4 w-4", card.color)} />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{card.value}</div>
+              <div className="text-xl font-bold">{card.value}</div>
             </CardContent>
           </Card>
         ))}
@@ -45,10 +46,14 @@ export default async function DashboardPage() {
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
         <Card className="col-span-4">
           <CardHeader>
-            <CardTitle>Recent Job Sheets</CardTitle>
+            <CardTitle>Business Overview</CardTitle>
           </CardHeader>
-          <CardContent>
-            <p className="text-sm text-muted-foreground">No recent jobs found.</p>
+          <CardContent className="h-[200px] flex items-center justify-center border-2 border-dashed rounded-lg bg-gray-50/50">
+            <div className="text-center space-y-2">
+              <TrendingUp className="h-8 w-8 text-green-600 mx-auto" />
+              <p className="text-sm font-medium">Profit Margin: {stats.monthlySales > 0 ? ((stats.netProfit / stats.monthlySales) * 100).toFixed(1) : 0}%</p>
+              <p className="text-xs text-muted-foreground italic">Monitor your financial health in real-time.</p>
+            </div>
           </CardContent>
         </Card>
         <Card className="col-span-3">
@@ -61,9 +66,9 @@ export default async function DashboardPage() {
                 New Job Sheet
               </button>
             </Link>
-            <Link href="/dashboard/customers">
-              <button className="w-full text-left px-4 py-2 text-sm border border-[#b0b2b5] rounded-md hover:bg-gray-50 transition-colors">
-                Add New Customer
+            <Link href="/dashboard/expenses">
+              <button className="w-full text-left px-4 py-2 text-sm border border-red-200 bg-red-50 text-red-700 rounded-md hover:bg-red-100 transition-colors">
+                Record General Expense
               </button>
             </Link>
             <Link href="/dashboard/reports">
