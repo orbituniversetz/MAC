@@ -212,19 +212,20 @@ export function JobCardDocument({ job, settings, isInternal = false, className }
             </div>
           </div>
         )}
-
-        {!isInternal && (
-          <div className="mb-6 p-3 bg-gray-50 rounded-lg border border-gray-200">
-            <h3 className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1">Terms and Conditions</h3>
-            <div className="text-[8px] text-gray-600 whitespace-pre-wrap italic leading-relaxed">
-              {settings.garage_terms || 'No terms and conditions defined.'}
-            </div>
-          </div>
-        )}
       </div>
 
+      {/* Terms and Conditions - Always at the bottom before signatures */}
+      {!isInternal && (
+        <div className="mt-auto mb-6 p-3 bg-gray-50 rounded-lg border border-gray-200">
+          <h3 className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1">Terms and Conditions</h3>
+          <div className="text-[8px] text-gray-600 whitespace-pre-wrap italic leading-relaxed">
+            {settings.garage_terms || 'No terms and conditions defined.'}
+          </div>
+        </div>
+      )}
+
       {/* Signatures - Fixed to bottom of content area */}
-      <div className="mt-8 pt-4 grid grid-cols-2 gap-20 signature-block">
+      <div className="mt-4 pt-4 grid grid-cols-2 gap-20 signature-block">
         <div className="space-y-4">
           <div className="border-t border-gray-400 pt-2">
             <p className="text-[9px] font-black uppercase tracking-widest text-gray-400">
