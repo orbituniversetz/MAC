@@ -92,12 +92,20 @@ export async function createJobSheet(formData: FormData) {
 
 export async function addJobItem(jobId: number | null, proformaId: number | null, item: any) {
   const subtotal = item.qty * item.unitPrice;
+  
+  // If we only have proformaId, try to find the linked jobId to keep them in sync
+  let effectiveJobId = jobId;
+  if (!effectiveJobId && proformaId) {
+    const pf = db.prepare('SELECT jobSheetId FROM proformas WHERE id = ?').get(proformaId) as any;
+    if (pf?.jobSheetId) effectiveJobId = pf.jobSheetId;
+  }
+
   db.prepare(`
     INSERT INTO job_items (jobSheetId, proformaId, type, description, qty, unitPrice, subtotal)
     VALUES (?, ?, ?, ?, ?, ?, ?)
-  `).run(jobId, proformaId, item.type, item.description, item.qty, item.unitPrice, subtotal);
+  `).run(effectiveJobId, proformaId, item.type, item.description, item.qty, item.unitPrice, subtotal);
   
-  if (jobId) revalidatePath(`/dashboard/jobsheets/${jobId}`);
+  if (effectiveJobId) revalidatePath(`/dashboard/jobsheets/${effectiveJobId}`);
   if (proformaId) revalidatePath(`/dashboard/proformas/${proformaId}`);
 }
 
@@ -191,6 +199,7 @@ export async function createProformaDirect(formData: FormData) {
   let vehicleId = formData.get('vehicleId') ? parseInt(formData.get('vehicleId') as string) : null;
   const newVehiclePlate = formData.get('newVehiclePlate') as string;
   const newVehicleModel = formData.get('newVehicleModel') as string;
+  const description = formData.get('description') as string;
 
   if (!customerId && newCustomerName) {
     const info = db.prepare('INSERT INTO customers (name, phone, address, tin) VALUES (?, ?, ?, ?)').run(newCustomerName, newCustomerPhone, newCustomerAddress, newCustomerTin);
@@ -202,17 +211,36 @@ export async function createProformaDirect(formData: FormData) {
     vehicleId = info.lastInsertRowid as number;
   }
 
+  if (!customerId || !vehicleId) {
+    throw new Error("Customer and Vehicle are required.");
+  }
+
   const currentYear = new Date().getFullYear().toString().slice(-2);
-  const countObj = db.prepare("SELECT COUNT(*) as count FROM proformas WHERE proformaNo LIKE ?").get(`${currentYear}%`) as any;
-  const nextNo = (countObj?.count || 0) + 1;
-  const proformaNo = `${currentYear}${nextNo.toString().padStart(4, '0')}`;
+  
+  // Create the Job Sheet first to link them
+  const jsCountObj = db.prepare("SELECT COUNT(*) as count FROM jobsheets WHERE jobNo LIKE ?").get(`${currentYear}%`) as any;
+  const jsNextNo = (jsCountObj?.count || 0) + 1;
+  const jobNo = `${currentYear}${jsNextNo.toString().padStart(4, '0')}`;
+  
+  const jsInfo = db.prepare(`
+    INSERT INTO jobsheets (jobNo, customerId, vehicleId, complaint, status)
+    VALUES (?, ?, ?, ?, ?)
+  `).run(jobNo, customerId, vehicleId, description || "Direct Proforma Case", 'Draft');
+  
+  const jobSheetId = jsInfo.lastInsertRowid;
+
+  // Create the Proforma
+  const pfCountObj = db.prepare("SELECT COUNT(*) as count FROM proformas WHERE proformaNo LIKE ?").get(`${currentYear}%`) as any;
+  const pfNextNo = (pfCountObj?.count || 0) + 1;
+  const proformaNo = `${currentYear}${pfNextNo.toString().padStart(4, '0')}`;
 
   const info = db.prepare(`
-    INSERT INTO proformas (proformaNo, customerId, vehicleId, status)
-    VALUES (?, ?, ?, ?)
-  `).run(proformaNo, customerId, vehicleId, 'Draft');
+    INSERT INTO proformas (proformaNo, jobSheetId, customerId, vehicleId, status)
+    VALUES (?, ?, ?, ?, ?)
+  `).run(proformaNo, jobSheetId, customerId, vehicleId, 'Draft');
 
   revalidatePath('/dashboard/proformas');
+  revalidatePath('/dashboard/jobsheets');
   redirect(`/dashboard/proformas/${info.lastInsertRowid}`);
 }
 
@@ -238,10 +266,14 @@ export async function getProformaById(id: number) {
   `).get(id) as any;
 
   if (pf) {
-    const itemsFromJob = pf.jobSheetId ? db.prepare('SELECT * FROM job_items WHERE jobSheetId = ?').all(pf.jobSheetId) : [];
-    const itemsFromPF = db.prepare('SELECT * FROM job_items WHERE proformaId = ?').all(id);
-    pf.items = [...itemsFromJob, ...itemsFromPF];
-    pf.expenses = db.prepare('SELECT * FROM expenses WHERE proformaId = ?').all(id);
+    // Synchronized items: pull from either the specific proforma record OR the linked job sheet
+    pf.items = db.prepare(`
+      SELECT * FROM job_items 
+      WHERE proformaId = ? 
+      OR (jobSheetId = ? AND jobSheetId IS NOT NULL)
+    `).all(id, pf.jobSheetId);
+    
+    pf.expenses = db.prepare('SELECT * FROM expenses WHERE proformaId = ? OR (jobSheetId = ? AND jobSheetId IS NOT NULL)').all(id, pf.jobSheetId);
   }
   return pf;
 }

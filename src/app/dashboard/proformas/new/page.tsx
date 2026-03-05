@@ -1,3 +1,4 @@
+
 'use client'
 
 import { useState, useEffect } from 'react';
@@ -6,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 import { FileText, UserPlus, CarFront } from 'lucide-react';
 import Link from 'next/link';
 
@@ -55,7 +57,7 @@ export default function NewProformaPage() {
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-3xl font-bold tracking-tight text-black">New Direct Proforma</h2>
-          <p className="text-muted-foreground">Create a quotation without opening a job sheet.</p>
+          <p className="text-muted-foreground">Create a quotation (this will also open a linked Job Sheet).</p>
         </div>
         <Link href="/dashboard/proformas">
           <Button variant="outline">Cancel</Button>
@@ -127,7 +129,7 @@ export default function NewProformaPage() {
             <div className="space-y-4 p-4 border rounded-lg bg-gray-50/50">
               <div className="flex items-center justify-between">
                 <Label className="text-base font-bold flex items-center gap-2">
-                  <CarFront className="h-4 w-4" /> Vehicle (Optional)
+                  <CarFront className="h-4 w-4" /> Vehicle
                 </Label>
                 {!isNewCustomer && (
                   <Button 
@@ -145,9 +147,10 @@ export default function NewProformaPage() {
               {!isNewVehicle && !isNewCustomer ? (
                 <select 
                   name="vehicleId" 
+                  required={!isNewVehicle}
                   className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                 >
-                  <option value="">None / Select a vehicle...</option>
+                  <option value="">Select a vehicle...</option>
                   {vehicles.map((v) => (
                     <option key={v.id} value={v.id}>{v.plateNumber} - {v.makeModel} ({v.customerName})</option>
                   ))}
@@ -164,6 +167,17 @@ export default function NewProformaPage() {
                   <Input name="newVehicleModel" placeholder="Make & Model (e.g. Toyota Hilux)" />
                 </div>
               )}
+            </div>
+
+            <div className="grid gap-2">
+              <Label htmlFor="description">Service / Repair Description</Label>
+              <Textarea 
+                id="description" 
+                name="description" 
+                placeholder="Briefly describe the job for the linked Job Sheet..." 
+                required 
+                className="min-h-[100px]"
+              />
             </div>
 
             <Button type="submit" className="w-full bg-[#c10d12] hover:bg-[#a00b0f] text-white py-6 text-lg font-bold">
