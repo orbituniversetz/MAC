@@ -1,4 +1,4 @@
-import { getProformaById, addJobItem, deleteJobItem } from '@/lib/actions';
+import { getProformaById, addJobItem, deleteJobItem, getSettings } from '@/lib/actions';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -12,10 +12,12 @@ import {
   TableRow 
 } from '@/components/ui/table';
 import { Trash2, Printer, FileText } from 'lucide-react';
+import { PrintProformaButton } from '@/components/dashboard/PrintProformaButton';
 
 export default async function ProformaDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const pf = await getProformaById(parseInt(id));
+  const settings = await getSettings();
 
   if (!pf) {
     return (
@@ -49,9 +51,7 @@ export default async function ProformaDetailPage({ params }: { params: Promise<{
           {pf.jobNo && <Badge variant="outline">Linked to {pf.jobNo}</Badge>}
         </div>
         <div className="flex gap-2">
-          <Button className="bg-[#c10d12]">
-            <Printer className="mr-2 h-4 w-4" /> Print Proforma
-          </Button>
+          <PrintProformaButton proforma={pf} settings={settings} />
         </div>
       </div>
 
@@ -81,7 +81,6 @@ export default async function ProformaDetailPage({ params }: { params: Promise<{
                     <TableCell>{item.unitPrice.toLocaleString()}</TableCell>
                     <TableCell className="font-bold">{item.subtotal.toLocaleString()}</TableCell>
                     <TableCell>
-                      {/* Only allow deleting if it's a direct proforma item or we want to allow job item removal here too */}
                       <form action={async () => { 'use server'; await deleteJobItem(item.id, pf.jobSheetId, pf.id); }}>
                         <Button variant="ghost" size="icon" className="text-red-500 hover:text-red-700">
                           <Trash2 className="h-4 w-4" />

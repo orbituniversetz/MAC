@@ -1,4 +1,4 @@
-import { getJobSheetById, addJobItem, deleteJobItem, createProformaFromJob } from '@/lib/actions';
+import { getJobSheetById, addJobItem, deleteJobItem, createProformaFromJob, getSettings } from '@/lib/actions';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -13,10 +13,12 @@ import {
 } from '@/components/ui/table';
 import { Trash2, FilePlus, Printer } from 'lucide-react';
 import { redirect } from 'next/navigation';
+import { PrintJobCardButton } from '@/components/dashboard/PrintJobCardButton';
 
 export default async function JobSheetDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const job = await getJobSheetById(parseInt(id));
+  const settings = await getSettings();
 
   if (!job) {
     return (
@@ -63,9 +65,7 @@ export default async function JobSheetDetailPage({ params }: { params: Promise<{
               <FilePlus className="mr-2 h-4 w-4" /> Create Proforma
             </Button>
           </form>
-          <Button className="bg-[#c10d12]">
-            <Printer className="mr-2 h-4 w-4" /> Print Job Card
-          </Button>
+          <PrintJobCardButton job={job} settings={settings} />
         </div>
       </div>
 
