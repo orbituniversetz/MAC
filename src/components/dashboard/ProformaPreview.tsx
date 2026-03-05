@@ -1,4 +1,3 @@
-
 'use client'
 
 import { useState } from 'react';
@@ -30,11 +29,9 @@ export function ProformaPreview({ proforma, settings }: ProformaPreviewProps) {
   const total = subtotal - discount + taxAmount;
 
   const handlePrint = () => {
-    // Re-use existing print logic but potentially wrap it
     const doc = new jsPDF();
     const pageWidth = doc.internal.pageSize.getWidth();
 
-    // Logic similar to PrintProformaButton but standardized
     let startY = 22;
     if (settings.garage_logo) {
       try {
@@ -115,7 +112,7 @@ export function ProformaPreview({ proforma, settings }: ProformaPreviewProps) {
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={setOpenIs}>
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
         <Button variant="outline" onClick={() => setIsOpen(true)}>
           <Eye className="mr-2 h-4 w-4" /> Preview Proforma
@@ -135,9 +132,7 @@ export function ProformaPreview({ proforma, settings }: ProformaPreviewProps) {
         </div>
 
         <div className="flex justify-center p-8">
-          {/* A4 Page Simulation */}
           <div className="bg-white shadow-2xl w-full max-w-[210mm] min-h-[297mm] p-[15mm] text-black font-sans leading-tight">
-            {/* Header */}
             <div className="flex justify-between items-start mb-8">
               <div className="flex gap-4 items-center">
                 {settings.garage_logo && (
@@ -162,7 +157,6 @@ export function ProformaPreview({ proforma, settings }: ProformaPreviewProps) {
 
             <div className="h-1 bg-gray-100 mb-8" />
 
-            {/* Bill To & Vehicle */}
             <div className="grid grid-cols-2 gap-8 mb-8">
               <div>
                 <h3 className="text-xs font-black text-gray-400 uppercase tracking-widest mb-2">Bill To</h3>
@@ -182,7 +176,6 @@ export function ProformaPreview({ proforma, settings }: ProformaPreviewProps) {
               </div>
             </div>
 
-            {/* Items Table */}
             <table className="w-full mb-8 border-collapse">
               <thead>
                 <tr className="bg-[#c10d12] text-white">
@@ -211,7 +204,6 @@ export function ProformaPreview({ proforma, settings }: ProformaPreviewProps) {
               </tbody>
             </table>
 
-            {/* Totals */}
             <div className="flex justify-end mb-8">
               <div className="w-64 space-y-2">
                 <div className="flex justify-between text-sm">
@@ -233,7 +225,6 @@ export function ProformaPreview({ proforma, settings }: ProformaPreviewProps) {
               </div>
             </div>
 
-            {/* Payment Summary Box */}
             <div className="bg-gray-900 text-white p-6 rounded-xl mb-8 flex justify-between items-center">
               <div>
                 <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">Status Summary</p>
@@ -245,7 +236,6 @@ export function ProformaPreview({ proforma, settings }: ProformaPreviewProps) {
               </div>
             </div>
 
-            {/* Payment Details */}
             <div className="grid grid-cols-2 gap-8 border-t pt-8">
               <div>
                 <h3 className="text-xs font-black text-gray-400 uppercase tracking-widest mb-4">Bank Details</h3>
