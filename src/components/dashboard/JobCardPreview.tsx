@@ -40,6 +40,7 @@ export function JobCardPreview({ job, settings, mode }: JobCardPreviewProps) {
     const element = document.getElementById(docId);
     if (!element) return;
 
+    // Use scale 2 for high quality text, but JPEG 0.8 for file size efficiency
     const canvas = await html2canvas(element, {
       scale: 2.0,
       useCORS: true,
@@ -67,7 +68,7 @@ export function JobCardPreview({ job, settings, mode }: JobCardPreviewProps) {
     pdf.addImage(imgData, 'JPEG', 0, position, pdfWidth, canvasHeightInPdf, undefined, 'FAST');
     heightLeft -= pdfHeight;
 
-    // Add subsequent pages if content overflows
+    // Add subsequent pages if content overflows the A4 height
     while (heightLeft > 0) {
       position = heightLeft - canvasHeightInPdf;
       pdf.addPage();

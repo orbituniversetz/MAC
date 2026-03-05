@@ -43,7 +43,7 @@ export function ProformaPreview({ proforma, settings }: ProformaPreviewProps) {
       backgroundColor: '#ffffff'
     });
     
-    const imgData = canvas.toDataURL('image/jpeg', 0.85);
+    const imgData = canvas.toDataURL('image/jpeg', 0.80);
     const pdf = new jsPDF({
       orientation: 'portrait',
       unit: 'mm',
@@ -120,7 +120,7 @@ export function ProformaPreview({ proforma, settings }: ProformaPreviewProps) {
               <Download className="mr-2 h-4 w-4" /> Download PDF
             </Button>
             <Button onClick={handlePrint} className="bg-[#c10d12] hover:bg-[#a00b0f] text-white">
-              <Printer className="mr-2 h-4 w-4" /> I want to print
+              <Printer className="mr-2 h-4 w-4" /> Print Now
             </Button>
             <Button variant="ghost" size="icon" onClick={() => setIsOpen(false)}>
               <X className="h-4 w-4" />

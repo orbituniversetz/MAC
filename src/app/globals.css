@@ -51,8 +51,8 @@
   .a4-page {
     width: 210mm;
     min-height: 297mm;
-    /* 0.5 inch margin requirement */
-    padding: 12.7mm; 
+    /* 1 inch margin (25.4mm) requirement for header/footer and sides */
+    padding: 25.4mm; 
     margin: 0 auto;
     background: white;
     box-shadow: 0 0 10px rgba(0,0,0,0.1);
@@ -81,7 +81,6 @@
     width: 100% !important;
     height: auto !important;
     min-height: 0 !important;
-    /* Page margin handles the 0.5in space in browser print */
     padding: 0 !important; 
     margin: 0 !important;
     box-shadow: none !important;
@@ -89,7 +88,8 @@
   }
   @page {
     size: A4;
-    margin: 0.5in;
+    /* 1 inch margin at the page level for printing correspondence */
+    margin: 1in;
   }
   .no-print {
     display: none !important;
