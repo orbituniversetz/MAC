@@ -36,24 +36,28 @@ export function DocumentPreview({ doc, settings }: DocumentPreviewProps) {
     const element = document.getElementById('document-paper');
     if (!element) return;
 
+    // Optimized canvas for smaller file size
     const canvas = await html2canvas(element, {
-      scale: 2,
+      scale: 1.5, // Reduced scale for better performance/size balance
       useCORS: true,
       logging: false,
+      backgroundColor: '#ffffff'
     });
     
-    const imgData = canvas.toDataURL('image/png');
+    // Using JPEG at 0.75 quality significantly reduces file size compared to PNG
+    const imgData = canvas.toDataURL('image/jpeg', 0.75);
     const pdf = new jsPDF({
       orientation: 'portrait',
       unit: 'mm',
-      format: 'a4'
+      format: 'a4',
+      compress: true // Enable internal PDF compression
     });
 
     const imgProps = pdf.getImageProperties(imgData);
     const pdfWidth = pdf.internal.pageSize.getWidth();
     const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
 
-    pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+    pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight, undefined, 'FAST');
     pdf.save(`${doc.docType} ${doc.docNo}.pdf`);
   };
 

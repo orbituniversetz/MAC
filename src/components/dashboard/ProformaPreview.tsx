@@ -1,4 +1,3 @@
-
 'use client'
 
 import { useState, useEffect } from 'react';
@@ -37,24 +36,28 @@ export function ProformaPreview({ proforma, settings }: ProformaPreviewProps) {
     const element = document.getElementById('proforma-document');
     if (!element) return;
 
+    // Optimized canvas for smaller file size
     const canvas = await html2canvas(element, {
-      scale: 2,
+      scale: 1.5,
       useCORS: true,
       logging: false,
+      backgroundColor: '#ffffff'
     });
     
-    const imgData = canvas.toDataURL('image/png');
+    // Using JPEG at 0.75 quality for massive file size savings
+    const imgData = canvas.toDataURL('image/jpeg', 0.75);
     const pdf = new jsPDF({
       orientation: 'portrait',
       unit: 'mm',
-      format: 'a4'
+      format: 'a4',
+      compress: true
     });
 
     const imgProps = pdf.getImageProperties(imgData);
     const pdfWidth = pdf.internal.pageSize.getWidth();
     const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
 
-    pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+    pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight, undefined, 'FAST');
     pdf.save(`PROFORMA INVOICE ${proforma.proformaNo}.pdf`);
   };
 
