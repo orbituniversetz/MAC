@@ -180,11 +180,6 @@ export function ProformaDocument({ proforma, settings, className }: ProformaDocu
             </div>
           </div>
         </div>
-
-        {/* Bottom Note */}
-        <div className="mt-8 text-center border-t pt-3">
-          <p className="text-[8px] text-gray-400 font-medium italic">Computer generated document. Valid without signature.</p>
-        </div>
       </div>
     </div>
   );
