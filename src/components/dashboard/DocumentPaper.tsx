@@ -1,8 +1,8 @@
 'use client'
 
+import { cn } from '@/lib/utils';
 import { FileText, Mail } from 'lucide-react';
 import Image from 'next/image';
-import { cn } from '@/lib/utils';
 
 interface DocumentPaperProps {
   doc: any;
