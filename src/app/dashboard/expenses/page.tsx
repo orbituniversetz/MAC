@@ -1,5 +1,4 @@
-
-import { getExpenses, deleteExpense, getJobSheets, getProformas } from '@/lib/actions';
+import { getExpenses, deleteExpense, getJobSheets, getProformas, getRecentExpenses } from '@/lib/actions';
 import { 
   Table, 
   TableBody, 
@@ -18,6 +17,7 @@ export default async function ExpensesPage() {
   const expenses = await getExpenses();
   const jobs = await getJobSheets();
   const proformas = await getProformas();
+  const recentExpenses = await getRecentExpenses();
 
   const total = expenses.reduce((acc, curr) => acc + curr.amount, 0);
 
@@ -111,6 +111,7 @@ export default async function ExpensesPage() {
               <AddExpenseForm 
                 allJobs={jobs} 
                 allProformas={proformas} 
+                recentExpenses={recentExpenses}
               />
               <p className="text-[10px] text-muted-foreground mt-4 italic">
                 Linking an expense helps track profit and loss for specific repair jobs or quotations.

@@ -1,4 +1,4 @@
-import { getJobSheetById, getSettings, createProformaFromJob, createReportFromJob, deleteJobItem, getRecentItems, deleteExpense } from '@/lib/actions';
+import { getJobSheetById, getSettings, createProformaFromJob, createReportFromJob, deleteJobItem, getRecentItems, deleteExpense, getRecentExpenses } from '@/lib/actions';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -23,6 +23,7 @@ export default async function JobSheetDetailPage({ params }: { params: Promise<{
   const job = await getJobSheetById(parseInt(id));
   const settings = await getSettings();
   const recentItems = await getRecentItems();
+  const recentExpenses = await getRecentExpenses();
 
   if (!job) {
     return (
@@ -168,7 +169,7 @@ export default async function JobSheetDetailPage({ params }: { params: Promise<{
                   )}
                 </TableBody>
               </Table>
-              <AddExpenseForm jobSheetId={job.id} />
+              <AddExpenseForm jobSheetId={job.id} recentExpenses={recentExpenses} />
             </CardContent>
           </Card>
         </div>

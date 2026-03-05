@@ -1,20 +1,28 @@
-
 'use client'
 
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { PriceInput } from './PriceInput';
-import { Banknote, Link as LinkIcon } from 'lucide-react';
+import { Banknote, Link as LinkIcon, History } from 'lucide-react';
 import { addExpense } from '@/lib/actions';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 interface AddExpenseFormProps {
   jobSheetId?: number | null;
   proformaId?: number | null;
   allJobs?: any[];
   allProformas?: any[];
+  recentExpenses?: any[];
 }
 
-export function AddExpenseForm({ jobSheetId, proformaId, allJobs = [], allProformas = [] }: AddExpenseFormProps) {
+export function AddExpenseForm({ jobSheetId, proformaId, allJobs = [], allProformas = [], recentExpenses = [] }: AddExpenseFormProps) {
   const [description, setDescription] = useState('');
   const [category, setCategory] = useState('PART');
   const [amount, setAmount] = useState<string | number>('');
@@ -22,8 +30,13 @@ export function AddExpenseForm({ jobSheetId, proformaId, allJobs = [], allProfor
   const [selectedJobId, setSelectedJobId] = useState(jobSheetId?.toString() || '');
   const [selectedProformaId, setSelectedProformaId] = useState(proformaId?.toString() || '');
 
+  const handleRecentPick = (exp: any) => {
+    setCategory(exp.category);
+    setDescription(exp.description);
+    setAmount(exp.amount);
+  };
+
   async function handleAction(formData: FormData) {
-    // Override linking based on selected linkType if in general mode
     if (linkType === 'general') {
       formData.delete('jobSheetId');
       formData.delete('proformaId');
@@ -44,10 +57,39 @@ export function AddExpenseForm({ jobSheetId, proformaId, allJobs = [], allProfor
 
   return (
     <div className="mt-6 border-t pt-4 bg-red-50/30 p-4 rounded-lg">
-      <h4 className="font-bold text-sm flex items-center gap-2 mb-4 text-red-800">
-        <Banknote className="h-4 w-4" /> 
-        {isContextual ? 'Record Expense for this Document' : 'Record Garage Expense'}
-      </h4>
+      <div className="flex items-center justify-between mb-4">
+        <h4 className="font-bold text-sm flex items-center gap-2 text-red-800">
+          <Banknote className="h-4 w-4" /> 
+          {isContextual ? 'Record Expense for this Document' : 'Record Garage Expense'}
+        </h4>
+
+        {recentExpenses.length > 0 && (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" size="sm" className="h-8 text-[10px] uppercase font-bold border-red-200 bg-white/50 text-red-800 hover:bg-red-50">
+                <History className="mr-1.5 h-3.5 w-3.5" /> Quick Pick Previous
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-80 max-h-72 overflow-y-auto">
+              <DropdownMenuLabel className="text-[10px] uppercase tracking-wider text-muted-foreground">Recent Expenses</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              {recentExpenses.map((exp, idx) => (
+                <DropdownMenuItem 
+                  key={idx} 
+                  onClick={() => handleRecentPick(exp)} 
+                  className="flex flex-col items-start gap-1 py-2 cursor-pointer"
+                >
+                  <div className="flex justify-between w-full items-start">
+                    <span className="font-bold text-xs text-black">{exp.description}</span>
+                    <span className="text-[9px] bg-red-100 px-1.5 py-0.5 rounded font-black text-red-600 uppercase">{exp.category}</span>
+                  </div>
+                  <span className="text-[10px] font-bold text-red-700">TZS {exp.amount.toLocaleString()}</span>
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        )}
+      </div>
 
       <form action={handleAction} className="space-y-4">
         {!isContextual && (
@@ -104,7 +146,6 @@ export function AddExpenseForm({ jobSheetId, proformaId, allJobs = [], allProfor
         )}
 
         <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
-          {/* Hidden inputs if context is provided */}
           {jobSheetId && <input type="hidden" name="jobSheetId" value={jobSheetId} />}
           {proformaId && <input type="hidden" name="proformaId" value={proformaId} />}
           

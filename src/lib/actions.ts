@@ -1,4 +1,3 @@
-
 'use server'
 
 import db from './db';
@@ -146,6 +145,17 @@ export async function getExpenses() {
     LEFT JOIN jobsheets js ON e.jobSheetId = js.id
     LEFT JOIN proformas p ON e.proformaId = p.id
     ORDER BY e.date DESC
+  `).all() as any[];
+}
+
+export async function getRecentExpenses() {
+  return db.prepare(`
+    SELECT DISTINCT category, description, amount 
+    FROM expenses 
+    WHERE description IS NOT NULL AND description != ''
+    GROUP BY description, category, amount
+    ORDER BY description ASC
+    LIMIT 30
   `).all() as any[];
 }
 
