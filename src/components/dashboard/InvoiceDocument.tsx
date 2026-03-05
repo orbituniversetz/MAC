@@ -134,9 +134,6 @@ export function InvoiceDocument({ invoice, settings, className }: InvoiceDocumen
             <p className="text-[8px] text-gray-400 mt-1 uppercase">{settings.garage_name} Management</p>
           </div>
         </div>
-        <p className="text-[8px] text-center text-gray-400 font-medium italic">
-          This is a computer-generated Tax Invoice. Thank you for your business!
-        </p>
       </div>
     </div>
   );
