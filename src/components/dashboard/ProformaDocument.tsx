@@ -15,6 +15,9 @@ export function ProformaDocument({ proforma, settings, className }: ProformaDocu
   // Enforce 18% VAT
   const taxAmount = (subtotal - discount) * 0.18;
   const total = subtotal - discount + taxAmount;
+  const totalPaid = proforma.totalPaid || 0;
+  const balanceDue = Math.max(0, total - totalPaid);
+  const isFullyPaid = balanceDue <= 0;
 
   return (
     <div id="proforma-document" className={`a4-page print-container text-black font-sans flex flex-col ${className || ''}`}>
@@ -110,7 +113,7 @@ export function ProformaDocument({ proforma, settings, className }: ProformaDocu
 
         {/* Totals Section */}
         <div className="flex justify-end mb-6">
-          <div className="w-48 space-y-1.5">
+          <div className="w-56 space-y-1.5 bg-gray-50 p-4 rounded-xl">
             <div className="flex justify-between text-[10px]">
               <span className="text-gray-500">Subtotal:</span>
               <span className="font-medium">{subtotal.toLocaleString()}</span>
@@ -123,22 +126,30 @@ export function ProformaDocument({ proforma, settings, className }: ProformaDocu
               <span className="text-gray-500">VAT (18%):</span>
               <span className="font-medium">{taxAmount.toLocaleString()}</span>
             </div>
-            <div className="pt-1.5 border-t flex justify-between items-center">
-              <span className="font-bold text-[11px]">TOTAL:</span>
+            <div className="pt-1.5 border-t border-gray-200 flex justify-between items-center mb-1">
+              <span className="font-bold text-[11px]">GRAND TOTAL:</span>
               <span className="font-black text-sm text-[#c10d12]">TZS {total.toLocaleString()}</span>
+            </div>
+            <div className="flex justify-between text-[10px] pt-1 text-green-700 font-bold border-t border-dashed border-gray-300">
+              <span>Paid to Date:</span>
+              <span>{totalPaid.toLocaleString()}</span>
+            </div>
+            <div className="flex justify-between text-[10px] text-red-700 font-black">
+              <span>BALANCE DUE:</span>
+              <span>TZS {balanceDue.toLocaleString()}</span>
             </div>
           </div>
         </div>
 
         {/* Status Summary */}
-        <div className="bg-gray-900 text-white p-4 rounded-xl mb-6 flex justify-between items-center">
+        <div className={`p-4 rounded-xl mb-6 flex justify-between items-center ${isFullyPaid ? 'bg-green-600 text-white' : 'bg-gray-900 text-white'}`}>
           <div>
-            <p className="text-[8px] font-black uppercase tracking-widest text-gray-400">Status Summary</p>
-            <h4 className="text-lg font-bold">Pending Payment</h4>
+            <p className="text-[8px] font-black uppercase tracking-widest opacity-70">Payment Status</p>
+            <h4 className="text-lg font-bold">{isFullyPaid ? 'Fully Paid' : 'Pending Payment'}</h4>
           </div>
           <div className="text-right">
-            <p className="text-[10px] font-medium text-gray-400">Balance Due</p>
-            <p className="text-xl font-black">TZS {total.toLocaleString()}</p>
+            <p className="text-[10px] font-medium opacity-70">Remaining Balance</p>
+            <p className="text-xl font-black">TZS {balanceDue.toLocaleString()}</p>
           </div>
         </div>
       </div>
