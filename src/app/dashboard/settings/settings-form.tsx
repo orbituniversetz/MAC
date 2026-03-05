@@ -1,3 +1,4 @@
+
 'use client'
 
 import { useState } from 'react';
@@ -5,8 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
-import { Switch } from '@/components/ui/switch';
-import { Building, Save, CreditCard, Upload, Image as ImageIcon, ZapOff } from 'lucide-react';
+import { Building, Save, CreditCard, Upload, Image as ImageIcon } from 'lucide-react';
 import Image from 'next/image';
 import { updateAllSettings } from '@/lib/actions';
 import { useToast } from '@/hooks/use-toast';
@@ -18,7 +18,6 @@ interface SettingsFormProps {
 export function SettingsForm({ settings }: SettingsFormProps) {
   const [logoBase64, setLogoBase64] = useState(settings.garage_logo || '');
   const [isSaving, setIsSaving] = useState(false);
-  const [perfMode, setPerfMode] = useState(settings.performance_mode === 'true');
   const { toast } = useToast();
 
   const handleLogoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -52,7 +51,6 @@ export function SettingsForm({ settings }: SettingsFormProps) {
       }
       
       updates['garage_logo'] = logoBase64;
-      updates['performance_mode'] = perfMode ? 'true' : 'false';
 
       await updateAllSettings(updates);
       toast({
@@ -155,29 +153,6 @@ export function SettingsForm({ settings }: SettingsFormProps) {
               <div className="grid gap-2">
                 <Label htmlFor="bank_swift">SWIFT Code</Label>
                 <Input id="bank_swift" name="bank_swift" defaultValue={settings.bank_swift} />
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="border-orange-200 bg-orange-50/30">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-lg">
-                <ZapOff className="h-5 w-5 text-orange-600" />
-                PC Performance
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex items-center justify-between p-4 border border-orange-100 bg-white rounded-md shadow-sm">
-                <div className="space-y-0.5">
-                  <Label className="text-base">Performance Mode</Label>
-                  <p className="text-xs text-muted-foreground leading-relaxed">
-                    Disable animations and high-resolution live previews. Recommended for older or slow PCs.
-                  </p>
-                </div>
-                <Switch 
-                  checked={perfMode} 
-                  onCheckedChange={setPerfMode} 
-                />
               </div>
             </CardContent>
           </Card>
