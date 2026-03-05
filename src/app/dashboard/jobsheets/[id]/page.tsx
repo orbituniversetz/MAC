@@ -11,7 +11,7 @@ import {
   TableHeader, 
   TableRow 
 } from '@/components/ui/table';
-import { Trash2, FilePlus, TrendingUp, TrendingDown, Banknote, FileBadge } from 'lucide-react';
+import { Trash2, FilePlus, TrendingUp, TrendingDown, Banknote, FileBadge, Printer } from 'lucide-react';
 import { redirect } from 'next/navigation';
 import { JobCardPreview } from '@/components/dashboard/JobCardPreview';
 import { AddItemForm } from '@/components/dashboard/AddItemForm';
@@ -65,6 +65,10 @@ export default async function JobSheetDetailPage({ params }: { params: Promise<{
           <Badge className="bg-[#c10d12]">{job.status}</Badge>
         </div>
         <div className="flex flex-wrap gap-2">
+          <JobCardPreview job={job} settings={settings} />
+          
+          <Separator orientation="vertical" className="h-10 hidden md:block mx-1" />
+          
           <form action={handleCreateReport}>
             <Button variant="outline" type="submit" className="border-blue-200 hover:bg-blue-50 text-blue-700">
               <FileBadge className="mr-2 h-4 w-4" /> Technical Report
@@ -75,7 +79,6 @@ export default async function JobSheetDetailPage({ params }: { params: Promise<{
               <FilePlus className="mr-2 h-4 w-4" /> Create Proforma
             </Button>
           </form>
-          <JobCardPreview job={job} settings={settings} />
         </div>
       </div>
 

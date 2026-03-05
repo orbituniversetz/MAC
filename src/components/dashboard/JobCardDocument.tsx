@@ -54,7 +54,8 @@ export function JobCardDocument({ job, settings, className }: JobCardDocumentPro
             <h3 className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Customer Details</h3>
             <p className="font-bold text-base">{job.customerName}</p>
             <p className="text-sm">{job.customerPhone}</p>
-            <p className="text-xs text-muted-foreground">{job.customerAddress}</p>
+            <p className="text-xs text-muted-foreground">{job.customerAddress || 'No address provided'}</p>
+            {job.customerTin && <p className="text-[10px] font-bold mt-1">TIN: {job.customerTin}</p>}
           </div>
         </div>
         <div className="space-y-4 bg-gray-50 p-4 rounded-xl border border-gray-100">
@@ -74,12 +75,12 @@ export function JobCardDocument({ job, settings, className }: JobCardDocumentPro
       {/* Complaint Section */}
       <div className="mb-10">
         <h3 className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Customer Complaint / Job Description</h3>
-        <div className="p-4 border-2 border-dashed border-gray-200 rounded-xl min-h-[80px] bg-white italic text-sm text-gray-700 leading-relaxed">
-          "{job.complaint || 'No complaint recorded.'}"
+        <div className="p-4 border-2 border-dashed border-gray-200 rounded-xl min-h-[100px] bg-white italic text-sm text-gray-700 leading-relaxed">
+          {job.complaint || 'No complaint recorded.'}
         </div>
       </div>
 
-      {/* Items Table */}
+      {/* Items Table - Show empty rows if no items yet to allow manual writing if printed for intake */}
       <div className="mb-10">
         <h3 className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3 text-center">Work Performed & Parts Installed</h3>
         <table className="w-full border-collapse">
@@ -92,24 +93,29 @@ export function JobCardDocument({ job, settings, className }: JobCardDocumentPro
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100">
-            {job.items.map((item: any, index: number) => (
-              <tr key={item.id} className="text-[11px]">
-                <td className="py-3 text-gray-400">{index + 1}</td>
-                <td className="py-3 font-bold">{item.description}</td>
-                <td className="py-3 text-center">
-                  <span className="bg-gray-100 px-2 py-0.5 rounded text-[9px] font-black text-gray-500 uppercase">
-                    {item.type}
-                  </span>
-                </td>
-                <td className="py-3 text-center font-bold">{item.qty}</td>
-              </tr>
-            ))}
-            {job.items.length === 0 && (
-              <tr>
-                <td colSpan={4} className="py-10 text-center text-gray-300 italic text-sm">
-                  Service items will be listed here as work progresses.
-                </td>
-              </tr>
+            {job.items.length > 0 ? (
+              job.items.map((item: any, index: number) => (
+                <tr key={item.id} className="text-[11px]">
+                  <td className="py-3 text-gray-400">{index + 1}</td>
+                  <td className="py-3 font-bold">{item.description}</td>
+                  <td className="py-3 text-center">
+                    <span className="bg-gray-100 px-2 py-0.5 rounded text-[9px] font-black text-gray-500 uppercase">
+                      {item.type}
+                    </span>
+                  </td>
+                  <td className="py-3 text-center font-bold">{item.qty}</td>
+                </tr>
+              ))
+            ) : (
+              // Add empty rows for manual intake entry if printed empty
+              Array.from({ length: 6 }).map((_, i) => (
+                <tr key={i} className="h-10">
+                  <td className="py-3 text-gray-300">{i + 1}</td>
+                  <td className="py-3"></td>
+                  <td className="py-3"></td>
+                  <td className="py-3"></td>
+                </tr>
+              ))
             )}
           </tbody>
         </table>
@@ -119,22 +125,24 @@ export function JobCardDocument({ job, settings, className }: JobCardDocumentPro
       <div className="mt-auto pt-10 grid grid-cols-2 gap-20">
         <div className="space-y-6">
           <div className="border-t border-gray-400 pt-3">
-            <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">Garage Supervisor</p>
+            <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">Received By (Garage)</p>
             <p className="text-xs font-bold mt-1 uppercase">{settings.garage_name}</p>
           </div>
         </div>
         <div className="space-y-6">
           <div className="border-t border-gray-400 pt-3">
-            <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">Customer Confirmation</p>
-            <p className="text-xs font-bold mt-1 italic">I confirm the work described above.</p>
+            <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">Customer Authorization</p>
+            <p className="text-[9px] text-gray-500 mt-1 italic leading-tight">
+              I authorize the work described above and agree to the standard terms of service.
+            </p>
           </div>
         </div>
       </div>
 
       {/* Footer */}
       <div className="mt-16 text-center border-t pt-4">
-        <p className="text-[9px] text-gray-400 font-medium">
-          Computer generated Job Card. All repair work is subject to standard garage terms and conditions.
+        <p className="text-[9px] text-gray-400 font-medium italic">
+          Official {settings.garage_name} Job Card. Valid without official seal. All work is subject to our standard garage policy.
         </p>
       </div>
     </div>
