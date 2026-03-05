@@ -1,4 +1,4 @@
-import { getProformaById, getSettings, finalizeProforma, saveProformaDraft, getRecentItems, deleteJobItem, convertToInvoice, updateProformaDiscount } from '@/lib/actions';
+import { getProformaById, getSettings, finalizeProforma, saveProformaDraft, getRecentItems, deleteJobItem, convertToInvoice, updateProformaDiscount, recordProformaPayment } from '@/lib/actions';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -11,7 +11,7 @@ import {
   TableHeader, 
   TableRow 
 } from '@/components/ui/table';
-import { Trash2, Save, Lock, FileCheck, Receipt, Banknote, CreditCard } from 'lucide-react';
+import { Trash2, Save, Lock, FileCheck, Receipt, Banknote, CreditCard, History } from 'lucide-react';
 import { ProformaPreview } from '@/components/dashboard/ProformaPreview';
 import { AddItemForm } from '@/components/dashboard/AddItemForm';
 import { Label } from '@/components/ui/label';
@@ -41,6 +41,7 @@ export default async function ProformaDetailPage({ params }: { params: Promise<{
   // Enforce 18% VAT
   const taxAmount = (subtotal - discount) * 0.18;
   const total = subtotal - discount + taxAmount;
+  const balanceDue = total - (pf.totalPaid || 0);
 
   async function handleFinalize() {
     'use server'
@@ -115,55 +116,94 @@ export default async function ProformaDetailPage({ params }: { params: Promise<{
       </div>
 
       <div className="grid gap-6 md:grid-cols-3">
-        <Card className="md:col-span-2">
-          <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle>Quotation Items</CardTitle>
-            {!isFinalized && <Badge variant="outline">Editable</Badge>}
-          </CardHeader>
-          <CardContent>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Type</TableHead>
-                  <TableHead>Description</TableHead>
-                  <TableHead>Qty</TableHead>
-                  <TableHead>Price</TableHead>
-                  <TableHead>Subtotal</TableHead>
-                  <TableHead></TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {pf.items.map((item: any) => (
-                  <TableRow key={item.id}>
-                    <TableCell><Badge variant="outline">{item.type}</Badge></TableCell>
-                    <TableCell className="font-medium">{item.description}</TableCell>
-                    <TableCell>{item.qty}</TableCell>
-                    <TableCell>{item.unitPrice.toLocaleString()}</TableCell>
-                    <TableCell className="font-bold">{item.subtotal.toLocaleString()}</TableCell>
-                    <TableCell>
-                      {!isFinalized && (
-                        <form action={async () => { 'use server'; await deleteJobItem(item.id, pf.jobSheetId, pf.id); }}>
-                          <Button variant="ghost" size="icon" className="text-red-500 hover:text-red-700">
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        </form>
-                      )}
-                    </TableCell>
-                  </TableRow>
-                ))}
-                {pf.items.length === 0 && (
+        <div className="md:col-span-2 space-y-6">
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between">
+              <CardTitle>Quotation Items</CardTitle>
+              {!isFinalized && <Badge variant="outline">Editable</Badge>}
+            </CardHeader>
+            <CardContent>
+              <Table>
+                <TableHeader>
                   <TableRow>
-                    <TableCell colSpan={6} className="text-center py-8 text-muted-foreground italic">No items added to this proforma yet.</TableCell>
+                    <TableHead>Type</TableHead>
+                    <TableHead>Description</TableHead>
+                    <TableHead>Qty</TableHead>
+                    <TableHead>Price</TableHead>
+                    <TableHead>Subtotal</TableHead>
+                    <TableHead></TableHead>
                   </TableRow>
-                )}
-              </TableBody>
-            </Table>
+                </TableHeader>
+                <TableBody>
+                  {pf.items.map((item: any) => (
+                    <TableRow key={item.id}>
+                      <TableCell><Badge variant="outline">{item.type}</Badge></TableCell>
+                      <TableCell className="font-medium">{item.description}</TableCell>
+                      <TableCell>{item.qty}</TableCell>
+                      <TableCell>{item.unitPrice.toLocaleString()}</TableCell>
+                      <TableCell className="font-bold">{item.subtotal.toLocaleString()}</TableCell>
+                      <TableCell>
+                        {!isFinalized && (
+                          <form action={async () => { 'use server'; await deleteJobItem(item.id, pf.jobSheetId, pf.id); }}>
+                            <Button variant="ghost" size="icon" className="text-red-500 hover:text-red-700">
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </form>
+                        )}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                  {pf.items.length === 0 && (
+                    <TableRow>
+                      <TableCell colSpan={6} className="text-center py-8 text-muted-foreground italic">No items added to this proforma yet.</TableCell>
+                    </TableRow>
+                  )}
+                </TableBody>
+              </Table>
 
-            {!isFinalized && (
-              <AddItemForm jobId={pf.jobSheetId} proformaId={pf.id} recentItems={recentItems} />
-            )}
-          </CardContent>
-        </Card>
+              {!isFinalized && (
+                <AddItemForm jobId={pf.jobSheetId} proformaId={pf.id} recentItems={recentItems} />
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Payment History */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-lg flex items-center gap-2">
+                <History className="h-5 w-5 text-green-600" />
+                Payment History
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Date</TableHead>
+                    <TableHead>Amount</TableHead>
+                    <TableHead>Method</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {pf.payments?.map((p: any) => (
+                    <TableRow key={p.id}>
+                      <TableCell>{new Date(p.paidAt).toLocaleDateString()}</TableCell>
+                      <TableCell className="font-bold text-green-700">{p.amount.toLocaleString()}</TableCell>
+                      <TableCell><Badge variant="outline" className="text-[10px]">{p.method}</Badge></TableCell>
+                    </TableRow>
+                  ))}
+                  {(!pf.payments || pf.payments.length === 0) && (
+                    <TableRow>
+                      <TableCell colSpan={3} className="text-center py-4 text-muted-foreground italic text-xs">
+                        No payments recorded yet.
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+        </div>
 
         <div className="space-y-6">
           <Card>
@@ -223,16 +263,38 @@ export default async function ProformaDetailPage({ params }: { params: Promise<{
                 <span className="text-muted-foreground">VAT (18%):</span>
                 <span>{taxAmount.toLocaleString()}</span>
               </div>
+
+              <Separator />
+
+              <div className="flex justify-between text-sm py-1">
+                <span className="text-muted-foreground">Paid to Date:</span>
+                <span className="font-bold text-green-600">{pf.totalPaid?.toLocaleString() || 0}</span>
+              </div>
+
               <div className="pt-2 border-t flex justify-between items-center font-black">
-                <span className="text-lg">Total Due:</span>
-                <span className="text-2xl text-[#c10d12]">TZS {total.toLocaleString()}</span>
+                <span className="text-lg">Balance Due:</span>
+                <span className="text-2xl text-[#c10d12]">TZS {balanceDue.toLocaleString()}</span>
               </div>
             </div>
+
+            {/* Record Payment Form */}
+            {!isInvoiced && (
+              <form action={recordProformaPayment} className="space-y-3 bg-red-50/50 p-4 rounded-xl border border-red-100">
+                <Label className="text-[10px] uppercase font-black text-red-700 flex items-center gap-1">
+                  <Banknote className="h-3 w-3" /> Record New Payment (Cash)
+                </Label>
+                <input type="hidden" name="proformaId" value={pf.id} />
+                <div className="flex gap-2">
+                  <PriceInput name="amount" placeholder="Paid Amount" className="h-10 text-sm bg-white" required />
+                  <Button type="submit" className="bg-black text-white hover:bg-gray-800 h-10 px-4">Record</Button>
+                </div>
+              </form>
+            )}
             
             {isFinalized && !isInvoiced && (
               <form action={handleConvertToInvoice}>
-                <Button className="w-full bg-black hover:bg-gray-800">
-                  Convert to Final Invoice
+                <Button className="w-full bg-red-700 hover:bg-red-800 text-white font-bold py-6">
+                  Finalize & Generate Invoice
                 </Button>
               </form>
             )}
@@ -240,22 +302,22 @@ export default async function ProformaDetailPage({ params }: { params: Promise<{
             {!isFinalized && (
                <form action={handleFinalize}>
                 <Button className="w-full bg-black hover:bg-gray-800">
-                  Finalize for Payment
+                  Finalize Quotation
                 </Button>
               </form>
             )}
             
             {isInvoiced && (
               <Button disabled className="w-full bg-green-600 hover:bg-green-700">
-                <FileCheck className="mr-2 h-4 w-4" /> Invoiced
+                <FileCheck className="mr-2 h-4 w-4" /> Fully Invoiced
               </Button>
             )}
           </Card>
 
           {isFinalized && (
-            <div className="p-4 border rounded-lg bg-green-50 text-green-800 flex items-center gap-3">
+            <div className="p-4 border rounded-lg bg-green-50 text-green-800 flex items-center gap-3 shadow-sm">
               <FileCheck className="h-5 w-5" />
-              <p className="text-xs font-medium">Quotation is finalized. Convert to Invoice to record payment.</p>
+              <p className="text-[10px] font-medium leading-relaxed">Quotation is finalized. You can still record payments until the final invoice is generated.</p>
             </div>
           )}
         </div>

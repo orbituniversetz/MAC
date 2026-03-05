@@ -319,8 +319,26 @@ export async function getProformaById(id: number) {
     `).all(id, pf.jobSheetId);
     
     pf.expenses = db.prepare('SELECT * FROM expenses WHERE proformaId = ? OR (jobSheetId = ? AND jobSheetId IS NOT NULL)').all(id, pf.jobSheetId);
+    
+    pf.payments = db.prepare('SELECT * FROM payments WHERE proformaId = ? ORDER BY paidAt DESC').all(id);
+    pf.totalPaid = pf.payments.reduce((acc: number, p: any) => acc + p.amount, 0);
   }
   return pf;
+}
+
+export async function recordProformaPayment(formData: FormData) {
+  const proformaId = parseInt(formData.get('proformaId') as string);
+  const amountRaw = (formData.get('amount') as string).replace(/,/g, '');
+  const amount = parseFloat(amountRaw);
+  
+  if (isNaN(amount) || amount <= 0) return;
+
+  db.prepare(`
+    INSERT INTO payments (proformaId, amount, method)
+    VALUES (?, ?, ?)
+  `).run(proformaId, amount, 'Cash');
+
+  revalidatePath(`/dashboard/proformas/${proformaId}`);
 }
 
 export async function getRecentItems() {
