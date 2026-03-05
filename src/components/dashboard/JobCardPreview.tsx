@@ -50,7 +50,7 @@ export function JobCardPreview({ job, settings, mode }: JobCardPreviewProps) {
 
     const pdfWidth = pdf.internal.pageSize.getWidth();
     const pdfHeight = pdf.internal.pageSize.getHeight();
-    const pxToMm = 210 / (canvas.width / 2); // 2.0 scale factor
+    const pxToMm = 210 / (canvas.width / 2);
     
     const imgHeightInMm = canvas.height * pxToMm;
     let heightLeft = imgHeightInMm;

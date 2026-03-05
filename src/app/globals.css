@@ -56,11 +56,6 @@
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
-    page-break-after: always;
-  }
-
-  .a4-page:last-child {
-    margin-bottom: 40px;
   }
 }
 
@@ -75,7 +70,6 @@
     visibility: hidden;
   }
 
-  /* Only show the document container and its children */
   .print-container, 
   .print-container * {
     visibility: visible;
@@ -92,43 +86,26 @@
 
   .a4-page {
     width: 210mm !important;
-    height: 297mm !important;
     margin: 0 !important;
     box-shadow: none !important;
     padding: 25.4mm !important;
-    display: flex !important;
-    flex-direction: column !important;
     border: none !important;
   }
 
   @page {
     size: A4;
-    margin: 0; /* Margins are handled by .a4-page padding */
+    margin: 0;
   }
 
   .no-print {
     display: none !important;
   }
 
-  /* Table Pagination Rules */
-  thead {
-    display: table-header-group !important;
-  }
-  
-  tfoot {
-    display: table-footer-group !important;
-  }
-
   tr {
-    page-break-inside: avoid !important;
-  }
-
-  p, h1, h2, h3, h4, .signature-block, .terms-block {
     page-break-inside: avoid !important;
   }
 }
 
-/* Custom Scrollbar for Preview */
 .preview-scroll::-webkit-scrollbar {
   width: 8px;
 }
