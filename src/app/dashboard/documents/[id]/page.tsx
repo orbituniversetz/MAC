@@ -35,19 +35,24 @@ export default async function DocumentDetailPage({ params }: { params: Promise<{
         <div className="p-8 border-b bg-gray-50 flex justify-between items-start">
           <div className="flex items-center gap-4">
             {settings.garage_logo && (
-              <div className="relative h-16 w-16 overflow-hidden rounded-lg border bg-white flex items-center justify-center shrink-0">
+              <div className="relative h-20 w-20 overflow-hidden shrink-0">
                 <Image 
                   src={settings.garage_logo} 
                   alt="Garage Logo" 
                   fill 
-                  className="object-contain p-1" 
+                  className="object-contain" 
                   unoptimized 
                 />
               </div>
             )}
-            <div className="space-y-1">
-              <h1 className="text-3xl font-black text-[#c10d12] uppercase">{settings.garage_name}</h1>
-              <p className="text-xs text-muted-foreground">{settings.garage_address}</p>
+            <div className="space-y-0.5">
+              <h1 className="text-2xl font-black text-[#c10d12] uppercase leading-tight">{settings.garage_name}</h1>
+              <div className="text-[10px] text-muted-foreground font-medium leading-normal">
+                <p>{settings.garage_mailbox}</p>
+                <p>{settings.garage_address}</p>
+                <p>Tel: {settings.garage_phone}</p>
+                <p className="font-bold text-black mt-1">TIN: {settings.garage_tin}</p>
+              </div>
             </div>
           </div>
           <div className="text-right">
