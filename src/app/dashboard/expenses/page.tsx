@@ -1,5 +1,4 @@
-
-import { getExpenses, getJobSheets } from '@/lib/actions';
+import { getExpenses, deleteExpense } from '@/lib/actions';
 import { 
   Table, 
   TableBody, 
@@ -10,9 +9,9 @@ import {
 } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Banknote, Trash2, Calendar } from 'lucide-react';
 import { AddExpenseForm } from '@/components/dashboard/AddExpenseForm';
-import { deleteExpense } from '@/lib/actions';
 
 export default async function ExpensesPage() {
   const expenses = await getExpenses();
@@ -105,6 +104,3 @@ export default async function ExpensesPage() {
     </div>
   );
 }
-
-import { Card } from '@/components/ui/card';
-import { CardHeader as UIHeader } from '@/components/ui/card';
