@@ -15,7 +15,8 @@ import {
   Settings, 
   Database,
   Wrench,
-  Banknote
+  Banknote,
+  FileBadge
 } from 'lucide-react';
 
 const navItems = [
@@ -23,6 +24,7 @@ const navItems = [
   { name: 'Job Sheets', href: '/dashboard/jobsheets', icon: Wrench },
   { name: 'Expenses', href: '/dashboard/expenses', icon: Banknote },
   { name: 'Proforma Invoices', href: '/dashboard/proformas', icon: FileText },
+  { name: 'Letters & Reports', href: '/dashboard/documents', icon: FileBadge },
   { name: 'Invoices / Receipts', href: '/dashboard/invoices', icon: Receipt },
   { name: 'Customers', href: '/dashboard/customers', icon: Users },
   { name: 'Vehicles', href: '/dashboard/vehicles', icon: Car },
@@ -44,6 +46,7 @@ export function SidebarNav({ garageName, logo }: { garageName: string, logo?: st
               alt="Garage Logo" 
               fill
               className="object-contain p-1"
+              unoptimized
             />
           ) : (
             <div className="bg-[#c10d12] h-full w-full flex items-center justify-center">

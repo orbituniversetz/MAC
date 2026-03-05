@@ -1,5 +1,5 @@
 
-import { getJobSheetById, getSettings, createProformaFromJob, deleteJobItem, getRecentItems, deleteExpense } from '@/lib/actions';
+import { getJobSheetById, getSettings, createProformaFromJob, createReportFromJob, deleteJobItem, getRecentItems, deleteExpense } from '@/lib/actions';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -12,7 +12,7 @@ import {
   TableHeader, 
   TableRow 
 } from '@/components/ui/table';
-import { Trash2, FilePlus, TrendingUp, TrendingDown, Banknote } from 'lucide-react';
+import { Trash2, FilePlus, TrendingUp, TrendingDown, Banknote, FileBadge } from 'lucide-react';
 import { redirect } from 'next/navigation';
 import { PrintJobCardButton } from '@/components/dashboard/PrintJobCardButton';
 import { AddItemForm } from '@/components/dashboard/AddItemForm';
@@ -50,6 +50,14 @@ export default async function JobSheetDetailPage({ params }: { params: Promise<{
     }
   }
 
+  async function handleCreateReport() {
+    'use server'
+    const reportId = await createReportFromJob(job.id);
+    if (reportId) {
+      redirect(`/dashboard/documents/${reportId}`);
+    }
+  }
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -58,6 +66,11 @@ export default async function JobSheetDetailPage({ params }: { params: Promise<{
           <Badge className="bg-[#c10d12]">{job.status}</Badge>
         </div>
         <div className="flex gap-2">
+          <form action={handleCreateReport}>
+            <Button variant="outline" type="submit" className="border-blue-200 hover:bg-blue-50">
+              <FileBadge className="mr-2 h-4 w-4 text-blue-600" /> Technical Report
+            </Button>
+          </form>
           <form action={handleCreateProforma}>
             <Button variant="outline" type="submit">
               <FilePlus className="mr-2 h-4 w-4" /> Create Proforma
@@ -138,7 +151,7 @@ export default async function JobSheetDetailPage({ params }: { params: Promise<{
                       <TableCell>{exp.description}</TableCell>
                       <TableCell className="font-bold text-red-600">-{exp.amount.toLocaleString()}</TableCell>
                       <TableCell>
-                        <form action={async () => { 'use server'; await deleteExpense(exp.id, job.id); }}>
+                        <form action={async () => { 'use server'; await deleteExpense(exp.id, job.id, null); }}>
                           <Button variant="ghost" size="icon" className="text-red-500 hover:text-red-700">
                             <Trash2 className="h-4 w-4" />
                           </Button>

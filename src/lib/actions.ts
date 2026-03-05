@@ -93,7 +93,6 @@ export async function createJobSheet(formData: FormData) {
 export async function addJobItem(jobId: number | null, proformaId: number | null, item: any) {
   const subtotal = item.qty * item.unitPrice;
   
-  // If we only have proformaId, try to find the linked jobId to keep them in sync
   let effectiveJobId = jobId;
   if (!effectiveJobId && proformaId) {
     const pf = db.prepare('SELECT jobSheetId FROM proformas WHERE id = ?').get(proformaId) as any;
@@ -217,7 +216,6 @@ export async function createProformaDirect(formData: FormData) {
 
   const currentYear = new Date().getFullYear().toString().slice(-2);
   
-  // Create the Job Sheet first to link them
   const jsCountObj = db.prepare("SELECT COUNT(*) as count FROM jobsheets WHERE jobNo LIKE ?").get(`${currentYear}%`) as any;
   const jsNextNo = (jsCountObj?.count || 0) + 1;
   const jobNo = `${currentYear}${jsNextNo.toString().padStart(4, '0')}`;
@@ -229,7 +227,6 @@ export async function createProformaDirect(formData: FormData) {
   
   const jobSheetId = jsInfo.lastInsertRowid;
 
-  // Create the Proforma
   const pfCountObj = db.prepare("SELECT COUNT(*) as count FROM proformas WHERE proformaNo LIKE ?").get(`${currentYear}%`) as any;
   const pfNextNo = (pfCountObj?.count || 0) + 1;
   const proformaNo = `${currentYear}${pfNextNo.toString().padStart(4, '0')}`;
@@ -266,7 +263,6 @@ export async function getProformaById(id: number) {
   `).get(id) as any;
 
   if (pf) {
-    // Synchronized items: pull from either the specific proforma record OR the linked job sheet
     pf.items = db.prepare(`
       SELECT * FROM job_items 
       WHERE proformaId = ? 
@@ -318,4 +314,73 @@ export async function updateAllSettings(settings: Record<string, string>) {
   transaction(settings);
   revalidatePath('/dashboard/settings');
   revalidatePath('/dashboard');
+}
+
+// Documents CRUD
+export async function getDocuments() {
+  return db.prepare(`
+    SELECT d.*, c.name as customerName, js.jobNo 
+    FROM documents d
+    LEFT JOIN customers c ON d.customerId = c.id
+    LEFT JOIN jobsheets js ON d.jobSheetId = js.id
+    ORDER BY d.createdAt DESC
+  `).all() as any[];
+}
+
+export async function getDocumentById(id: number) {
+  return db.prepare(`
+    SELECT d.*, c.name as customerName, c.phone as customerPhone, c.address as customerAddress, c.tin as customerTin,
+           js.jobNo, v.plateNumber as vehiclePlate, v.makeModel as vehicleModel
+    FROM documents d
+    LEFT JOIN customers c ON d.customerId = c.id
+    LEFT JOIN jobsheets js ON d.jobSheetId = js.id
+    LEFT JOIN vehicles v ON js.vehicleId = v.id
+    WHERE d.id = ?
+  `).get(id) as any;
+}
+
+export async function createDocument(formData: FormData) {
+  const docType = formData.get('docType') as string;
+  const customerId = formData.get('customerId') ? parseInt(formData.get('customerId') as string) : null;
+  const jobSheetId = formData.get('jobSheetId') ? parseInt(formData.get('jobSheetId') as string) : null;
+  const title = formData.get('title') as string;
+  const content = formData.get('content') as string;
+
+  const currentYear = new Date().getFullYear().toString().slice(-2);
+  const prefix = docType === 'LETTER' ? 'LTR' : 'REP';
+  const countObj = db.prepare("SELECT COUNT(*) as count FROM documents WHERE docNo LIKE ?").get(`${prefix}-${currentYear}%`) as any;
+  const nextNo = (countObj?.count || 0) + 1;
+  const docNo = `${prefix}-${currentYear}${nextNo.toString().padStart(4, '0')}`;
+
+  const info = db.prepare(`
+    INSERT INTO documents (docType, docNo, customerId, jobSheetId, title, content)
+    VALUES (?, ?, ?, ?, ?, ?)
+  `).run(docType, docNo, customerId, jobSheetId, title, content);
+
+  revalidatePath('/dashboard/documents');
+  redirect(`/dashboard/documents/${info.lastInsertRowid}`);
+}
+
+export async function deleteDocument(id: number) {
+  db.prepare('DELETE FROM documents WHERE id = ?').run(id);
+  revalidatePath('/dashboard/documents');
+}
+
+export async function createReportFromJob(jobId: number) {
+  const job = await getJobSheetById(jobId);
+  if (!job) return null;
+
+  const currentYear = new Date().getFullYear().toString().slice(-2);
+  const prefix = 'REP';
+  const countObj = db.prepare("SELECT COUNT(*) as count FROM documents WHERE docNo LIKE ?").get(`${prefix}-${currentYear}%`) as any;
+  const nextNo = (countObj?.count || 0) + 1;
+  const docNo = `${prefix}-${currentYear}${nextNo.toString().padStart(4, '0')}`;
+
+  const info = db.prepare(`
+    INSERT INTO documents (docType, docNo, customerId, jobSheetId, title, content)
+    VALUES (?, ?, ?, ?, ?, ?)
+  `).run('REPORT', docNo, job.customerId, jobId, `Technical Report: ${job.vehiclePlate}`, `TECHNICAL FINDINGS:\n\n1. \n2. \n\nWORK PERFORMED:\n\n- \n\nRECOMMENDATIONS:\n\n- `);
+
+  revalidatePath('/dashboard/documents');
+  return info.lastInsertRowid;
 }

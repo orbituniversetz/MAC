@@ -108,6 +108,20 @@ db.exec(`
     key TEXT PRIMARY KEY,
     value TEXT
   );
+
+  CREATE TABLE IF NOT EXISTS documents (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    docType TEXT NOT NULL, -- 'LETTER' or 'REPORT'
+    docNo TEXT UNIQUE,
+    customerId INTEGER,
+    jobSheetId INTEGER,
+    title TEXT,
+    content TEXT,
+    status TEXT DEFAULT 'Draft',
+    createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY(customerId) REFERENCES customers(id),
+    FOREIGN KEY(jobSheetId) REFERENCES jobsheets(id)
+  );
 `);
 
 // Migration safety
