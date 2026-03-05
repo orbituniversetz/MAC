@@ -11,11 +11,12 @@ import {
   TableHeader, 
   TableRow 
 } from '@/components/ui/table';
-import { Trash2, Save, Lock, FileCheck, Receipt, Banknote, CreditCard, History, AlertCircle } from 'lucide-react';
+import { ChevronLeft, Trash2, Save, Lock, FileCheck, Receipt, Banknote, CreditCard, History, AlertCircle } from 'lucide-react';
 import { ProformaPreview } from '@/components/dashboard/ProformaPreview';
 import { AddItemForm } from '@/components/dashboard/AddItemForm';
 import { Label } from '@/components/ui/label';
 import { PriceInput } from '@/components/dashboard/PriceInput';
+import Link from 'next/link';
 
 export default async function ProformaDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -28,7 +29,7 @@ export default async function ProformaDetailPage({ params }: { params: Promise<{
       <div className="flex flex-col items-center justify-center h-[50vh] space-y-4">
         <h2 className="text-2xl font-bold text-gray-800">Proforma Not Found</h2>
         <Button asChild variant="outline">
-          <a href="/dashboard/proformas">Back to Proformas</a>
+          <Link href="/dashboard/proformas">Back to Proformas</Link>
         </Button>
       </div>
     );
@@ -68,6 +69,12 @@ export default async function ProformaDetailPage({ params }: { params: Promise<{
 
   return (
     <div className="space-y-6">
+      <div className="flex items-center">
+        <Link href="/dashboard/proformas" className="flex items-center text-sm text-muted-foreground hover:text-black">
+          <ChevronLeft className="h-4 w-4 mr-1" /> Back to Proformas
+        </Link>
+      </div>
+
       {/* Action Bar */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-4 border rounded-lg shadow-sm sticky top-0 z-20">
         <div className="flex items-center gap-4">

@@ -11,12 +11,13 @@ import {
   TableHeader, 
   TableRow 
 } from '@/components/ui/table';
-import { Trash2, FilePlus, TrendingUp, TrendingDown, Banknote, FileBadge, Printer } from 'lucide-react';
+import { ChevronLeft, Trash2, FilePlus, TrendingUp, TrendingDown, Banknote, FileBadge, Printer } from 'lucide-react';
 import { redirect } from 'next/navigation';
 import { JobCardPreview } from '@/components/dashboard/JobCardPreview';
 import { AddItemForm } from '@/components/dashboard/AddItemForm';
 import { AddExpenseForm } from '@/components/dashboard/AddExpenseForm';
 import { cn } from '@/lib/utils';
+import Link from 'next/link';
 
 export default async function JobSheetDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -31,7 +32,7 @@ export default async function JobSheetDetailPage({ params }: { params: Promise<{
         <h2 className="text-2xl font-bold text-gray-800">Job Not Found</h2>
         <p className="text-muted-foreground">The job sheet you are looking for does not exist.</p>
         <Button asChild variant="outline">
-          <a href="/dashboard/jobsheets">Back to Job Sheets</a>
+          <Link href="/dashboard/jobsheets">Back to Job Sheets</Link>
         </Button>
       </div>
     );
@@ -60,6 +61,12 @@ export default async function JobSheetDetailPage({ params }: { params: Promise<{
 
   return (
     <div className="space-y-6">
+      <div className="flex items-center">
+        <Link href="/dashboard/jobsheets" className="flex items-center text-sm text-muted-foreground hover:text-black">
+          <ChevronLeft className="h-4 w-4 mr-1" /> Back to Job Sheets
+        </Link>
+      </div>
+
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="flex items-center gap-4">
           <h2 className="text-3xl font-bold tracking-tight text-black">{job.jobNo}</h2>
