@@ -15,7 +15,8 @@ db.exec(`
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT NOT NULL,
     phone TEXT,
-    address TEXT
+    address TEXT,
+    tin TEXT
   );
 
   CREATE TABLE IF NOT EXISTS vehicles (
@@ -62,7 +63,7 @@ db.exec(`
     status TEXT DEFAULT 'Draft',
     snapshotJson TEXT,
     discount REAL DEFAULT 0,
-    taxEnabled INTEGER DEFAULT 0,
+    taxEnabled INTEGER DEFAULT 1,
     createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY(jobSheetId) REFERENCES jobsheets(id),
     FOREIGN KEY(customerId) REFERENCES customers(id),
@@ -97,14 +98,15 @@ db.exec(`
   );
 `);
 
-// Migration safety for existing local databases
+// Migration safety
+try { db.exec("ALTER TABLE customers ADD COLUMN tin TEXT;"); } catch (e) {}
 try { db.exec("ALTER TABLE proformas ADD COLUMN customerId INTEGER;"); } catch (e) {}
 try { db.exec("ALTER TABLE proformas ADD COLUMN vehicleId INTEGER;"); } catch (e) {}
 try { db.exec("ALTER TABLE job_items ADD COLUMN proformaId INTEGER;"); } catch (e) {}
 
 const customerCount = db.prepare('SELECT count(*) as count FROM customers').get() as { count: number };
 if (customerCount.count === 0) {
-  db.prepare('INSERT INTO customers (name, phone, address) VALUES (?, ?, ?)').run('Baraka Joseph', '0712 000 000', 'Posta, Dar es Salaam');
+  db.prepare('INSERT INTO customers (name, phone, address, tin) VALUES (?, ?, ?, ?)').run('Baraka Joseph', '0712 000 000', 'Posta, Dar es Salaam', '123-456-789');
   db.prepare('INSERT INTO vehicles (customerId, plateNumber, makeModel) VALUES (?, ?, ?)').run(1, 'T 123 ABC', 'Toyota Hilux');
   db.prepare('INSERT INTO jobsheets (jobNo, customerId, vehicleId, complaint, status) VALUES (?, ?, ?, ?, ?)').run('JS-0001', 1, 1, 'Oil change and brake check', 'Draft');
   db.prepare('INSERT INTO job_items (jobSheetId, type, description, qty, unitPrice, subtotal) VALUES (?, ?, ?, ?, ?, ?)').run(1, 'PART', 'Oil Filter', 1, 35000, 35000);

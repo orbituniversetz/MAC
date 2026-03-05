@@ -1,3 +1,4 @@
+
 import { getProformaById, addJobItem, deleteJobItem, getSettings } from '@/lib/actions';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -13,6 +14,7 @@ import {
 } from '@/components/ui/table';
 import { Trash2, Printer, FileText } from 'lucide-react';
 import { PrintProformaButton } from '@/components/dashboard/PrintProformaButton';
+import { ProformaPreview } from '@/components/dashboard/ProformaPreview';
 
 export default async function ProformaDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -30,7 +32,11 @@ export default async function ProformaDetailPage({ params }: { params: Promise<{
     );
   }
 
-  const total = pf.items.reduce((acc: number, item: any) => acc + item.subtotal, 0);
+  const subtotal = pf.items.reduce((acc: number, item: any) => acc + item.subtotal, 0);
+  const discount = pf.discount || 0;
+  const taxRate = parseFloat(settings.tax_rate || '0') / 100;
+  const taxAmount = pf.taxEnabled ? (subtotal - discount) * taxRate : 0;
+  const total = subtotal - discount + taxAmount;
 
   async function handleAdd(formData: FormData) {
     'use server'
@@ -51,6 +57,7 @@ export default async function ProformaDetailPage({ params }: { params: Promise<{
           {pf.jobNo && <Badge variant="outline">Linked to {pf.jobNo}</Badge>}
         </div>
         <div className="flex gap-2">
+          <ProformaPreview proforma={pf} settings={settings} />
           <PrintProformaButton proforma={pf} settings={settings} />
         </div>
       </div>
@@ -123,6 +130,7 @@ export default async function ProformaDetailPage({ params }: { params: Promise<{
                 <p className="text-xs text-muted-foreground uppercase font-bold">Client</p>
                 <p className="font-medium text-black">{pf.customerName}</p>
                 <p className="text-sm">{pf.customerPhone}</p>
+                <p className="text-xs text-muted-foreground italic">{pf.customerAddress}</p>
               </div>
               <Separator />
               {pf.vehiclePlate && (
@@ -139,9 +147,18 @@ export default async function ProformaDetailPage({ params }: { params: Promise<{
             <CardHeader>
               <CardTitle>Total Summary</CardTitle>
             </CardHeader>
-            <CardContent>
+            <CardContent className="space-y-2">
+              <div className="flex justify-between items-center text-sm">
+                <span className="text-muted-foreground">Subtotal:</span>
+                <span>{subtotal.toLocaleString()}</span>
+              </div>
+              <div className="flex justify-between items-center text-sm">
+                <span className="text-muted-foreground">VAT ({settings.tax_rate}%):</span>
+                <span>{taxAmount.toLocaleString()}</span>
+              </div>
+              <Separator className="my-2" />
               <div className="flex justify-between items-center text-lg">
-                <span>Total Amount:</span>
+                <span className="font-bold">Total:</span>
                 <span className="font-bold text-[#c10d12]">TZS {total.toLocaleString()}</span>
               </div>
             </CardContent>

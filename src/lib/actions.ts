@@ -1,3 +1,4 @@
+
 'use server'
 
 import db from './db';
@@ -30,7 +31,7 @@ export async function getJobSheets() {
 
 export async function getJobSheetById(id: number) {
   const job = db.prepare(`
-    SELECT js.*, c.name as customerName, c.phone as customerPhone, v.plateNumber as vehiclePlate, v.makeModel as vehicleModel
+    SELECT js.*, c.name as customerName, c.phone as customerPhone, c.address as customerAddress, c.tin as customerTin, v.plateNumber as vehiclePlate, v.makeModel as vehicleModel
     FROM jobsheets js
     JOIN customers c ON js.customerId = c.id
     JOIN vehicles v ON js.vehicleId = v.id
@@ -177,7 +178,7 @@ export async function getProformas() {
 
 export async function getProformaById(id: number) {
   const pf = db.prepare(`
-    SELECT p.*, c.name as customerName, c.phone as customerPhone, v.plateNumber as vehiclePlate, v.makeModel as vehicleModel, js.jobNo
+    SELECT p.*, c.name as customerName, c.phone as customerPhone, c.address as customerAddress, c.tin as customerTin, v.plateNumber as vehiclePlate, v.makeModel as vehicleModel, js.jobNo
     FROM proformas p
     LEFT JOIN customers c ON p.customerId = c.id
     LEFT JOIN vehicles v ON p.vehicleId = v.id
