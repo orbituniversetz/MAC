@@ -1,4 +1,3 @@
-
 import Database from 'better-sqlite3';
 import path from 'path';
 import fs from 'fs';
@@ -135,7 +134,7 @@ const customerCount = db.prepare('SELECT count(*) as count FROM customers').get(
 if (customerCount.count === 0) {
   db.prepare('INSERT INTO customers (name, phone, address, tin) VALUES (?, ?, ?, ?)').run('Baraka Joseph', '0712 000 000', 'Posta, Dar es Salaam', '123-456-789');
   db.prepare('INSERT INTO vehicles (customerId, plateNumber, makeModel) VALUES (?, ?, ?)').run(1, 'T 123 ABC', 'Toyota Hilux');
-  db.prepare('INSERT INTO jobsheets (jobNo, customerId, vehicleId, complaint, status) VALUES (?, ?, ?, ?, ?)').run('JS-0001', 1, 1, 'Oil change and brake check', 'Draft');
+  db.prepare('INSERT INTO jobsheets (jobNo, customerId, vehicleId, complaint, status) VALUES (?, ?, ?, ?, ?)').run('JS-250001', 1, 1, 'Oil change and brake check', 'Draft');
   db.prepare('INSERT INTO job_items (jobSheetId, type, description, qty, unitPrice, subtotal) VALUES (?, ?, ?, ?, ?, ?)').run(1, 'PART', 'Oil Filter', 1, 35000, 35000);
   db.prepare('INSERT INTO job_items (jobSheetId, type, description, qty, unitPrice, subtotal) VALUES (?, ?, ?, ?, ?, ?)').run(1, 'LABOUR', 'General Service', 1, 50000, 50000);
   

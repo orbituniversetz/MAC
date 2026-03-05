@@ -75,9 +75,10 @@ export async function createJobSheet(formData: FormData) {
   const complaint = formData.get('complaint') as string;
 
   const currentYear = new Date().getFullYear().toString().slice(-2);
-  const countObj = db.prepare("SELECT COUNT(*) as count FROM jobsheets WHERE jobNo LIKE ?").get(`${currentYear}%`) as any;
+  const prefix = 'JS';
+  const countObj = db.prepare("SELECT COUNT(*) as count FROM jobsheets WHERE jobNo LIKE ?").get(`${prefix}-${currentYear}%`) as any;
   const nextNo = (countObj?.count || 0) + 1;
-  const jobNo = `${currentYear}${nextNo.toString().padStart(4, '0')}`;
+  const jobNo = `${prefix}-${currentYear}${nextNo.toString().padStart(4, '0')}`;
 
   const info = db.prepare(`
     INSERT INTO jobsheets (jobNo, customerId, vehicleId, complaint, status)
@@ -172,9 +173,10 @@ export async function createProformaFromJob(jobId: number) {
   if (!job) return null;
 
   const currentYear = new Date().getFullYear().toString().slice(-2);
-  const countObj = db.prepare("SELECT COUNT(*) as count FROM proformas WHERE proformaNo LIKE ?").get(`${currentYear}%`) as any;
+  const prefix = 'PF';
+  const countObj = db.prepare("SELECT COUNT(*) as count FROM proformas WHERE proformaNo LIKE ?").get(`${prefix}-${currentYear}%`) as any;
   const nextNo = (countObj?.count || 0) + 1;
-  const proformaNo = `${currentYear}${nextNo.toString().padStart(4, '0')}`;
+  const proformaNo = `${prefix}-${currentYear}${nextNo.toString().padStart(4, '0')}`;
 
   const info = db.prepare(`
     INSERT INTO proformas (proformaNo, jobSheetId, customerId, vehicleId, status)
@@ -226,9 +228,10 @@ export async function createProformaDirect(formData: FormData) {
 
   const currentYear = new Date().getFullYear().toString().slice(-2);
   
-  const jsCountObj = db.prepare("SELECT COUNT(*) as count FROM jobsheets WHERE jobNo LIKE ?").get(`${currentYear}%`) as any;
+  const jsPrefix = 'JS';
+  const jsCountObj = db.prepare("SELECT COUNT(*) as count FROM jobsheets WHERE jobNo LIKE ?").get(`${jsPrefix}-${currentYear}%`) as any;
   const jsNextNo = (jsCountObj?.count || 0) + 1;
-  const jobNo = `${currentYear}${jsNextNo.toString().padStart(4, '0')}`;
+  const jobNo = `${jsPrefix}-${currentYear}${jsNextNo.toString().padStart(4, '0')}`;
   
   const jsInfo = db.prepare(`
     INSERT INTO jobsheets (jobNo, customerId, vehicleId, complaint, status)
@@ -237,9 +240,10 @@ export async function createProformaDirect(formData: FormData) {
   
   const jobSheetId = jsInfo.lastInsertRowid;
 
-  const pfCountObj = db.prepare("SELECT COUNT(*) as count FROM proformas WHERE proformaNo LIKE ?").get(`${currentYear}%`) as any;
+  const pfPrefix = 'PF';
+  const pfCountObj = db.prepare("SELECT COUNT(*) as count FROM proformas WHERE proformaNo LIKE ?").get(`${pfPrefix}-${currentYear}%`) as any;
   const pfNextNo = (pfCountObj?.count || 0) + 1;
-  const proformaNo = `${currentYear}${pfNextNo.toString().padStart(4, '0')}`;
+  const proformaNo = `${pfPrefix}-${currentYear}${pfNextNo.toString().padStart(4, '0')}`;
 
   const info = db.prepare(`
     INSERT INTO proformas (proformaNo, jobSheetId, customerId, vehicleId, status)
