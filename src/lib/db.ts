@@ -7,7 +7,12 @@ const DB_PATH = process.env.NODE_ENV === 'production'
   : path.join(process.cwd(), 'garage.db');
 
 const db = new Database(DB_PATH);
+
+// Performance Optimizations
 db.pragma('journal_mode = WAL');
+db.pragma('synchronous = NORMAL');
+db.pragma('temp_store = MEMORY');
+db.pragma('mmap_size = 30000000000');
 
 db.exec(`
   CREATE TABLE IF NOT EXISTS customers (
@@ -112,7 +117,7 @@ db.exec(`
 
   CREATE TABLE IF NOT EXISTS documents (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    docType TEXT NOT NULL, -- 'LETTER' or 'REPORT'
+    docType TEXT NOT NULL,
     docNo TEXT UNIQUE,
     customerId INTEGER,
     jobSheetId INTEGER,
@@ -123,6 +128,24 @@ db.exec(`
     FOREIGN KEY(customerId) REFERENCES customers(id),
     FOREIGN KEY(jobSheetId) REFERENCES jobsheets(id)
   );
+
+  -- Indexes for Performance
+  CREATE INDEX IF NOT EXISTS idx_vehicles_cust ON vehicles(customerId);
+  CREATE INDEX IF NOT EXISTS idx_jobsheets_cust ON jobsheets(customerId);
+  CREATE INDEX IF NOT EXISTS idx_jobsheets_veh ON jobsheets(vehicleId);
+  CREATE INDEX IF NOT EXISTS idx_items_js ON job_items(jobSheetId);
+  CREATE INDEX IF NOT EXISTS idx_items_pf ON job_items(proformaId);
+  CREATE INDEX IF NOT EXISTS idx_pf_js ON proformas(jobSheetId);
+  CREATE INDEX IF NOT EXISTS idx_pf_cust ON proformas(customerId);
+  CREATE INDEX IF NOT EXISTS idx_pf_veh ON proformas(vehicleId);
+  CREATE INDEX IF NOT EXISTS idx_inv_js ON invoices(jobSheetId);
+  CREATE INDEX IF NOT EXISTS idx_inv_pf ON invoices(proformaId);
+  CREATE INDEX IF NOT EXISTS idx_pay_inv ON payments(invoiceId);
+  CREATE INDEX IF NOT EXISTS idx_pay_pf ON payments(proformaId);
+  CREATE INDEX IF NOT EXISTS idx_exp_js ON expenses(jobSheetId);
+  CREATE INDEX IF NOT EXISTS idx_exp_pf ON expenses(proformaId);
+  CREATE INDEX IF NOT EXISTS idx_doc_cust ON documents(customerId);
+  CREATE INDEX IF NOT EXISTS idx_doc_js ON documents(jobSheetId);
 `);
 
 // Migration safety

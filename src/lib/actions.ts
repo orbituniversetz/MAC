@@ -3,8 +3,9 @@
 import db from './db';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
+import { cache } from 'react';
 
-export async function getDashboardStats() {
+export const getDashboardStats = cache(async () => {
   const openJobs = db.prepare("SELECT COUNT(*) as count FROM jobsheets WHERE status != 'Closed'").get() as any;
   const completedJobs = db.prepare("SELECT COUNT(*) as count FROM jobsheets WHERE status = 'Completed'").get() as any;
   const totalSales = db.prepare("SELECT SUM(subtotal) as total FROM job_items").get() as any;
@@ -19,9 +20,9 @@ export async function getDashboardStats() {
     totalExpenses: totalExpenses?.total || 0,
     netProfit: (totalSales?.total || 0) - (totalExpenses?.total || 0)
   };
-}
+});
 
-export async function getJobSheets() {
+export const getJobSheets = cache(async () => {
   return db.prepare(`
     SELECT js.*, c.name as customerName, v.plateNumber as vehiclePlate 
     FROM jobsheets js
@@ -29,9 +30,9 @@ export async function getJobSheets() {
     JOIN vehicles v ON js.vehicleId = v.id
     ORDER BY js.openedAt DESC
   `).all();
-}
+});
 
-export async function getJobSheetById(id: number) {
+export const getJobSheetById = cache(async (id: number) => {
   const job = db.prepare(`
     SELECT js.*, c.name as customerName, c.phone as customerPhone, c.address as customerAddress, c.tin as customerTin, v.plateNumber as vehiclePlate, v.makeModel as vehicleModel
     FROM jobsheets js
@@ -45,7 +46,7 @@ export async function getJobSheetById(id: number) {
     job.expenses = db.prepare('SELECT * FROM expenses WHERE jobSheetId = ?').all(id);
   }
   return job;
-}
+});
 
 export async function createJobSheet(formData: FormData) {
   let customerId = formData.get('customerId') ? parseInt(formData.get('customerId') as string) : null;
@@ -139,7 +140,7 @@ export async function deleteExpense(id: number, jobSheetId: number | null, profo
   revalidatePath('/dashboard/expenses');
 }
 
-export async function getExpenses() {
+export const getExpenses = cache(async () => {
   return db.prepare(`
     SELECT e.*, js.jobNo, p.proformaNo
     FROM expenses e
@@ -147,9 +148,9 @@ export async function getExpenses() {
     LEFT JOIN proformas p ON e.proformaId = p.id
     ORDER BY e.date DESC
   `).all() as any[];
-}
+});
 
-export async function getRecentExpenses() {
+export const getRecentExpenses = cache(async () => {
   return db.prepare(`
     SELECT DISTINCT category, description, amount 
     FROM expenses 
@@ -158,15 +159,15 @@ export async function getRecentExpenses() {
     ORDER BY description ASC
     LIMIT 30
   `).all() as any[];
-}
+});
 
-export async function getCustomers() {
+export const getCustomers = cache(async () => {
   return db.prepare('SELECT * FROM customers ORDER BY name ASC').all() as any[];
-}
+});
 
-export async function getAllVehicles() {
+export const getAllVehicles = cache(async () => {
   return db.prepare('SELECT v.*, c.name as customerName FROM vehicles v JOIN customers c ON v.customerId = c.id ORDER BY v.plateNumber ASC').all() as any[];
-}
+});
 
 export async function createProformaFromJob(jobId: number) {
   const job = await getJobSheetById(jobId);
@@ -295,7 +296,7 @@ export async function createProformaDirect(formData: FormData) {
   redirect(`/dashboard/proformas/${info.lastInsertRowid}`);
 }
 
-export async function getProformas() {
+export const getProformas = cache(async () => {
   return db.prepare(`
     SELECT p.*, js.jobNo, c.name as customerName, v.plateNumber as vehiclePlate
     FROM proformas p
@@ -304,9 +305,9 @@ export async function getProformas() {
     LEFT JOIN vehicles v ON p.vehicleId = v.id
     ORDER BY p.createdAt DESC
   `).all();
-}
+});
 
-export async function getProformaById(id: number) {
+export const getProformaById = cache(async (id: number) => {
   const pf = db.prepare(`
     SELECT p.*, c.name as customerName, c.phone as customerPhone, c.address as customerAddress, c.tin as customerTin, v.plateNumber as vehiclePlate, v.makeModel as vehicleModel, js.jobNo
     FROM proformas p
@@ -329,7 +330,7 @@ export async function getProformaById(id: number) {
     pf.totalPaid = pf.payments.reduce((acc: number, p: any) => acc + p.amount, 0);
   }
   return pf;
-}
+});
 
 export async function recordProformaPayment(formData: FormData) {
   const proformaId = parseInt(formData.get('proformaId') as string);
@@ -346,7 +347,7 @@ export async function recordProformaPayment(formData: FormData) {
   revalidatePath(`/dashboard/proformas/${proformaId}`);
 }
 
-export async function getRecentItems() {
+export const getRecentItems = cache(async () => {
   return db.prepare(`
     SELECT DISTINCT type, description, unitPrice 
     FROM job_items 
@@ -355,9 +356,9 @@ export async function getRecentItems() {
     ORDER BY description ASC
     LIMIT 50
   `).all() as any[];
-}
+});
 
-export async function getInvoices() {
+export const getInvoices = cache(async () => {
   return db.prepare(`
     SELECT i.*, js.jobNo, c.name as customerName 
     FROM invoices i
@@ -365,9 +366,9 @@ export async function getInvoices() {
     LEFT JOIN customers c ON js.customerId = c.id
     ORDER BY i.createdAt DESC
   `).all();
-}
+});
 
-export async function getInvoiceById(id: number) {
+export const getInvoiceById = cache(async (id: number) => {
   const inv = db.prepare(`
     SELECT i.*, js.jobNo, c.name as customerName, c.phone as customerPhone, c.address as customerAddress, c.tin as customerTin, v.plateNumber as vehiclePlate, v.makeModel as vehicleModel
     FROM invoices i
@@ -381,15 +382,15 @@ export async function getInvoiceById(id: number) {
     inv.snapshot = JSON.parse(inv.snapshotJson);
   }
   return inv;
-}
+});
 
-export async function getSettings() {
+export const getSettings = cache(async () => {
   const settings = db.prepare('SELECT * FROM settings').all() as any[];
   return settings.reduce((acc, curr) => {
     acc[curr.key] = curr.value;
     return acc;
   }, {} as any);
-}
+});
 
 export async function updateAllSettings(settings: Record<string, string>) {
   const stmt = db.prepare('INSERT OR REPLACE INTO settings (key, value) VALUES (?, ?)');
@@ -404,8 +405,7 @@ export async function updateAllSettings(settings: Record<string, string>) {
   revalidatePath('/dashboard');
 }
 
-// Documents CRUD
-export async function getDocuments() {
+export const getDocuments = cache(async () => {
   return db.prepare(`
     SELECT d.*, c.name as customerName, js.jobNo 
     FROM documents d
@@ -413,19 +413,19 @@ export async function getDocuments() {
     LEFT JOIN jobsheets js ON d.jobSheetId = js.id
     ORDER BY d.createdAt DESC
   `).all() as any[];
-}
+});
 
-export async function getDocumentById(id: number) {
+export const getDocumentById = cache(async (id: number) => {
   return db.prepare(`
     SELECT d.*, c.name as customerName, c.phone as customerPhone, c.address as customerAddress, c.tin as customerTin,
            js.jobNo, v.plateNumber as vehiclePlate, v.makeModel as vehicleModel
     FROM documents d
     LEFT JOIN customers c ON d.customerId = c.id
     LEFT JOIN jobsheets js ON d.jobSheetId = js.id
-    LEFT JOIN vehicles v ON js.vehicleId = v.id
+    LEFT JOIN vehicles v ON d.vehicleId = v.id
     WHERE d.id = ?
   `).get(id) as any;
-}
+});
 
 export async function createDocument(formData: FormData) {
   const docType = formData.get('docType') as string;
