@@ -43,7 +43,7 @@ export function DocumentPaper({ doc, settings, className }: DocumentPaperProps) 
           </div>
         </div>
 
-        <div className="flex justify-between items-center mb-10 border-b-4 border-zinc-900 pb-2">
+        <div className="flex justify-between items-center mb-10 border-b-4 border-zinc-900 pb-2 shadow-sm">
           <div className="inline-flex items-center gap-2 bg-zinc-950 text-white px-4 py-1.5 rounded text-[10px] font-black uppercase tracking-widest">
             {doc.docType === 'LETTER' ? <Mail className="h-3.5 w-3.5" /> : <FileText className="h-3.5 w-3.5" />}
             {doc.docType === 'LETTER' ? 'Official Correspondence' : 'Technical Inspection Report'}
@@ -81,12 +81,20 @@ export function DocumentPaper({ doc, settings, className }: DocumentPaperProps) 
           {doc.content}
         </div>
 
-        <div className="mt-12 space-y-12 signature-block">
-          <p className="text-base font-bold">Yours faithfully,</p>
-          <div className="space-y-2">
-            <div className="w-72 border-b-4 border-zinc-900 opacity-20" />
-            <p className="text-sm font-black uppercase tracking-widest text-zinc-900">{settings.garage_name} Management</p>
-            <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest leading-none">AUTHORIZED SIGNATORY</p>
+        <div className="mt-auto space-y-12">
+          {/* Terms and Conditions */}
+          <div className="p-6 bg-zinc-50 rounded-2xl border-2 border-zinc-100">
+            <h3 className="text-[10px] font-black text-zinc-400 uppercase tracking-widest mb-2">Standard Notice</h3>
+            <p className="text-[10px] text-zinc-500 italic leading-relaxed">This document serves as an official communication from {settings.garage_name}. Any technical findings are based on the inspection performed on the date stated above.</p>
+          </div>
+
+          <div className="signature-block">
+            <p className="text-base font-bold mb-8">Yours faithfully,</p>
+            <div className="space-y-2">
+              <div className="w-72 border-b-4 border-zinc-900 opacity-20" />
+              <p className="text-sm font-black uppercase tracking-widest text-zinc-900">{settings.garage_name} Management</p>
+              <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest leading-none">AUTHORIZED SIGNATORY</p>
+            </div>
           </div>
         </div>
       </div>

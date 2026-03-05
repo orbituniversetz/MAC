@@ -22,9 +22,9 @@ export function PreviewContainer({
   icon
 }: PreviewContainerProps) {
   return (
-    <div className="fixed inset-0 z-[9999] flex flex-col bg-zinc-900/90 backdrop-blur-sm no-print">
+    <div className="fixed inset-0 z-[9999] flex flex-col bg-zinc-900/95 backdrop-blur-sm no-print">
       {/* Toolbar */}
-      <div className="flex h-16 w-full items-center justify-between border-b border-white/10 bg-zinc-950 px-6 text-white shadow-2xl">
+      <div className="flex h-16 w-full items-center justify-between border-b border-white/10 bg-zinc-950 px-6 text-white shadow-2xl shrink-0">
         <div className="flex items-center gap-3">
           <div className="p-2 bg-zinc-800 rounded-lg">
             {icon}

@@ -49,7 +49,7 @@ export function ProformaDocument({ proforma, settings, className }: ProformaDocu
           </div>
         </div>
 
-        <div className="flex justify-between items-center mb-8 bg-[#c10d12] text-white p-4 rounded-md">
+        <div className="flex justify-between items-center mb-8 bg-[#c10d12] text-white p-4 rounded-md shadow-lg">
           <h2 className="text-lg font-black uppercase tracking-widest">PROFORMA INVOICE</h2>
           <div className="text-right">
             <p className="text-[10px] font-bold opacity-70 uppercase tracking-tighter leading-none">QUOTATION NUMBER</p>

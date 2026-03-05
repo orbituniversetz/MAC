@@ -50,7 +50,7 @@ export function JobCardDocument({ job, settings, isInternal = false, className }
         </div>
 
         {/* Title Bar */}
-        <div className="flex justify-between items-center mb-6 bg-zinc-950 text-white p-3 rounded-md">
+        <div className="flex justify-between items-center mb-6 bg-zinc-950 text-white p-3 rounded-md shadow-lg">
           <div className="flex items-center gap-3">
             {isInternal ? <ShieldCheck className="h-5 w-5 text-blue-400" /> : <User className="h-5 w-5 text-red-400" />}
             <h2 className="text-sm font-black uppercase tracking-widest">
@@ -58,8 +58,8 @@ export function JobCardDocument({ job, settings, isInternal = false, className }
             </h2>
           </div>
           <div className="text-right">
-            <p className="text-[10px] font-bold opacity-70">JOB NUMBER</p>
-            <p className="text-lg font-black leading-none">{job.jobNo}</p>
+            <p className="text-[10px] font-bold opacity-70 leading-none mb-1 uppercase tracking-widest">JOB NUMBER</p>
+            <p className="text-xl font-black leading-none tracking-tighter">{job.jobNo}</p>
           </div>
         </div>
 
@@ -67,7 +67,7 @@ export function JobCardDocument({ job, settings, isInternal = false, className }
         <div className="grid grid-cols-2 gap-8 mb-8">
           <div className="space-y-4">
             <div>
-              <h3 className="text-[10px] font-black text-zinc-400 uppercase tracking-widest mb-1">Bill To / Customer</h3>
+              <h3 className="text-[10px] font-black text-zinc-400 uppercase tracking-widest mb-1">Customer Details</h3>
               <p className="font-black text-lg text-zinc-900 leading-tight">{job.customerName}</p>
               <p className="text-sm font-bold text-zinc-600">{job.customerPhone}</p>
               <p className="text-xs text-zinc-500 italic">{job.customerAddress || 'Address not registered'}</p>
@@ -80,7 +80,7 @@ export function JobCardDocument({ job, settings, isInternal = false, className }
           </div>
           
           <div className="bg-zinc-50 p-5 rounded-2xl border-2 border-zinc-100 flex flex-col justify-center">
-            <h3 className="text-[10px] font-black text-zinc-400 uppercase tracking-widest mb-3">Vehicle Details</h3>
+            <h3 className="text-[10px] font-black text-zinc-400 uppercase tracking-widest mb-3">Vehicle Reference</h3>
             <div className="flex items-start justify-between">
               <div>
                 <p className="text-2xl font-black text-zinc-900 tracking-tighter leading-none mb-1">{job.vehiclePlate}</p>
@@ -95,7 +95,7 @@ export function JobCardDocument({ job, settings, isInternal = false, className }
         <div className="mb-8">
           <h3 className="text-[10px] font-black text-zinc-400 uppercase tracking-widest mb-2 flex items-center gap-2">
             <div className="w-1.5 h-1.5 rounded-full bg-[#c10d12]" />
-            Customer Complaint / Work Requested
+            Work Requested / Complaint
           </h3>
           <div className="p-5 border-2 border-dashed border-zinc-200 rounded-2xl min-h-[80px] bg-white text-sm text-zinc-800 leading-relaxed italic shadow-inner">
             {job.complaint || 'General mechanical inspection and service.'}
@@ -109,7 +109,7 @@ export function JobCardDocument({ job, settings, isInternal = false, className }
           </div>
         )}
 
-        {/* Items Table - Only visible on Internal Copy or if required */}
+        {/* Internal Cost Data */}
         {isInternal && (
           <div className="space-y-10">
             <div>
@@ -131,7 +131,7 @@ export function JobCardDocument({ job, settings, isInternal = false, className }
                     job.items.map((item: any, index: number) => (
                       <tr key={item.id} className="text-xs">
                         <td className="py-3 text-zinc-400 px-2 font-bold">{index + 1}</td>
-                        <td className="py-3 font-black text-zinc-900 px-2">{item.description}</td>
+                        <td className="py-3 font-black text-zinc-900 px-2 uppercase tracking-tight">{item.description}</td>
                         <td className="py-3 text-center px-2">
                           <span className="bg-zinc-100 px-2 py-0.5 rounded text-[9px] font-black text-zinc-500 uppercase">
                             {item.type}
@@ -173,7 +173,7 @@ export function JobCardDocument({ job, settings, isInternal = false, className }
                     job.expenses.map((exp: any, index: number) => (
                       <tr key={exp.id} className="text-xs">
                         <td className="py-3 text-red-300 px-2 font-bold">{index + 1}</td>
-                        <td className="py-3 font-black text-zinc-900 px-2">{exp.description}</td>
+                        <td className="py-3 font-black text-zinc-900 px-2 uppercase tracking-tight">{exp.description}</td>
                         <td className="py-3 text-center px-2">
                           <span className="bg-red-100 px-2 py-0.5 rounded text-[9px] font-black text-red-500 uppercase">
                             {exp.category}
@@ -202,7 +202,7 @@ export function JobCardDocument({ job, settings, isInternal = false, className }
                 isProfit ? 'border-green-600 bg-green-50' : 'border-red-600 bg-red-50'
               )}>
                 <div className="flex items-center justify-between mb-4">
-                  <span className="text-[10px] font-black uppercase tracking-widest text-zinc-500">Financial Performance</span>
+                  <span className="text-[10px] font-black uppercase tracking-widest text-zinc-500">Financial Analysis</span>
                   {isProfit ? <TrendingUp className="h-6 w-6 text-green-600" /> : <TrendingDown className="h-6 w-6 text-red-600" />}
                 </div>
                 <div className="space-y-2">
@@ -210,9 +210,9 @@ export function JobCardDocument({ job, settings, isInternal = false, className }
                     <span className="text-zinc-500">Gross Income:</span>
                     <span className="text-zinc-900 whitespace-nowrap">{totalIncome.toLocaleString()}</span>
                   </div>
-                  <div className="flex justify-between text-xs font-bold uppercase tracking-tighter">
+                  <div className="flex justify-between text-xs font-bold uppercase tracking-tighter text-red-600">
                     <span className="text-zinc-500">Total Costs:</span>
-                    <span className="text-red-600 whitespace-nowrap">-{totalExpenses.toLocaleString()}</span>
+                    <span className="whitespace-nowrap">-{totalExpenses.toLocaleString()}</span>
                   </div>
                   <div className={cn("border-t-2 pt-4 mt-4 flex justify-between items-center", isProfit ? "border-green-200" : "border-red-200")}>
                     <span className="font-black text-xs uppercase tracking-widest">Net {isProfit ? 'Profit' : 'Loss'}:</span>
@@ -228,32 +228,32 @@ export function JobCardDocument({ job, settings, isInternal = false, className }
 
         {/* Footer Area */}
         <div className="mt-auto pt-12">
-          {/* Terms and Conditions */}
+          {/* Terms and Conditions - Always at the bottom */}
           <div className="mb-10 p-6 bg-zinc-50 rounded-2xl border-2 border-zinc-100 terms-block">
             <h3 className="text-[10px] font-black text-zinc-400 uppercase tracking-widest mb-3">Terms and Conditions</h3>
             <div className="text-[10px] text-zinc-600 whitespace-pre-wrap italic leading-relaxed font-medium">
-              {settings.garage_terms || 'The garage is not responsible for loss of personal items. Work is performed according to complaint. Vehicles must be picked up within 48 hours of completion.'}
+              {settings.garage_terms || 'Standard repair conditions apply. All parts installed remain property of the garage until fully settled.'}
             </div>
           </div>
 
           {/* Signatures */}
-          <div className={cn("grid grid-cols-2 gap-20 signature-block", !isInternal && "mt-0")}>
-            <div className="space-y-8">
-              <div className="border-t-4 border-zinc-900 pt-4">
-                <p className="text-[10px] font-black uppercase tracking-widest text-zinc-400 mb-1">
+          <div className={cn("grid grid-cols-2 gap-20 signature-block pt-8", !isInternal && "mt-0")}>
+            <div className="space-y-6">
+              <div className="border-t border-gray-400 pt-3">
+                <p className="text-[9px] font-black uppercase tracking-widest text-gray-400 mb-1">
                   {isInternal ? 'Technician / Supervisor' : 'Authorized Representative'}
                 </p>
                 <p className="text-sm font-black uppercase tracking-tight text-zinc-900">{settings.garage_name}</p>
               </div>
             </div>
-            <div className="space-y-8">
-              <div className="border-t-4 border-zinc-900 pt-4">
-                <p className="text-[10px] font-black uppercase tracking-widest text-zinc-400 mb-1">
+            <div className="space-y-6">
+              <div className="border-t border-gray-400 pt-3">
+                <p className="text-[9px] font-black uppercase tracking-widest text-gray-400 mb-1">
                   {isInternal ? 'Management Approval' : 'Customer Signature'}
                 </p>
                 <p className="text-[10px] text-zinc-500 italic leading-snug font-bold">
                   {isInternal 
-                    ? 'I certify that the work described has been completed and costs are verified.'
+                    ? 'I certify that the work described has been completed and costs verified.'
                     : 'I hereby authorize the repair work and agree to the terms mentioned above.'}
                 </p>
               </div>
