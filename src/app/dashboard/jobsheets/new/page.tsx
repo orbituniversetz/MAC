@@ -16,6 +16,7 @@ export default function NewJobSheetPage() {
   const [isNewCustomer, setIsNewCustomer] = useState(false);
   const [isNewVehicle, setIsNewVehicle] = useState(false);
   const [tinValue, setTinValue] = useState('');
+  const [plateValue, setPlateValue] = useState('');
 
   useEffect(() => {
     getCustomers().then(setCustomers);
@@ -24,16 +25,30 @@ export default function NewJobSheetPage() {
 
   const handleTinChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
-    // Remove all non-digits
     const digits = value.replace(/\D/g, '').slice(0, 9);
     
-    // Format as XXX-XXX-XXX
     let formatted = '';
     if (digits.length > 0) formatted += digits.slice(0, 3);
     if (digits.length > 3) formatted += '-' + digits.slice(3, 6);
     if (digits.length > 6) formatted += '-' + digits.slice(6, 9);
     
     setTinValue(formatted);
+  };
+
+  const handlePlateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    let raw = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+    let formatted = raw;
+    
+    if (raw.startsWith('T')) {
+      if (raw.length > 1) {
+        formatted = 'T ' + raw.slice(1, 4);
+      }
+      if (raw.length > 4) {
+        formatted += ' ' + raw.slice(4, 7);
+      }
+    }
+    
+    setPlateValue(formatted);
   };
 
   return (
@@ -57,7 +72,6 @@ export default function NewJobSheetPage() {
         </CardHeader>
         <CardContent>
           <form action={createJobSheet} className="space-y-6">
-            {/* Customer Section */}
             <div className="space-y-4 p-4 border rounded-lg bg-gray-50/50">
               <div className="flex items-center justify-between">
                 <Label className="text-base font-bold flex items-center gap-2">
@@ -69,7 +83,7 @@ export default function NewJobSheetPage() {
                   size="sm" 
                   onClick={() => {
                     setIsNewCustomer(!isNewCustomer);
-                    if (!isNewCustomer) setIsNewVehicle(true); // Usually new customer = new vehicle
+                    if (!isNewCustomer) setIsNewVehicle(true);
                   }}
                   className="text-[#c10d12] font-semibold"
                 >
@@ -111,7 +125,6 @@ export default function NewJobSheetPage() {
               )}
             </div>
 
-            {/* Vehicle Section */}
             <div className="space-y-4 p-4 border rounded-lg bg-gray-50/50">
               <div className="flex items-center justify-between">
                 <Label className="text-base font-bold flex items-center gap-2">
@@ -143,7 +156,13 @@ export default function NewJobSheetPage() {
                 </select>
               ) : (
                 <div className="grid gap-3">
-                  <Input name="newVehiclePlate" placeholder="Plate Number (e.g. T 123 ABC)" required={isNewVehicle || isNewCustomer} />
+                  <Input 
+                    name="newVehiclePlate" 
+                    placeholder="Plate Number (e.g. T 123 ABC)" 
+                    required={isNewVehicle || isNewCustomer}
+                    value={plateValue}
+                    onChange={handlePlateChange}
+                  />
                   <Input name="newVehicleModel" placeholder="Make & Model (e.g. Toyota Hilux)" />
                 </div>
               )}
