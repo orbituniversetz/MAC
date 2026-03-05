@@ -212,10 +212,12 @@ export async function convertToInvoice(proformaId: number) {
 
   const snapshotJson = JSON.stringify(pf);
   
-  db.prepare(`
+  const info = db.prepare(`
     INSERT INTO invoices (invoiceNo, jobSheetId, proformaId, snapshotJson, status)
     VALUES (?, ?, ?, ?, ?)
   `).run(invoiceNo, pf.jobSheetId, proformaId, snapshotJson, 'Unpaid');
+
+  const newId = info.lastInsertRowid;
 
   db.prepare("UPDATE proformas SET status = 'Invoiced' WHERE id = ?").run(proformaId);
   if (pf.jobSheetId) {
@@ -225,7 +227,7 @@ export async function convertToInvoice(proformaId: number) {
   revalidatePath('/dashboard/invoices');
   revalidatePath('/dashboard/proformas');
   revalidatePath(`/dashboard/proformas/${proformaId}`);
-  redirect('/dashboard/invoices');
+  redirect(`/dashboard/invoices/${newId}`);
 }
 
 export async function createProformaDirect(formData: FormData) {
@@ -335,6 +337,22 @@ export async function getInvoices() {
     LEFT JOIN customers c ON js.customerId = c.id
     ORDER BY i.createdAt DESC
   `).all();
+}
+
+export async function getInvoiceById(id: number) {
+  const inv = db.prepare(`
+    SELECT i.*, js.jobNo, c.name as customerName, c.phone as customerPhone, c.address as customerAddress, c.tin as customerTin, v.plateNumber as vehiclePlate, v.makeModel as vehicleModel
+    FROM invoices i
+    LEFT JOIN jobsheets js ON i.jobSheetId = js.id
+    LEFT JOIN customers c ON js.customerId = c.id
+    LEFT JOIN vehicles v ON js.vehicleId = v.id
+    WHERE i.id = ?
+  `).get(id) as any;
+
+  if (inv && inv.snapshotJson) {
+    inv.snapshot = JSON.parse(inv.snapshotJson);
+  }
+  return inv;
 }
 
 export async function getSettings() {

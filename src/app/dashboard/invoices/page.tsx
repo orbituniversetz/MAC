@@ -1,4 +1,4 @@
-import { getInvoices, getProformas } from '@/lib/actions';
+import { getInvoices, getProformas, convertToInvoice } from '@/lib/actions';
 import { 
   Table, 
   TableBody, 
@@ -9,7 +9,7 @@ import {
 } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Receipt, Eye, Plus, ArrowRight } from 'lucide-react';
+import { Receipt, Eye, Plus, ArrowRight, FileText } from 'lucide-react';
 import Link from 'next/link';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 
@@ -52,7 +52,7 @@ export default async function InvoicesPage() {
                   invoices.map((inv: any) => (
                     <TableRow key={inv.id}>
                       <TableCell className="font-bold">{inv.invoiceNo}</TableCell>
-                      <TableCell>{inv.jobNo}</TableCell>
+                      <TableCell>{inv.jobNo || '-'}</TableCell>
                       <TableCell>{inv.customerName}</TableCell>
                       <TableCell>
                         <Badge variant={inv.status === 'Paid' ? 'secondary' : 'outline'} className={inv.status === 'Paid' ? "bg-green-100 text-green-800" : ""}>
@@ -61,9 +61,11 @@ export default async function InvoicesPage() {
                       </TableCell>
                       <TableCell>{new Date(inv.createdAt).toLocaleDateString()}</TableCell>
                       <TableCell className="text-right">
-                        <Button variant="ghost" size="sm">
-                          <Eye className="mr-2 h-4 w-4" /> View
-                        </Button>
+                        <Link href={`/dashboard/invoices/${inv.id}`}>
+                          <Button variant="ghost" size="sm">
+                            <Eye className="mr-2 h-4 w-4" /> View
+                          </Button>
+                        </Link>
                       </TableCell>
                     </TableRow>
                   ))
@@ -81,7 +83,7 @@ export default async function InvoicesPage() {
                 New Invoice
               </CardTitle>
               <CardDescription className="text-[10px]">
-                Invoices must be created from a finalized Proforma.
+                Generate an invoice from a finalized quotation.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -92,30 +94,34 @@ export default async function InvoicesPage() {
                     No finalized proformas found. Go to Proformas to finalize a quotation.
                   </div>
                 ) : (
-                  <div className="space-y-1">
+                  <div className="space-y-2">
                     {finalizedProformas.slice(0, 5).map((p: any) => (
-                      <Link key={p.id} href={`/dashboard/proformas/${p.id}`} className="block">
-                        <div className="group flex items-center justify-between p-2 text-xs border rounded hover:border-[#c10d12] hover:bg-red-50 transition-colors">
-                          <div>
-                            <p className="font-bold">{p.proformaNo}</p>
-                            <p className="text-[10px] text-muted-foreground">{p.customerName}</p>
-                          </div>
-                          <ArrowRight className="h-3 w-3 text-muted-foreground group-hover:text-[#c10d12]" />
+                      <div key={p.id} className="group flex items-center justify-between p-2 text-xs border rounded bg-white hover:border-[#c10d12] transition-colors">
+                        <div className="flex-1">
+                          <p className="font-bold">{p.proformaNo}</p>
+                          <p className="text-[10px] text-muted-foreground truncate max-w-[120px]">{p.customerName}</p>
                         </div>
-                      </Link>
+                        <div className="flex items-center gap-1">
+                          <Link href={`/dashboard/proformas/${p.id}`} title="View Proforma">
+                            <Button variant="ghost" size="icon" className="h-6 w-6">
+                              <FileText className="h-3 w-3 text-gray-400" />
+                            </Button>
+                          </Link>
+                          <form action={async () => { 'use server'; await convertToInvoice(p.id); }}>
+                            <Button type="submit" variant="ghost" size="icon" className="h-6 w-6 hover:bg-red-50" title="Generate Final Invoice">
+                              <Plus className="h-4 w-4 text-[#c10d12]" />
+                            </Button>
+                          </form>
+                        </div>
+                      </div>
                     ))}
-                    {finalizedProformas.length > 5 && (
-                      <Link href="/dashboard/proformas" className="text-[10px] text-[#c10d12] font-bold hover:underline block text-center pt-1">
-                        View all finalized quotations
-                      </Link>
-                    )}
                   </div>
                 )}
               </div>
               
               <Link href="/dashboard/proformas" className="block w-full">
                 <Button variant="outline" className="w-full text-xs">
-                  Go to Proformas
+                  View All Proformas
                 </Button>
               </Link>
             </CardContent>
