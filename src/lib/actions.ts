@@ -1,4 +1,3 @@
-
 'use server'
 
 import db from './db';
@@ -129,6 +128,20 @@ export async function createProformaFromJob(jobId: number) {
 
   revalidatePath('/dashboard/proformas');
   return info.lastInsertRowid;
+}
+
+export async function finalizeProforma(id: number) {
+  const pf = await getProformaById(id);
+  if (!pf) return;
+  
+  const snapshotJson = JSON.stringify(pf);
+  db.prepare('UPDATE proformas SET status = ?, snapshotJson = ? WHERE id = ?').run('Finalized', snapshotJson, id);
+  revalidatePath(`/dashboard/proformas/${id}`);
+}
+
+export async function saveProformaDraft(id: number) {
+  // Currently just a trigger for revalidation, but could save extra fields
+  revalidatePath(`/dashboard/proformas/${id}`);
 }
 
 export async function createProformaDirect(formData: FormData) {
