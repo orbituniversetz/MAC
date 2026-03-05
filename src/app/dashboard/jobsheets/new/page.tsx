@@ -15,11 +15,26 @@ export default function NewJobSheetPage() {
   const [vehicles, setVehicles] = useState<any[]>([]);
   const [isNewCustomer, setIsNewCustomer] = useState(false);
   const [isNewVehicle, setIsNewVehicle] = useState(false);
+  const [tinValue, setTinValue] = useState('');
 
   useEffect(() => {
     getCustomers().then(setCustomers);
     getAllVehicles().then(setVehicles);
   }, []);
+
+  const handleTinChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    // Remove all non-digits
+    const digits = value.replace(/\D/g, '').slice(0, 9);
+    
+    // Format as XXX-XXX-XXX
+    let formatted = '';
+    if (digits.length > 0) formatted += digits.slice(0, 3);
+    if (digits.length > 3) formatted += '-' + digits.slice(3, 6);
+    if (digits.length > 6) formatted += '-' + digits.slice(6, 9);
+    
+    setTinValue(formatted);
+  };
 
   return (
     <div className="max-w-2xl mx-auto space-y-6">
@@ -84,7 +99,14 @@ export default function NewJobSheetPage() {
                     title="Phone number must start with +255 followed by 9 digits (e.g., +255765000000)"
                   />
                   <Input name="newCustomerAddress" placeholder="Physical Address" />
-                  <Input name="newCustomerTin" placeholder="TIN Number" />
+                  <Input 
+                    name="newCustomerTin" 
+                    placeholder="TIN Number (e.g. 108-133-805)" 
+                    value={tinValue}
+                    onChange={handleTinChange}
+                    pattern="\d{3}-\d{3}-\d{3}"
+                    title="TIN number must be in the format 000-000-000"
+                  />
                 </div>
               )}
             </div>
