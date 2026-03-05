@@ -11,7 +11,7 @@ import {
   TableHeader, 
   TableRow 
 } from '@/components/ui/table';
-import { Trash2, Save, Lock, FileCheck, Receipt, Banknote } from 'lucide-react';
+import { Trash2, Save, Lock, FileCheck, Receipt, Banknote, CreditCard } from 'lucide-react';
 import { ProformaPreview } from '@/components/dashboard/ProformaPreview';
 import { AddItemForm } from '@/components/dashboard/AddItemForm';
 import { Label } from '@/components/ui/label';
@@ -189,14 +189,15 @@ export default async function ProformaDetailPage({ params }: { params: Promise<{
             </CardContent>
           </Card>
 
-          <Card className="bg-gray-50 border-[#c10d12] border-l-4 shadow-md">
-            <CardHeader>
-              <CardTitle className="text-lg">Financial Summary</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-2">
-              <div className="flex justify-between items-center text-sm">
+          <Card className="bg-white border rounded-xl p-6 shadow-sm space-y-4 border-l-4 border-l-[#c10d12]">
+            <h3 className="font-bold flex items-center gap-2">
+              <CreditCard className="h-4 w-4 text-[#c10d12]" />
+              Payment Summary
+            </h3>
+            <div className="space-y-2">
+              <div className="flex justify-between text-sm">
                 <span className="text-muted-foreground">Subtotal:</span>
-                <span className="font-medium">{subtotal.toLocaleString()}</span>
+                <span>{subtotal.toLocaleString()}</span>
               </div>
               
               <div className="py-2 space-y-2">
@@ -206,44 +207,55 @@ export default async function ProformaDetailPage({ params }: { params: Promise<{
                 </div>
                 
                 {!isFinalized && (
-                  <form action={handleUpdateDiscount} className="bg-white p-3 border rounded-md shadow-sm">
+                  <form action={handleUpdateDiscount} className="bg-gray-50 p-3 border rounded-md shadow-sm">
                     <Label className="text-[10px] uppercase font-black text-muted-foreground flex items-center gap-1 mb-1.5">
-                      <Banknote className="h-3 w-3" /> Set Total Discount (TZS Cash)
+                      <Banknote className="h-3 w-3" /> Set Discount (Cash TZS)
                     </Label>
                     <div className="flex gap-2">
-                      <PriceInput name="discount" defaultValue={pf.discount} className="h-9 text-sm" placeholder="Discount Amount (TZS)" />
-                      <Button type="submit" size="sm" variant="outline" className="h-9">Apply</Button>
+                      <PriceInput name="discount" defaultValue={pf.discount} className="h-9 text-sm" placeholder="Amount (TZS)" />
+                      <Button type="submit" size="sm" variant="outline" className="h-9 bg-white">Apply</Button>
                     </div>
                   </form>
                 )}
               </div>
 
-              <div className="flex justify-between items-center text-sm">
+              <div className="flex justify-between text-sm">
                 <span className="text-muted-foreground">VAT (18%):</span>
-                <span className="font-medium">{taxAmount.toLocaleString()}</span>
+                <span>{taxAmount.toLocaleString()}</span>
               </div>
-              <Separator className="my-2" />
-              <div className="flex flex-col gap-1">
-                <div className="flex justify-between items-center">
-                  <span className="font-bold text-gray-700">Total Payable:</span>
-                  <span className="font-black text-xl text-[#c10d12]">TZS {total.toLocaleString()}</span>
-                </div>
-                <p className="text-[10px] text-muted-foreground text-right italic">All prices in Tanzanian Shillings</p>
+              <div className="pt-2 border-t flex justify-between items-center font-black">
+                <span className="text-lg">Total Due:</span>
+                <span className="text-2xl text-[#c10d12]">TZS {total.toLocaleString()}</span>
               </div>
-            </CardContent>
+            </div>
+            
+            {isFinalized && !isInvoiced && (
+              <form action={handleConvertToInvoice}>
+                <Button className="w-full bg-black hover:bg-gray-800">
+                  Convert to Final Invoice
+                </Button>
+              </form>
+            )}
+            
+            {!isFinalized && (
+               <form action={handleFinalize}>
+                <Button className="w-full bg-black hover:bg-gray-800">
+                  Finalize for Payment
+                </Button>
+              </form>
+            )}
+            
+            {isInvoiced && (
+              <Button disabled className="w-full bg-green-600 hover:bg-green-700">
+                <FileCheck className="mr-2 h-4 w-4" /> Invoiced
+              </Button>
+            )}
           </Card>
 
           {isFinalized && (
             <div className="p-4 border rounded-lg bg-green-50 text-green-800 flex items-center gap-3">
               <FileCheck className="h-5 w-5" />
-              <p className="text-xs font-medium">This document is finalized and locked for editing.</p>
-            </div>
-          )}
-          
-          {isInvoiced && (
-            <div className="p-4 border rounded-lg bg-blue-50 text-blue-800 flex items-center gap-3">
-              <Receipt className="h-5 w-5" />
-              <p className="text-xs font-medium">This proforma has been converted to an official Invoice.</p>
+              <p className="text-xs font-medium">Quotation is finalized. Convert to Invoice to record payment.</p>
             </div>
           )}
         </div>

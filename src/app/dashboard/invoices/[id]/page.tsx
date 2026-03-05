@@ -1,7 +1,7 @@
 import { getInvoiceById, getSettings } from '@/lib/actions';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { ChevronLeft, Printer, CreditCard } from 'lucide-react';
+import { ChevronLeft, CreditCard } from 'lucide-react';
 import Link from 'next/link';
 import { InvoicePreview } from '@/components/dashboard/InvoicePreview';
 
@@ -22,7 +22,7 @@ export default async function InvoiceDetailPage({ params }: { params: Promise<{ 
   const snapshot = inv.snapshot || {};
   const subtotal = snapshot.items?.reduce((acc: number, item: any) => acc + item.subtotal, 0) || 0;
   const discount = snapshot.discount || 0;
-  // Enforce 18% VAT as requested
+  // Enforce 18% VAT
   const taxAmount = (subtotal - discount) * 0.18;
   const total = subtotal - discount + taxAmount;
 
@@ -82,8 +82,8 @@ export default async function InvoiceDetailPage({ params }: { params: Promise<{ 
         <div className="space-y-6">
           <div className="bg-white border rounded-xl p-6 shadow-sm space-y-4">
             <h3 className="font-bold flex items-center gap-2">
-              <CreditCard className="h-4 w-4 text-[#c10d12]" />
-              Payment Summary
+              <CreditCard className="h-4 w-4 text-green-600" />
+              Final Totals
             </h3>
             <div className="space-y-2">
               <div className="flex justify-between text-sm">
@@ -95,13 +95,10 @@ export default async function InvoiceDetailPage({ params }: { params: Promise<{ 
                 <span>{taxAmount.toLocaleString()}</span>
               </div>
               <div className="pt-2 border-t flex justify-between items-center font-black">
-                <span className="text-lg">Total Due:</span>
-                <span className="text-2xl text-[#c10d12]">TZS {total.toLocaleString()}</span>
+                <span className="text-lg">Grand Total:</span>
+                <span className="text-xl">TZS {total.toLocaleString()}</span>
               </div>
             </div>
-            <Button className="w-full bg-black hover:bg-gray-800">
-              Record Payment
-            </Button>
           </div>
 
           <div className="bg-gray-50 border border-dashed rounded-xl p-6 text-center space-y-2">
