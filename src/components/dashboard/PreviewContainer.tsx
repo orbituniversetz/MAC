@@ -1,8 +1,10 @@
+
 'use client';
 
-import React from 'react';
-import { Printer, Download, X } from 'lucide-react';
+import React, { useState } from 'react';
+import { Printer, Download, X, ZoomIn, ZoomOut, Maximize } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
 
 interface PreviewContainerProps {
   title: string;
@@ -21,32 +23,57 @@ export function PreviewContainer({
   children,
   icon
 }: PreviewContainerProps) {
+  const [zoom, setZoom] = useState(100);
+
+  const handleZoomIn = () => setZoom(prev => Math.min(prev + 10, 200));
+  const handleZoomOut = () => setZoom(prev => Math.max(prev - 10, 50));
+  const handleResetZoom = () => setZoom(100);
+
   return (
-    <div className="fixed inset-0 z-[9999] flex flex-col bg-zinc-900/95 backdrop-blur-sm no-print">
+    <div className="fixed inset-0 z-[9999] flex flex-col bg-zinc-950 no-print">
       {/* Toolbar */}
       <div className="flex h-16 w-full items-center justify-between border-b border-white/10 bg-zinc-950 px-6 text-white shadow-2xl shrink-0">
         <div className="flex items-center gap-3">
           <div className="p-2 bg-zinc-800 rounded-lg">
             {icon}
           </div>
-          <h2 className="text-sm font-bold tracking-tight uppercase tracking-widest">{title}</h2>
+          <div>
+            <h2 className="text-sm font-bold tracking-tight uppercase tracking-widest leading-none">{title}</h2>
+            <p className="text-[10px] text-white/40 mt-1 uppercase font-bold">Document Preview Mode</p>
+          </div>
+        </div>
+
+        {/* Zoom Controls */}
+        <div className="hidden md:flex items-center gap-1 bg-zinc-900 p-1 rounded-lg border border-white/5 mx-4">
+          <Button variant="ghost" size="icon" onClick={handleZoomOut} className="h-8 w-8 text-white/70 hover:text-white">
+            <ZoomOut className="h-4 w-4" />
+          </Button>
+          <button 
+            onClick={handleResetZoom}
+            className="px-2 text-[10px] font-bold min-w-[45px] hover:text-[#c10d12] transition-colors"
+          >
+            {zoom}%
+          </button>
+          <Button variant="ghost" size="icon" onClick={handleZoomIn} className="h-8 w-8 text-white/70 hover:text-white">
+            <ZoomIn className="h-4 w-4" />
+          </Button>
         </div>
 
         <div className="flex items-center gap-3">
           <Button 
             onClick={onDownload} 
             variant="outline" 
-            className="h-10 border-white/20 bg-white/5 text-white hover:bg-white/10 text-xs font-bold"
+            className="h-10 border-white/20 bg-white/5 text-white hover:bg-white/10 text-xs font-bold hidden sm:flex"
           >
             <Download className="mr-2 h-4 w-4" />
-            SAVE AS PDF
+            PDF
           </Button>
           <Button 
             onClick={onPrint} 
             className="h-10 bg-[#c10d12] text-white hover:bg-[#a00b0f] text-xs font-black shadow-lg shadow-red-900/40"
           >
             <Printer className="mr-2 h-4 w-4" />
-            PRINT DOCUMENT
+            PRINT
           </Button>
           <div className="w-px h-6 bg-white/10 mx-2" />
           <Button 
@@ -61,8 +88,11 @@ export function PreviewContainer({
       </div>
 
       {/* Viewport */}
-      <div className="flex-1 overflow-auto preview-scroll py-12 px-4 flex justify-center bg-zinc-900">
-        <div className="print-container relative">
+      <div className="flex-1 overflow-auto preview-scroll bg-zinc-900 flex justify-center items-start p-4 sm:p-8">
+        <div 
+          className="print-container relative shadow-2xl transition-transform duration-200 origin-top"
+          style={{ transform: `scale(${zoom / 100})` }}
+        >
           {children}
         </div>
       </div>
