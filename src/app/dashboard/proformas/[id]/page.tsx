@@ -11,7 +11,7 @@ import {
   TableHeader, 
   TableRow 
 } from '@/components/ui/table';
-import { Trash2, Save, Lock, FileCheck, Receipt, Banknote, CreditCard, History } from 'lucide-react';
+import { Trash2, Save, Lock, FileCheck, Receipt, Banknote, CreditCard, History, AlertCircle } from 'lucide-react';
 import { ProformaPreview } from '@/components/dashboard/ProformaPreview';
 import { AddItemForm } from '@/components/dashboard/AddItemForm';
 import { Label } from '@/components/ui/label';
@@ -41,7 +41,8 @@ export default async function ProformaDetailPage({ params }: { params: Promise<{
   // Enforce 18% VAT
   const taxAmount = (subtotal - discount) * 0.18;
   const total = subtotal - discount + taxAmount;
-  const balanceDue = total - (pf.totalPaid || 0);
+  const balanceDue = Math.max(0, total - (pf.totalPaid || 0));
+  const isFullyPaid = balanceDue <= 0;
 
   async function handleFinalize() {
     'use server'
@@ -99,7 +100,7 @@ export default async function ProformaDetailPage({ params }: { params: Promise<{
           
           <ProformaPreview proforma={pf} settings={settings} />
           
-          {isFinalized && !isInvoiced && (
+          {isFinalized && !isInvoiced && isFullyPaid && (
             <form action={handleConvertToInvoice}>
               <Button className="bg-[#c10d12]" type="submit">
                 <Receipt className="mr-2 h-4 w-4" /> Convert to Invoice
@@ -234,6 +235,7 @@ export default async function ProformaDetailPage({ params }: { params: Promise<{
               <CreditCard className="h-4 w-4 text-[#c10d12]" />
               Payment Summary
             </h3>
+            
             <div className="space-y-2">
               <div className="flex justify-between text-sm">
                 <span className="text-muted-foreground">Subtotal:</span>
@@ -264,21 +266,35 @@ export default async function ProformaDetailPage({ params }: { params: Promise<{
                 <span>{taxAmount.toLocaleString()}</span>
               </div>
 
-              <Separator />
+              {isFinalized && (
+                <>
+                  <Separator />
+                  <div className="flex justify-between text-sm py-1">
+                    <span className="text-muted-foreground">Paid to Date:</span>
+                    <span className="font-bold text-green-600">{pf.totalPaid?.toLocaleString() || 0}</span>
+                  </div>
 
-              <div className="flex justify-between text-sm py-1">
-                <span className="text-muted-foreground">Paid to Date:</span>
-                <span className="font-bold text-green-600">{pf.totalPaid?.toLocaleString() || 0}</span>
-              </div>
-
-              <div className="pt-2 border-t flex justify-between items-center font-black">
-                <span className="text-lg">Balance Due:</span>
-                <span className="text-2xl text-[#c10d12]">TZS {balanceDue.toLocaleString()}</span>
-              </div>
+                  <div className="pt-2 border-t flex justify-between items-center font-black">
+                    <span className="text-lg">Balance Due:</span>
+                    <span className="text-2xl text-[#c10d12]">TZS {balanceDue.toLocaleString()}</span>
+                  </div>
+                </>
+              )}
             </div>
 
-            {/* Record Payment Form */}
-            {!isInvoiced && (
+            {/* Actions Section */}
+            {!isFinalized && (
+               <form action={handleFinalize}>
+                <Button className="w-full bg-black hover:bg-gray-800 py-6 text-lg font-bold">
+                  Finalize Quotation
+                </Button>
+                <p className="text-[10px] text-muted-foreground text-center mt-2">
+                  Finalizing will enable payment recording.
+                </p>
+              </form>
+            )}
+
+            {isFinalized && !isInvoiced && !isFullyPaid && (
               <form action={recordProformaPayment} className="space-y-3 bg-red-50/50 p-4 rounded-xl border border-red-100">
                 <Label className="text-[10px] uppercase font-black text-red-700 flex items-center gap-1">
                   <Banknote className="h-3 w-3" /> Record New Payment (Cash)
@@ -288,36 +304,42 @@ export default async function ProformaDetailPage({ params }: { params: Promise<{
                   <PriceInput name="amount" placeholder="Paid Amount" className="h-10 text-sm bg-white" required />
                   <Button type="submit" className="bg-black text-white hover:bg-gray-800 h-10 px-4">Record</Button>
                 </div>
+                <div className="flex items-start gap-2 text-[9px] text-red-600 bg-white p-2 rounded border border-red-100">
+                  <AlertCircle className="h-3 w-3 shrink-0" />
+                  <span>Remaining balance must be TZS 0 before generating final invoice.</span>
+                </div>
               </form>
             )}
             
-            {isFinalized && !isInvoiced && (
+            {isFinalized && !isInvoiced && isFullyPaid && (
               <form action={handleConvertToInvoice}>
-                <Button className="w-full bg-red-700 hover:bg-red-800 text-white font-bold py-6">
-                  Finalize & Generate Invoice
+                <Button className="w-full bg-red-700 hover:bg-red-800 text-white font-bold py-6 text-lg shadow-lg">
+                  <Receipt className="mr-2 h-5 w-5" /> Generate Final Invoice
                 </Button>
-              </form>
-            )}
-            
-            {!isFinalized && (
-               <form action={handleFinalize}>
-                <Button className="w-full bg-black hover:bg-gray-800">
-                  Finalize Quotation
-                </Button>
+                <p className="text-[10px] text-green-600 font-bold text-center mt-2">
+                  Fully Paid! Ready for official invoicing.
+                </p>
               </form>
             )}
             
             {isInvoiced && (
-              <Button disabled className="w-full bg-green-600 hover:bg-green-700">
-                <FileCheck className="mr-2 h-4 w-4" /> Fully Invoiced
-              </Button>
+              <div className="space-y-3">
+                <Button disabled className="w-full bg-green-600 text-white opacity-100 py-6">
+                  <FileCheck className="mr-2 h-5 w-5" /> Fully Invoiced
+                </Button>
+                <p className="text-[10px] text-muted-foreground text-center italic">
+                  This proforma is now a locked historical record.
+                </p>
+              </div>
             )}
           </Card>
 
-          {isFinalized && (
+          {isFinalized && !isInvoiced && (
             <div className="p-4 border rounded-lg bg-green-50 text-green-800 flex items-center gap-3 shadow-sm">
               <FileCheck className="h-5 w-5" />
-              <p className="text-[10px] font-medium leading-relaxed">Quotation is finalized. You can still record payments until the final invoice is generated.</p>
+              <p className="text-[10px] font-medium leading-relaxed">
+                Quotation is finalized. Follow the payment steps to enable final invoicing.
+              </p>
             </div>
           )}
         </div>
