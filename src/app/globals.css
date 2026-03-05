@@ -55,6 +55,7 @@
     margin: 0 auto;
     background: white;
     box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    position: relative;
   }
 }
 
@@ -77,11 +78,12 @@
   .a4-page {
     width: 210mm !important;
     height: auto !important;
-    min-height: 0 !important;
+    min-height: 297mm !important;
     padding: 10mm !important;
     margin: 0 !important;
     box-shadow: none !important;
     display: block !important;
+    page-break-after: always;
   }
   @page {
     size: A4;
