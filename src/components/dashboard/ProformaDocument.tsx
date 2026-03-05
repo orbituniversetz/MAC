@@ -118,10 +118,12 @@ export function ProformaDocument({ proforma, settings, className }: ProformaDocu
               <span className="text-gray-500">Subtotal:</span>
               <span className="font-medium">{subtotal.toLocaleString()}</span>
             </div>
-            <div className="flex justify-between text-[10px]">
-              <span className="text-gray-500">Discount:</span>
-              <span className="font-medium">({discount.toLocaleString()})</span>
-            </div>
+            {discount > 0 && (
+              <div className="flex justify-between text-[10px]">
+                <span className="text-gray-500">Discount:</span>
+                <span className="font-medium">({discount.toLocaleString()})</span>
+              </div>
+            )}
             <div className="flex justify-between text-[10px]">
               <span className="text-gray-500">VAT (18%):</span>
               <span className="font-medium">{taxAmount.toLocaleString()}</span>

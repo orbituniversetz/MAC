@@ -44,7 +44,7 @@ export function InvoiceDocument({ invoice, settings, className }: InvoiceDocumen
               <h1 className="text-2xl font-black text-[#c10d12] uppercase leading-none mb-1">
                 {settings.garage_name}
               </h1>
-              <div className="text-[10px] font-medium text-gray-600 space-y-0.5">
+              <div className="text-[11px] font-medium text-gray-600 space-y-0.5">
                 <p>{settings.garage_mailbox}</p>
                 <p>{settings.garage_address}</p>
                 <p>Tel: {settings.garage_phone}</p>
@@ -104,12 +104,18 @@ export function InvoiceDocument({ invoice, settings, className }: InvoiceDocumen
               <span className="text-gray-500">Subtotal:</span>
               <span className="font-medium">{subtotal.toLocaleString()}</span>
             </div>
+            {discount > 0 && (
+              <div className="flex justify-between text-[10px]">
+                <span className="text-gray-500">Discount:</span>
+                <span className="font-medium">({discount.toLocaleString()})</span>
+              </div>
+            )}
             <div className="flex justify-between text-[10px]">
               <span className="text-gray-500">VAT (18%):</span>
               <span className="font-medium">{taxAmount.toLocaleString()}</span>
             </div>
             <div className="pt-2 border-t border-gray-200 flex justify-between items-center">
-              <span className="font-bold text-[11px]">AMOUNT DUE:</span>
+              <span className="font-bold text-[11px]">GRAND TOTAL:</span>
               <span className="font-black text-lg text-[#c10d12]">TZS {total.toLocaleString()}</span>
             </div>
           </div>

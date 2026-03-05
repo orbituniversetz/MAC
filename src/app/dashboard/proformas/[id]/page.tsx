@@ -250,10 +250,12 @@ export default async function ProformaDetailPage({ params }: { params: Promise<{
               </div>
               
               <div className="py-2 space-y-2">
-                <div className="flex justify-between items-center text-sm">
-                  <span className="text-muted-foreground">Discount:</span>
-                  <span className="font-medium text-red-600">({discount.toLocaleString()})</span>
-                </div>
+                {discount > 0 && (
+                  <div className="flex justify-between items-center text-sm">
+                    <span className="text-muted-foreground">Discount:</span>
+                    <span className="font-medium text-red-600">({discount.toLocaleString()})</span>
+                  </div>
+                )}
                 
                 {!isFinalized && (
                   <form action={handleUpdateDiscount} className="bg-gray-50 p-3 border rounded-md shadow-sm">

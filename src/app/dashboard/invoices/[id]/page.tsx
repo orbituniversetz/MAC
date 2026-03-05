@@ -90,6 +90,12 @@ export default async function InvoiceDetailPage({ params }: { params: Promise<{ 
                 <span className="text-muted-foreground">Subtotal:</span>
                 <span>{subtotal.toLocaleString()}</span>
               </div>
+              {discount > 0 && (
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Discount:</span>
+                  <span className="text-red-600">({discount.toLocaleString()})</span>
+                </div>
+              )}
               <div className="flex justify-between text-sm">
                 <span className="text-muted-foreground">VAT (18%):</span>
                 <span>{taxAmount.toLocaleString()}</span>
