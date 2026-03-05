@@ -88,13 +88,6 @@ export function DocumentPaper({ doc, settings, className }: DocumentPaperProps) 
           </div>
         </div>
       </div>
-
-      {/* Footer */}
-      <div className="mt-12 text-center pt-4 border-t border-gray-100">
-        <p className="text-[9px] text-gray-400 italic">
-          Valid without official seal. All repairs are subject to our standard terms of service.
-        </p>
-      </div>
     </div>
   );
 }

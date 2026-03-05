@@ -1,4 +1,3 @@
-
 'use client'
 
 import { Button } from '@/components/ui/button';
@@ -82,11 +81,6 @@ export function PrintDocumentButton({ doc, settings }: PrintDocumentButtonProps)
     pdf.line(margin, lastY + 25, margin + 50, lastY + 25);
     pdf.setFont('helvetica', 'bold');
     pdf.text(`${settings.garage_name} Management`, margin, lastY + 31);
-
-    // Footer
-    pdf.setFontSize(8);
-    pdf.setTextColor(150);
-    pdf.text('Computer generated document. Valid without seal.', pageWidth / 2, 285, { align: 'center' });
 
     pdf.save(`${doc.docType} ${doc.docNo}.pdf`);
   };

@@ -138,13 +138,6 @@ export function JobCardDocument({ job, settings, className }: JobCardDocumentPro
           </div>
         </div>
       </div>
-
-      {/* Footer */}
-      <div className="mt-16 text-center border-t pt-4">
-        <p className="text-[9px] text-gray-400 font-medium italic">
-          Official {settings.garage_name} Job Card. Valid without official seal. All work is subject to our standard garage policy.
-        </p>
-      </div>
     </div>
   );
 }
