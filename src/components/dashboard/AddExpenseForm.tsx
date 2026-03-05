@@ -52,7 +52,8 @@ export function AddExpenseForm({
     
     setCategory(mappedCategory);
     setDescription(`${item.description} (Cost)`);
-    setAmount(item.unitPrice * (item.qty || 1));
+    // Reset amount to allow manual entry of the buying price (cost)
+    setAmount('');
   };
 
   async function handleAction(formData: FormData) {
@@ -107,7 +108,7 @@ export function AddExpenseForm({
                     </div>
                     <div className="flex gap-2 text-[10px]">
                       <span className="text-muted-foreground">Qty: {item.qty}</span>
-                      <span className="font-bold text-red-700">Total Billed: {item.subtotal.toLocaleString()}</span>
+                      <span className="font-bold text-red-700">Selling Price: {item.subtotal.toLocaleString()}</span>
                     </div>
                   </DropdownMenuItem>
                 ))}
@@ -227,7 +228,7 @@ export function AddExpenseForm({
             name="amount" 
             defaultValue={amount}
             onValueChange={(val) => setAmount(val)}
-            placeholder="Amount (Cost)" 
+            placeholder="Buying Price (Cost)" 
             className="bg-white text-sm" 
             required
           />
