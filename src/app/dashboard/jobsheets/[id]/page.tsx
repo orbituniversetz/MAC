@@ -14,6 +14,7 @@ import {
 import { ChevronLeft, Trash2, FilePlus, TrendingUp, TrendingDown, Banknote, FileBadge, Printer, User, ShieldCheck } from 'lucide-react';
 import { redirect } from 'next/navigation';
 import { JobCardPreview } from '@/components/dashboard/JobCardPreview';
+import { JobCardDocument } from '@/components/dashboard/JobCardDocument';
 import { AddItemForm } from '@/components/dashboard/AddItemForm';
 import { AddExpenseForm } from '@/components/dashboard/AddExpenseForm';
 import { cn } from '@/lib/utils';
@@ -73,7 +74,6 @@ export default async function JobSheetDetailPage({ params }: { params: Promise<{
           <Badge className="bg-[#c10d12]">{job.status}</Badge>
         </div>
         <div className="flex flex-wrap gap-2">
-          {/* Document Previews */}
           <JobCardPreview job={job} settings={settings} mode="CUSTOMER" />
           <JobCardPreview job={job} settings={settings} mode="INTERNAL" />
           
@@ -89,6 +89,14 @@ export default async function JobSheetDetailPage({ params }: { params: Promise<{
               <FilePlus className="mr-2 h-4 w-4" /> Create Proforma
             </Button>
           </form>
+        </div>
+      </div>
+
+      {/* New Professional Inline Preview Section - Matching Proforma */}
+      <div className="max-w-6xl mx-auto space-y-6">
+        <h3 className="font-bold text-lg text-zinc-500 uppercase tracking-widest px-4">Document Preview</h3>
+        <div className="bg-gray-100 border rounded-2xl shadow-inner overflow-y-auto p-4 sm:p-12 flex justify-center min-h-[1400px]">
+          <JobCardDocument job={job} settings={settings} isInternal={false} />
         </div>
       </div>
 
@@ -114,7 +122,7 @@ export default async function JobSheetDetailPage({ params }: { params: Promise<{
                   {job.items.map((item: any) => (
                     <TableRow key={item.id}>
                       <TableCell><Badge variant="outline">{item.type}</Badge></TableCell>
-                      <TableCell className="text-black">{item.description}</TableCell>
+                      <TableCell className="text-black font-medium">{item.description}</TableCell>
                       <TableCell className="text-black">{item.qty}</TableCell>
                       <TableCell className="text-black">{item.unitPrice.toLocaleString()}</TableCell>
                       <TableCell className="font-bold text-black">{item.subtotal.toLocaleString()}</TableCell>
@@ -129,7 +137,7 @@ export default async function JobSheetDetailPage({ params }: { params: Promise<{
                   ))}
                   {job.items.length === 0 && (
                     <TableRow>
-                      <TableCell colSpan={6} className="text-center py-4 text-muted-foreground">No items added yet.</TableCell>
+                      <TableCell colSpan={6} className="text-center py-4 text-muted-foreground italic">No items added yet.</TableCell>
                     </TableRow>
                   )}
                 </TableBody>
@@ -160,7 +168,7 @@ export default async function JobSheetDetailPage({ params }: { params: Promise<{
                   {job.expenses.map((exp: any) => (
                     <TableRow key={exp.id}>
                       <TableCell><Badge variant="outline" className="text-[10px]">{exp.category}</Badge></TableCell>
-                      <TableCell className="text-black">{exp.description}</TableCell>
+                      <TableCell className="text-black font-medium">{exp.description}</TableCell>
                       <TableCell className="font-bold text-red-600">-{exp.amount.toLocaleString()}</TableCell>
                       <TableCell>
                         <form action={async () => { 'use server'; await deleteExpense(exp.id, job.id, null); }}>

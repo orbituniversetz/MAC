@@ -111,96 +111,104 @@ export function JobCardDocument({ job, settings, isInternal = false, className }
         </div>
       )}
 
-      {/* Internal Cost Data - Content area that expands */}
-      {isInternal && (
-        <div className="space-y-8 mb-8">
-          <div>
-            <h3 className="text-[9px] font-black text-zinc-400 uppercase tracking-widest mb-2 text-center">
-              Parts & Labour Income
-            </h3>
-            <table className="w-full text-xs">
-              <thead>
-                <tr className="border-b-2 border-zinc-900 bg-zinc-50">
-                  <th className="py-2 text-left px-2">Description</th>
-                  <th className="py-2 text-center w-20 px-2">Type</th>
-                  <th className="py-2 text-center w-12 px-2">Qty</th>
-                  <th className="py-2 text-right w-28 px-2">Total</th>
+      {/* Dynamic Content area that expands - Now visible for both customer and internal */}
+      <div className="space-y-8 mb-8">
+        <div>
+          <h3 className="text-[9px] font-black text-zinc-400 uppercase tracking-widest mb-2 text-center">
+            {isInternal ? 'Parts & Labour Income' : 'Service & Repair Summary'}
+          </h3>
+          <table className="w-full text-xs">
+            <thead>
+              <tr className="border-b-2 border-zinc-900 bg-zinc-50">
+                <th className="py-2 text-left px-2">Description</th>
+                <th className="py-2 text-center w-20 px-2">Type</th>
+                <th className="py-2 text-center w-12 px-2">Qty</th>
+                <th className="py-2 text-right w-28 px-2">Total</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-zinc-100">
+              {job.items?.map((item: any) => (
+                <tr key={item.id}>
+                  <td className="py-2 font-bold uppercase text-zinc-900 px-2">{item.description}</td>
+                  <td className="py-2 text-center px-2">
+                    <span className="bg-zinc-100 px-1.5 py-0.5 rounded text-[8px] font-black text-zinc-500 uppercase">{item.type}</span>
+                  </td>
+                  <td className="py-2 text-center font-bold px-2">{item.qty}</td>
+                  <td className="py-2 text-right font-black px-2 whitespace-nowrap">TZS {item.subtotal.toLocaleString()}</td>
                 </tr>
-              </thead>
-              <tbody className="divide-y divide-zinc-100">
-                {job.items?.map((item: any) => (
-                  <tr key={item.id}>
-                    <td className="py-2 font-bold uppercase text-zinc-900 px-2">{item.description}</td>
-                    <td className="py-2 text-center px-2">
-                      <span className="bg-zinc-100 px-1.5 py-0.5 rounded text-[8px] font-black text-zinc-500 uppercase">{item.type}</span>
-                    </td>
-                    <td className="py-2 text-center font-bold px-2">{item.qty}</td>
-                    <td className="py-2 text-right font-black px-2 whitespace-nowrap">TZS {item.subtotal.toLocaleString()}</td>
-                  </tr>
-                ))}
-              </tbody>
-              <tfoot>
-                <tr className="border-t-2 border-zinc-900 bg-zinc-50 font-black">
-                  <td colSpan={3} className="py-2 text-right uppercase text-[9px] px-2 tracking-widest">Gross Income:</td>
-                  <td className="py-2 text-right px-2 whitespace-nowrap">TZS {totalIncome.toLocaleString()}</td>
+              ))}
+              {(!job.items || job.items.length === 0) && (
+                <tr>
+                  <td colSpan={4} className="py-8 text-center text-zinc-400 italic">No repair items recorded.</td>
                 </tr>
-              </tfoot>
-            </table>
-          </div>
+              )}
+            </tbody>
+            <tfoot>
+              <tr className="border-t-2 border-zinc-900 bg-zinc-50 font-black">
+                <td colSpan={3} className="py-2 text-right uppercase text-[9px] px-2 tracking-widest">Gross Total:</td>
+                <td className="py-2 text-right px-2 whitespace-nowrap">TZS {totalIncome.toLocaleString()}</td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
 
-          <div>
-            <h3 className="text-[9px] font-black text-red-400 uppercase tracking-widest mb-2 text-center">
-              Actual Job Expenses (Costs)
-            </h3>
-            <table className="w-full text-xs">
-              <thead>
-                <tr className="border-red-900 bg-red-50 border-b-2">
-                  <th className="py-2 text-left px-2">Description</th>
-                  <th className="py-2 text-center w-24 px-2">Category</th>
-                  <th className="py-2 text-right w-28 px-2">Amount</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-red-100">
-                {job.expenses?.map((exp: any) => (
-                  <tr key={exp.id}>
-                    <td className="py-2 font-bold text-zinc-900 px-2 uppercase">{exp.description}</td>
-                    <td className="py-2 text-center px-2">
-                      <span className="bg-red-100 px-1.5 py-0.5 rounded text-[8px] font-black text-red-500 uppercase">{exp.category}</span>
-                    </td>
-                    <td className="py-2 text-right font-black px-2 whitespace-nowrap text-red-600">TZS {exp.amount.toLocaleString()}</td>
+        {/* Expenses and Profitability - INTERNAL ONLY */}
+        {isInternal && (
+          <>
+            <div>
+              <h3 className="text-[9px] font-black text-red-400 uppercase tracking-widest mb-2 text-center">
+                Actual Job Expenses (Costs)
+              </h3>
+              <table className="w-full text-xs">
+                <thead>
+                  <tr className="border-red-900 bg-red-50 border-b-2">
+                    <th className="py-2 text-left px-2">Description</th>
+                    <th className="py-2 text-center w-24 px-2">Category</th>
+                    <th className="py-2 text-right w-28 px-2">Amount</th>
                   </tr>
-                ))}
-              </tbody>
-              <tfoot>
-                <tr className="border-t-2 border-red-900 bg-red-50 font-black">
-                  <td colSpan={2} className="py-2 text-right uppercase text-[9px] px-2 tracking-widest text-red-900">Total Costs:</td>
-                  <td className="py-2 text-right px-2 whitespace-nowrap text-red-600">TZS {totalExpenses.toLocaleString()}</td>
-                </tr>
-              </tfoot>
-            </table>
-          </div>
+                </thead>
+                <tbody className="divide-y divide-red-100">
+                  {job.expenses?.map((exp: any) => (
+                    <tr key={exp.id}>
+                      <td className="py-2 font-bold text-zinc-900 px-2 uppercase">{exp.description}</td>
+                      <td className="py-2 text-center px-2">
+                        <span className="bg-red-100 px-1.5 py-0.5 rounded text-[8px] font-black text-red-500 uppercase">{exp.category}</span>
+                      </td>
+                      <td className="py-2 text-right font-black px-2 whitespace-nowrap text-red-600">TZS {exp.amount.toLocaleString()}</td>
+                    </tr>
+                  ))}
+                </tbody>
+                <tfoot>
+                  <tr className="border-t-2 border-red-900 bg-red-50 font-black">
+                    <td colSpan={2} className="py-2 text-right uppercase text-[9px] px-2 tracking-widest text-red-900">Total Costs:</td>
+                    <td className="py-2 text-right px-2 whitespace-nowrap text-red-600">TZS {totalExpenses.toLocaleString()}</td>
+                  </tr>
+                </tfoot>
+              </table>
+            </div>
 
-          <div className="flex justify-end pt-2">
-            <div className={cn(
-              "border-2 p-4 rounded-2xl min-w-[280px]",
-              isProfit ? 'border-green-600 bg-green-50' : 'border-red-600 bg-red-50'
-            )}>
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-[9px] font-black uppercase tracking-widest text-zinc-500">Net Profitability</span>
-                {isProfit ? <TrendingUp className="h-5 w-5 text-green-600" /> : <TrendingDown className="h-5 w-5 text-red-600" />}
-              </div>
-              <div className="flex justify-between items-center font-black">
-                <span className="text-[10px] uppercase">Net {isProfit ? 'Profit' : 'Loss'}:</span>
-                <span className={cn("text-xl whitespace-nowrap", isProfit ? 'text-green-700' : 'text-red-700')}>
-                  TZS {Math.abs(netProfit).toLocaleString()}
-                </span>
+            <div className="flex justify-end pt-2">
+              <div className={cn(
+                "border-2 p-4 rounded-2xl min-w-[280px]",
+                isProfit ? 'border-green-600 bg-green-50' : 'border-red-600 bg-red-50'
+              )}>
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-[9px] font-black uppercase tracking-widest text-zinc-500">Net Profitability</span>
+                  {isProfit ? <TrendingUp className="h-5 w-5 text-green-600" /> : <TrendingDown className="h-5 w-5 text-red-600" />}
+                </div>
+                <div className="flex justify-between items-center font-black">
+                  <span className="text-[10px] uppercase">Net {isProfit ? 'Profit' : 'Loss'}:</span>
+                  <span className={cn("text-xl whitespace-nowrap", isProfit ? 'text-green-700' : 'text-red-700')}>
+                    TZS {Math.abs(netProfit).toLocaleString()}
+                  </span>
+                </div>
               </div>
             </div>
-          </div>
-        </div>
-      )}
+          </>
+        )}
+      </div>
 
-      {/* Footer Area - Pushed to bottom of content, not necessarily page if content is long */}
+      {/* Footer Area - Pushed to bottom of content */}
       <div className="mt-auto pt-8 border-t border-zinc-100">
         <div className="mb-6 p-4 bg-zinc-50 rounded-xl border border-zinc-100 shrink-0">
           <h3 className="text-[9px] font-black text-zinc-400 uppercase tracking-widest mb-2">Terms and Conditions</h3>

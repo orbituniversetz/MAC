@@ -13,6 +13,7 @@ import {
 } from '@/components/ui/table';
 import { ChevronLeft, Trash2, Save, Lock, FileCheck, Receipt, Banknote, CreditCard, History, AlertCircle } from 'lucide-react';
 import { ProformaPreview } from '@/components/dashboard/ProformaPreview';
+import { ProformaDocument } from '@/components/dashboard/ProformaDocument';
 import { AddItemForm } from '@/components/dashboard/AddItemForm';
 import { Label } from '@/components/ui/label';
 import { PriceInput } from '@/components/dashboard/PriceInput';
@@ -122,6 +123,14 @@ export default async function ProformaDetailPage({ params }: { params: Promise<{
               <FileCheck className="mr-2 h-4 w-4" /> Already Invoiced
             </Button>
           )}
+        </div>
+      </div>
+
+      {/* Matching Professional Inline Preview Section */}
+      <div className="max-w-6xl mx-auto space-y-6">
+        <h3 className="font-bold text-lg text-zinc-500 uppercase tracking-widest px-4">Document Preview</h3>
+        <div className="bg-gray-100 border rounded-2xl shadow-inner overflow-y-auto p-4 sm:p-12 flex justify-center min-h-[1400px]">
+          <ProformaDocument proforma={pf} settings={settings} />
         </div>
       </div>
 

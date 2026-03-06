@@ -40,7 +40,7 @@ export function PreviewContainer({
           <div className="hidden sm:block">
             <h2 className="text-sm font-bold tracking-tight uppercase tracking-widest leading-none">{title}</h2>
             <p className="text-[10px] text-white/40 mt-1 uppercase font-bold">
-              Standard A4 View
+              Standard A4 Format
             </p>
           </div>
         </div>
@@ -90,21 +90,19 @@ export function PreviewContainer({
         </div>
       </div>
 
-      {/* Viewport */}
-      <div className="flex-1 overflow-auto preview-scroll bg-zinc-900/80 p-4 sm:p-12">
+      {/* Viewport - Improved scrolling logic */}
+      <div className="flex-1 overflow-auto preview-scroll bg-zinc-900/90 flex justify-center p-4 sm:p-12">
         <div 
-          className="mx-auto shadow-2xl transition-transform duration-200 origin-top bg-white print-container"
+          className="relative transition-transform duration-200 origin-top print-container h-fit"
           style={{ 
             transform: `scale(${scale})`,
             width: '210mm',
-            // Increase height buffer based on scale to prevent cutting off the bottom
-            marginBottom: `${Math.max(0, (scale - 1) * 100)}%`
+            // Ensure the container expands so the bottom is reachable
+            marginBottom: `${Math.max(20, (scale - 1) * 300)}mm`
           }}
         >
           {children}
         </div>
-        {/* Generous spacer to ensure we can always scroll to the bottom of long scaled documents */}
-        <div style={{ height: '1500px' }} className="w-full shrink-0" />
       </div>
     </div>
   );
