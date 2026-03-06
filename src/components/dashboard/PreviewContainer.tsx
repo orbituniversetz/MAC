@@ -1,9 +1,8 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Printer, Download, X, ZoomIn, ZoomOut, Maximize } from 'lucide-react';
+import { Printer, Download, X, ZoomIn, ZoomOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
 
 interface PreviewContainerProps {
   title: string;
@@ -28,10 +27,14 @@ export function PreviewContainer({
   const handleZoomOut = () => setZoom(prev => Math.max(prev - 10, 50));
   const handleResetZoom = () => setZoom(100);
 
+  // We wrap the scaled content in a div that has its height adjusted
+  // This ensures the scroll container correctly identifies the full height
+  const scale = zoom / 100;
+
   return (
     <div className="fixed inset-0 z-[9999] flex flex-col bg-zinc-950 no-print">
       {/* Toolbar */}
-      <div className="flex h-16 w-full items-center justify-between border-b border-white/10 bg-zinc-950 px-6 text-white shadow-2xl shrink-0">
+      <div className="flex h-16 w-full items-center justify-between border-b border-white/10 bg-zinc-900 px-6 text-white shadow-2xl shrink-0">
         <div className="flex items-center gap-3">
           <div className="p-2 bg-zinc-800 rounded-lg">
             {icon}
@@ -45,7 +48,7 @@ export function PreviewContainer({
         </div>
 
         {/* Zoom Controls */}
-        <div className="flex items-center gap-1 bg-zinc-900 p-1 rounded-lg border border-white/5 mx-4">
+        <div className="flex items-center gap-1 bg-zinc-800 p-1 rounded-lg border border-white/5 mx-4">
           <Button variant="ghost" size="icon" onClick={handleZoomOut} title="Zoom Out" className="h-8 w-8 text-white/70 hover:text-white">
             <ZoomOut className="h-4 w-4" />
           </Button>
@@ -89,18 +92,21 @@ export function PreviewContainer({
         </div>
       </div>
 
-      {/* Viewport - Uses flexible centering to prevent clipping */}
-      <div className="flex-1 overflow-auto preview-scroll bg-zinc-900/50 flex flex-col items-center">
+      {/* Viewport */}
+      <div className="flex-1 overflow-auto preview-scroll bg-zinc-900/80 flex flex-col items-center">
         <div 
           className="print-container transition-transform duration-200 origin-top shadow-2xl my-12"
           style={{ 
-            transform: `scale(${zoom / 100})`,
-            // Ensure the container maintains a footprint that allows scrolling to the bottom
-            marginBottom: zoom > 100 ? `${(zoom - 100) * 4}px` : '48px'
+            transform: `scale(${scale})`,
+            // This is the critical fix for the height issue:
+            // We use a margin-bottom trick to push the scroll container down
+            // OR we can wrap it. Let's use a dynamic container height approach.
           }}
         >
           {children}
         </div>
+        {/* Invisible spacer to ensure we can scroll to the bottom of scaled content */}
+        <div style={{ height: `${scale * 1200}px`, minHeight: '100px' }} className="w-full shrink-0" />
       </div>
     </div>
   );

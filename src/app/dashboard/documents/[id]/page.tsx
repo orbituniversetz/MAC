@@ -1,6 +1,5 @@
 import { getDocumentById, getSettings } from '@/lib/actions';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { ChevronLeft } from 'lucide-react';
 import Link from 'next/link';
 import { DocumentPreview } from '@/components/dashboard/DocumentPreview';
@@ -30,7 +29,7 @@ export default async function DocumentDetailPage({ params }: { params: Promise<{
       </div>
 
       <div className="max-w-6xl mx-auto">
-        <div className="bg-white border rounded-xl shadow-2xl overflow-y-auto p-4 sm:p-12 flex justify-center bg-gray-50/50 min-h-[1600px]">
+        <div className="bg-gray-100 border rounded-xl shadow-inner overflow-y-auto p-4 sm:p-12 flex justify-center min-h-[2000px]">
           <div className="origin-top h-fit py-4">
             <DocumentPaper doc={doc} settings={settings} />
           </div>
