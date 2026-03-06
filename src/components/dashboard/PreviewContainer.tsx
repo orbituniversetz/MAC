@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Printer, Download, X, ZoomIn, ZoomOut } from 'lucide-react';
+import { Printer, Download, X, ZoomIn, ZoomOut, Maximize } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
@@ -24,7 +24,7 @@ export function PreviewContainer({
 }: PreviewContainerProps) {
   const [zoom, setZoom] = useState(100);
 
-  const handleZoomIn = () => setZoom(prev => Math.min(prev + 10, 150));
+  const handleZoomIn = () => setZoom(prev => Math.min(prev + 10, 200));
   const handleZoomOut = () => setZoom(prev => Math.max(prev - 10, 50));
   const handleResetZoom = () => setZoom(100);
 
@@ -39,23 +39,24 @@ export function PreviewContainer({
           <div className="hidden sm:block">
             <h2 className="text-sm font-bold tracking-tight uppercase tracking-widest leading-none">{title}</h2>
             <p className="text-[10px] text-white/40 mt-1 uppercase font-bold">
-              Standard View Mode
+              Standard A4 Format
             </p>
           </div>
         </div>
 
         {/* Zoom Controls */}
         <div className="flex items-center gap-1 bg-zinc-900 p-1 rounded-lg border border-white/5 mx-4">
-          <Button variant="ghost" size="icon" onClick={handleZoomOut} className="h-8 w-8 text-white/70 hover:text-white">
+          <Button variant="ghost" size="icon" onClick={handleZoomOut} title="Zoom Out" className="h-8 w-8 text-white/70 hover:text-white">
             <ZoomOut className="h-4 w-4" />
           </Button>
           <button 
             onClick={handleResetZoom}
             className="px-2 text-[10px] font-bold min-w-[45px] hover:text-[#c10d12] transition-colors"
+            title="Reset Zoom"
           >
             {zoom}%
           </button>
-          <Button variant="ghost" size="icon" onClick={handleZoomIn} className="h-8 w-8 text-white/70 hover:text-white">
+          <Button variant="ghost" size="icon" onClick={handleZoomIn} title="Zoom In" className="h-8 w-8 text-white/70 hover:text-white">
             <ZoomIn className="h-4 w-4" />
           </Button>
         </div>
@@ -88,12 +89,14 @@ export function PreviewContainer({
         </div>
       </div>
 
-      {/* Viewport */}
-      <div className="flex-1 overflow-y-auto preview-scroll bg-zinc-900/50 flex flex-col items-center py-8">
+      {/* Viewport - Uses flexible centering to prevent clipping */}
+      <div className="flex-1 overflow-auto preview-scroll bg-zinc-900/50 flex flex-col items-center">
         <div 
-          className="print-container transition-transform duration-200 origin-top shadow-2xl mb-20"
+          className="print-container transition-transform duration-200 origin-top shadow-2xl my-12"
           style={{ 
             transform: `scale(${zoom / 100})`,
+            // Ensure the container maintains a footprint that allows scrolling to the bottom
+            marginBottom: zoom > 100 ? `${(zoom - 100) * 4}px` : '48px'
           }}
         >
           {children}

@@ -22,7 +22,7 @@ export function InvoiceDocument({ invoice, settings, className }: InvoiceDocumen
   return (
     <div id="invoice-document" className={cn("a4-page font-sans", className)}>
       {/* Header - Logo Left, Text Right */}
-      <div className="flex items-center justify-between mb-4 border-b-2 border-zinc-100 pb-4">
+      <div className="flex items-center justify-between mb-4 border-b-2 border-zinc-100 pb-4 shrink-0">
         <div className="flex items-center">
           {settings.garage_logo ? (
             <div className="relative h-20 w-20 overflow-hidden shrink-0">
@@ -46,7 +46,7 @@ export function InvoiceDocument({ invoice, settings, className }: InvoiceDocumen
         </div>
       </div>
 
-      <div className="flex justify-between items-center mb-8 bg-zinc-950 text-white p-4 rounded shadow-sm">
+      <div className="flex justify-between items-center mb-8 bg-zinc-950 text-white p-4 rounded shadow-sm shrink-0">
         <h2 className="text-xl font-black uppercase tracking-tighter">TAX INVOICE</h2>
         <div className="text-right">
           <p className="text-[9px] font-black uppercase tracking-widest opacity-70 leading-none">INVOICE NUMBER</p>
@@ -54,7 +54,7 @@ export function InvoiceDocument({ invoice, settings, className }: InvoiceDocumen
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-12 mb-8">
+      <div className="grid grid-cols-2 gap-12 mb-8 shrink-0">
         <div>
           <h3 className="text-[10px] font-black text-zinc-400 uppercase tracking-widest mb-3">Customer Billing Info</h3>
           <div className="space-y-1">
@@ -76,28 +76,30 @@ export function InvoiceDocument({ invoice, settings, className }: InvoiceDocumen
         </div>
       </div>
 
-      <table className="w-full mb-8 border-collapse">
-        <thead>
-          <tr className="bg-zinc-900 text-white">
-            <th className="p-3 text-left text-[10px] font-black uppercase">Service / Part Description</th>
-            <th className="p-3 text-center text-[10px] font-black uppercase w-16">Qty</th>
-            <th className="p-3 text-right text-[10px] font-black uppercase w-32">Unit Price</th>
-            <th className="p-3 text-right text-[10px] font-black uppercase w-32">Total (TZS)</th>
-          </tr>
-        </thead>
-        <tbody className="divide-y divide-zinc-100 font-bold">
-          {snapshot.items?.map((item: any) => (
-            <tr key={item.id} className="text-xs">
-              <td className="p-4 font-black text-zinc-900 uppercase tracking-tight">{item.description}</td>
-              <td className="p-4 text-center text-zinc-800">{item.qty}</td>
-              <td className="p-4 text-right whitespace-nowrap text-zinc-600">{item.unitPrice.toLocaleString()}</td>
-              <td className="p-4 text-right font-black whitespace-nowrap text-zinc-900">TZS {item.subtotal.toLocaleString()}</td>
+      <div className="mb-8">
+        <table className="w-full border-collapse">
+          <thead>
+            <tr className="bg-zinc-900 text-white">
+              <th className="p-3 text-left text-[10px] font-black uppercase">Service / Part Description</th>
+              <th className="p-3 text-center text-[10px] font-black uppercase w-16">Qty</th>
+              <th className="p-3 text-right text-[10px] font-black uppercase w-32">Unit Price</th>
+              <th className="p-3 text-right text-[10px] font-black uppercase w-32">Total (TZS)</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody className="divide-y divide-zinc-100 font-bold">
+            {snapshot.items?.map((item: any) => (
+              <tr key={item.id} className="text-xs">
+                <td className="p-4 font-black text-zinc-900 uppercase tracking-tight">{item.description}</td>
+                <td className="p-4 text-center text-zinc-800">{item.qty}</td>
+                <td className="p-4 text-right whitespace-nowrap text-zinc-600">{item.unitPrice.toLocaleString()}</td>
+                <td className="p-4 text-right font-black whitespace-nowrap text-zinc-900">TZS {item.subtotal.toLocaleString()}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
 
-      <div className="flex justify-end mb-12">
+      <div className="flex justify-end mb-12 shrink-0">
         <div className="w-72 space-y-2 bg-zinc-50 p-6 rounded-3xl border border-zinc-100 shadow-sm">
           <div className="flex justify-between text-xs font-bold uppercase tracking-tight">
             <span className="text-zinc-500">Subtotal:</span>
@@ -122,7 +124,7 @@ export function InvoiceDocument({ invoice, settings, className }: InvoiceDocumen
         </div>
       </div>
 
-      <div className="mt-auto pt-8 border-t-4 border-zinc-950">
+      <div className="mt-auto pt-8 border-t-4 border-zinc-950 shrink-0">
         <div className="grid grid-cols-2 gap-12">
           <div>
             <h3 className="text-[10px] font-black text-zinc-400 uppercase tracking-widest mb-4">Payment Instructions</h3>

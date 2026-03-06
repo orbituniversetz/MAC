@@ -23,7 +23,7 @@ export function JobCardDocument({ job, settings, isInternal = false, className }
       className={cn("a4-page font-sans", className)}
     >
       {/* Header - Logo Left, Text Right */}
-      <div className="flex items-center justify-between mb-4 border-b-2 border-zinc-100 pb-4">
+      <div className="flex items-center justify-between mb-4 border-b-2 border-zinc-100 pb-4 shrink-0">
         <div className="flex items-center">
           {settings.garage_logo ? (
             <div className="relative h-20 w-20 overflow-hidden shrink-0">
@@ -52,7 +52,7 @@ export function JobCardDocument({ job, settings, isInternal = false, className }
       </div>
 
       {/* Title Bar */}
-      <div className="flex justify-between items-center mb-6 bg-zinc-950 text-white p-3 rounded shadow-sm">
+      <div className="flex justify-between items-center mb-6 bg-zinc-950 text-white p-3 rounded shadow-sm shrink-0">
         <div className="flex items-center gap-3">
           {isInternal ? <ShieldCheck className="h-4 w-4 text-blue-400" /> : <User className="h-4 w-4 text-red-400" />}
           <h2 className="text-xs font-black uppercase tracking-widest">
@@ -66,7 +66,7 @@ export function JobCardDocument({ job, settings, isInternal = false, className }
       </div>
 
       {/* Info Grid */}
-      <div className="grid grid-cols-2 gap-8 mb-6">
+      <div className="grid grid-cols-2 gap-8 mb-6 shrink-0">
         <div className="space-y-4">
           <div>
             <h3 className="text-[9px] font-black text-zinc-400 uppercase tracking-widest mb-1">Customer Details</h3>
@@ -94,7 +94,7 @@ export function JobCardDocument({ job, settings, isInternal = false, className }
       </div>
 
       {/* Complaint Section */}
-      <div className="mb-6">
+      <div className="mb-6 shrink-0">
         <h3 className="text-[9px] font-black text-zinc-400 uppercase tracking-widest mb-2 flex items-center gap-2">
           <div className="w-1.5 h-1.5 rounded-full bg-[#c10d12]" />
           Work Requested / Complaint
@@ -105,15 +105,15 @@ export function JobCardDocument({ job, settings, isInternal = false, className }
       </div>
 
       {isInternal && job.mechanicNotes && (
-        <div className="mb-6 bg-blue-50/50 p-4 rounded-xl border border-blue-100">
+        <div className="mb-6 bg-blue-50/50 p-4 rounded-xl border border-blue-100 shrink-0">
           <h3 className="text-[9px] font-black text-blue-400 uppercase tracking-widest mb-1">Internal Technician Notes</h3>
           <p className="text-xs text-blue-900 leading-relaxed font-medium">{job.mechanicNotes}</p>
         </div>
       )}
 
-      {/* Internal Cost Data */}
+      {/* Internal Cost Data - Content area that expands */}
       {isInternal && (
-        <div className="space-y-8 flex-1">
+        <div className="space-y-8 mb-8">
           <div>
             <h3 className="text-[9px] font-black text-zinc-400 uppercase tracking-widest mb-2 text-center">
               Parts & Labour Income
@@ -200,16 +200,16 @@ export function JobCardDocument({ job, settings, isInternal = false, className }
         </div>
       )}
 
-      {/* Footer Area */}
-      <div className="mt-auto pt-8">
-        <div className="mb-6 p-4 bg-zinc-50 rounded-xl border border-zinc-100">
+      {/* Footer Area - Pushed to bottom of content, not necessarily page if content is long */}
+      <div className="mt-auto pt-8 border-t border-zinc-100">
+        <div className="mb-6 p-4 bg-zinc-50 rounded-xl border border-zinc-100 shrink-0">
           <h3 className="text-[9px] font-black text-zinc-400 uppercase tracking-widest mb-2">Terms and Conditions</h3>
           <div className="text-[9px] text-zinc-600 whitespace-pre-wrap italic leading-relaxed font-medium">
             {settings.garage_terms || 'Standard repair conditions apply. All parts installed remain property of the garage until fully settled.'}
           </div>
         </div>
 
-        <div className={cn("grid grid-cols-2 gap-12", !isInternal && "mt-0")}>
+        <div className={cn("grid grid-cols-2 gap-12 shrink-0", !isInternal && "mt-0")}>
           <div className="space-y-4">
             <div className="border-t border-zinc-200 pt-2">
               <p className="text-[8px] font-black uppercase tracking-widest text-zinc-400 mb-1">
