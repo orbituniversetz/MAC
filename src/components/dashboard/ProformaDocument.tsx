@@ -127,7 +127,7 @@ export function ProformaDocument({ proforma, settings, className }: ProformaDocu
           </div>
           <div className="flex justify-between text-sm text-red-700 font-black">
             <span>BALANCE DUE:</span>
-            <span>TZS {balance_due.toLocaleString()}</span>
+            <span>TZS {balanceDue.toLocaleString()}</span>
           </div>
         </div>
       </div>

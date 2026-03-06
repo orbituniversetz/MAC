@@ -27,8 +27,6 @@ export function PreviewContainer({
   const handleZoomOut = () => setZoom(prev => Math.max(prev - 10, 50));
   const handleResetZoom = () => setZoom(100);
 
-  // We wrap the scaled content in a div that has its height adjusted
-  // This ensures the scroll container correctly identifies the full height
   const scale = zoom / 100;
 
   return (
@@ -42,7 +40,7 @@ export function PreviewContainer({
           <div className="hidden sm:block">
             <h2 className="text-sm font-bold tracking-tight uppercase tracking-widest leading-none">{title}</h2>
             <p className="text-[10px] text-white/40 mt-1 uppercase font-bold">
-              Standard A4 Format
+              Standard A4 View
             </p>
           </div>
         </div>
@@ -93,20 +91,20 @@ export function PreviewContainer({
       </div>
 
       {/* Viewport */}
-      <div className="flex-1 overflow-auto preview-scroll bg-zinc-900/80 flex flex-col items-center">
+      <div className="flex-1 overflow-auto preview-scroll bg-zinc-900/80 p-4 sm:p-12">
         <div 
-          className="print-container transition-transform duration-200 origin-top shadow-2xl my-12"
+          className="mx-auto shadow-2xl transition-transform duration-200 origin-top bg-white print-container"
           style={{ 
             transform: `scale(${scale})`,
-            // This is the critical fix for the height issue:
-            // We use a margin-bottom trick to push the scroll container down
-            // OR we can wrap it. Let's use a dynamic container height approach.
+            width: '210mm',
+            // Increase height buffer based on scale to prevent cutting off the bottom
+            marginBottom: `${Math.max(0, (scale - 1) * 100)}%`
           }}
         >
           {children}
         </div>
-        {/* Invisible spacer to ensure we can scroll to the bottom of scaled content */}
-        <div style={{ height: `${scale * 1200}px`, minHeight: '100px' }} className="w-full shrink-0" />
+        {/* Generous spacer to ensure we can always scroll to the bottom of long scaled documents */}
+        <div style={{ height: '1500px' }} className="w-full shrink-0" />
       </div>
     </div>
   );
