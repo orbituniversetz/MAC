@@ -3,14 +3,17 @@
   "name": "nextn",
   "version": "0.1.0",
   "private": true,
+  "main": "electron-main.js",
   "scripts": {
     "dev": "next dev --turbopack -p 9002",
     "genkit:dev": "genkit start -- tsx src/ai/dev.ts",
     "genkit:watch": "genkit start -- tsx --watch src/ai/dev.ts",
     "build": "NODE_ENV=production next build",
-    "start": "next start",
+    "start": "next start -p 9002",
     "lint": "next lint",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "electron-dev": "electron .",
+    "dist": "npm run build && electron-builder"
   },
   "dependencies": {
     "@genkit-ai/google-genai": "^1.28.0",
@@ -64,9 +67,21 @@
     "@types/node": "^20",
     "@types/react": "^19.2.1",
     "@types/react-dom": "^19.2.1",
+    "electron": "^31.0.0",
+    "electron-builder": "^24.13.3",
     "genkit-cli": "^1.28.0",
     "postcss": "^8",
     "tailwindcss": "^3.4.1",
     "typescript": "^5"
+  },
+  "build": {
+    "appId": "com.garageflow.desk",
+    "productName": "GarageFlow Desk",
+    "directories": {
+      "output": "dist"
+    },
+    "win": {
+      "target": "portable"
+    }
   }
 }
