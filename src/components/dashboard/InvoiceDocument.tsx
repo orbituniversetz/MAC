@@ -1,3 +1,4 @@
+
 'use client'
 
 import { cn } from '@/lib/utils';
@@ -47,7 +48,7 @@ export function InvoiceDocument({ invoice, settings, className }: InvoiceDocumen
       </div>
 
       <div className="flex justify-between items-center mb-8 bg-zinc-950 text-white p-4 rounded shadow-sm shrink-0">
-        <h2 className="text-xl font-black uppercase tracking-tighter">TAX INVOICE</h2>
+        <h2 className="text-lg font-bold uppercase tracking-widest">TAX INVOICE</h2>
         <div className="text-right">
           <p className="text-[9px] font-black uppercase tracking-widest opacity-70 leading-none">INVOICE NUMBER</p>
           <p className="text-xl font-black leading-none">{invoice.invoiceNo}</p>

@@ -1,3 +1,4 @@
+
 'use client'
 
 import { cn } from '@/lib/utils';
@@ -71,7 +72,7 @@ export function DocumentPaper({ doc, settings, className }: DocumentPaperProps) 
       </div>
 
       <div className="mb-8">
-        <h2 className="text-2xl font-black uppercase border-b-8 border-zinc-950 inline-block pb-1 tracking-tighter text-zinc-900">
+        <h2 className="text-lg font-bold uppercase border-b-2 border-zinc-900 inline-block pb-1 tracking-tight text-zinc-900">
           {doc.title}
         </h2>
       </div>

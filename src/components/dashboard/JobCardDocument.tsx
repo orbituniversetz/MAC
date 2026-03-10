@@ -1,3 +1,4 @@
+
 'use client'
 
 import { cn } from '@/lib/utils';
@@ -55,7 +56,7 @@ export function JobCardDocument({ job, settings, isInternal = false, className }
       <div className="flex justify-between items-center mb-6 bg-zinc-950 text-white p-3 rounded shadow-sm shrink-0">
         <div className="flex items-center gap-3">
           {isInternal ? <ShieldCheck className="h-4 w-4 text-blue-400" /> : <User className="h-4 w-4 text-red-400" />}
-          <h2 className="text-xs font-black uppercase tracking-widest">
+          <h2 className="text-xs font-bold uppercase tracking-widest">
             {isInternal ? 'Internal Management Copy' : 'Customer Copy – Vehicle Receipt'}
           </h2>
         </div>
