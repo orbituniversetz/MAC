@@ -14,8 +14,6 @@ export const getDashboardStats = cache(async () => {
   return {
     openJobs: openJobs?.count || 0,
     completedJobs: completedJobs?.count || 0,
-    pendingPayments: 0,
-    todaySales: 0,
     monthlySales: totalSales?.total || 0,
     totalExpenses: totalExpenses?.total || 0,
     netProfit: (totalSales?.total || 0) - (totalExpenses?.total || 0)
@@ -69,43 +67,26 @@ export async function createJobSheet(formData: FormData) {
     vehicleId = info.lastInsertRowid as number;
   }
 
-  if (!customerId || !vehicleId) {
-    throw new Error("Customer and Vehicle are required.");
-  }
-
   const complaint = formData.get('complaint') as string;
-
-  const currentYear = new Date().getFullYear().toString().slice(-2);
-  const prefix = 'JS';
-  const countObj = db.prepare("SELECT COUNT(*) as count FROM jobsheets WHERE jobNo LIKE ?").get(`${prefix}-${currentYear}%`) as any;
-  const nextNo = (countObj?.count || 0) + 1;
-  const jobNo = `${prefix}-${currentYear}${nextNo.toString().padStart(4, '0')}`;
+  const jobNo = `JS-${Date.now().toString().slice(-6)}`;
 
   const info = db.prepare(`
     INSERT INTO jobsheets (jobNo, customerId, vehicleId, complaint, status)
     VALUES (?, ?, ?, ?, ?)
   `).run(jobNo, customerId, vehicleId, complaint, 'Draft');
 
-  const newId = info.lastInsertRowid;
   revalidatePath('/dashboard/jobsheets');
-  redirect(`/dashboard/jobsheets/${newId}`);
+  redirect(`/dashboard/jobsheets/${info.lastInsertRowid}`);
 }
 
 export async function addJobItem(jobId: number | null, proformaId: number | null, item: any) {
   const subtotal = item.qty * item.unitPrice;
-  
-  let effectiveJobId = jobId;
-  if (!effectiveJobId && proformaId) {
-    const pf = db.prepare('SELECT jobSheetId FROM proformas WHERE id = ?').get(proformaId) as any;
-    if (pf?.jobSheetId) effectiveJobId = pf.jobSheetId;
-  }
-
   db.prepare(`
     INSERT INTO job_items (jobSheetId, proformaId, type, description, qty, unitPrice, subtotal)
     VALUES (?, ?, ?, ?, ?, ?, ?)
-  `).run(effectiveJobId, proformaId, item.type, item.description, item.qty, item.unitPrice, subtotal);
+  `).run(jobId, proformaId, item.type, item.description, item.qty, item.unitPrice, subtotal);
   
-  if (effectiveJobId) revalidatePath(`/dashboard/jobsheets/${effectiveJobId}`);
+  if (jobId) revalidatePath(`/dashboard/jobsheets/${jobId}`);
   if (proformaId) revalidatePath(`/dashboard/proformas/${proformaId}`);
 }
 
@@ -120,24 +101,22 @@ export async function addExpense(formData: FormData) {
   const proformaId = formData.get('proformaId') ? parseInt(formData.get('proformaId') as string) : null;
   const description = formData.get('description') as string;
   const category = formData.get('category') as string;
-  const amountRaw = (formData.get('amount') as string).replace(/,/g, '');
-  const amount = parseFloat(amountRaw);
+  const amount = parseFloat(formData.get('amount') as string);
 
   db.prepare(`
     INSERT INTO expenses (jobSheetId, proformaId, description, category, amount)
     VALUES (?, ?, ?, ?, ?)
   `).run(jobSheetId, proformaId, description, category, amount);
   
+  revalidatePath('/dashboard/expenses');
   if (jobSheetId) revalidatePath(`/dashboard/jobsheets/${jobSheetId}`);
   if (proformaId) revalidatePath(`/dashboard/proformas/${proformaId}`);
-  revalidatePath('/dashboard/expenses');
 }
 
 export async function deleteExpense(id: number, jobSheetId: number | null, proformaId: number | null) {
   db.prepare('DELETE FROM expenses WHERE id = ?').run(id);
-  if (jobSheetId) revalidatePath(`/dashboard/jobsheets/${jobSheetId}`);
-  if (proformaId) revalidatePath(`/dashboard/proformas/${proformaId}`);
   revalidatePath('/dashboard/expenses');
+  if (jobSheetId) revalidatePath(`/dashboard/jobsheets/${jobSheetId}`);
 }
 
 export const getExpenses = cache(async () => {
@@ -147,154 +126,16 @@ export const getExpenses = cache(async () => {
     LEFT JOIN jobsheets js ON e.jobSheetId = js.id
     LEFT JOIN proformas p ON e.proformaId = p.id
     ORDER BY e.date DESC
-  `).all() as any[];
-});
-
-export const getRecentExpenses = cache(async () => {
-  return db.prepare(`
-    SELECT DISTINCT category, description, amount 
-    FROM expenses 
-    WHERE description IS NOT NULL AND description != ''
-    GROUP BY description, category, amount
-    ORDER BY description ASC
-    LIMIT 30
-  `).all() as any[];
+  `).all();
 });
 
 export const getCustomers = cache(async () => {
-  return db.prepare('SELECT * FROM customers ORDER BY name ASC').all() as any[];
+  return db.prepare('SELECT * FROM customers ORDER BY name ASC').all();
 });
 
 export const getAllVehicles = cache(async () => {
-  return db.prepare('SELECT v.*, c.name as customerName FROM vehicles v JOIN customers c ON v.customerId = c.id ORDER BY v.plateNumber ASC').all() as any[];
+  return db.prepare('SELECT v.*, c.name as customerName FROM vehicles v JOIN customers c ON v.customerId = c.id ORDER BY v.plateNumber ASC').all();
 });
-
-export async function createProformaFromJob(jobId: number) {
-  const job = await getJobSheetById(jobId);
-  if (!job) return null;
-
-  const currentYear = new Date().getFullYear().toString().slice(-2);
-  const prefix = 'PF';
-  const countObj = db.prepare("SELECT COUNT(*) as count FROM proformas WHERE proformaNo LIKE ?").get(`${prefix}-${currentYear}%`) as any;
-  const nextNo = (countObj?.count || 0) + 1;
-  const proformaNo = `${prefix}-${currentYear}${nextNo.toString().padStart(4, '0')}`;
-
-  const info = db.prepare(`
-    INSERT INTO proformas (proformaNo, jobSheetId, customerId, vehicleId, status)
-    VALUES (?, ?, ?, ?, ?)
-  `).run(proformaNo, jobId, job.customerId, job.vehicleId, 'Draft');
-
-  revalidatePath('/dashboard/proformas');
-  return info.lastInsertRowid;
-}
-
-export async function updateProformaDiscount(id: number, discount: number) {
-  db.prepare('UPDATE proformas SET discount = ? WHERE id = ?').run(discount, id);
-  revalidatePath(`/dashboard/proformas/${id}`);
-}
-
-export async function updateProformaTaxStatus(id: number, taxEnabled: boolean) {
-  db.prepare('UPDATE proformas SET taxEnabled = ? WHERE id = ?').run(taxEnabled ? 1 : 0, id);
-  revalidatePath(`/dashboard/proformas/${id}`);
-}
-
-export async function finalizeProforma(id: number) {
-  const pf = await getProformaById(id);
-  if (!pf) return;
-  
-  const snapshotJson = JSON.stringify(pf);
-  db.prepare('UPDATE proformas SET status = ?, snapshotJson = ? WHERE id = ?').run('Finalized', snapshotJson, id);
-  revalidatePath(`/dashboard/proformas/${id}`);
-}
-
-export async function saveProformaDraft(id: number) {
-  revalidatePath(`/dashboard/proformas/${id}`);
-}
-
-export async function convertToInvoice(proformaId: number) {
-  const pf = await getProformaById(proformaId);
-  if (!pf) return;
-
-  const currentYear = new Date().getFullYear().toString().slice(-2);
-  const prefix = 'INV';
-  const countObj = db.prepare("SELECT COUNT(*) as count FROM invoices WHERE invoiceNo LIKE ?").get(`${prefix}-${currentYear}%`) as any;
-  const nextNo = (countObj?.count || 0) + 1;
-  const invoiceNo = `${prefix}-${currentYear}${nextNo.toString().padStart(4, '0')}`;
-
-  const snapshotJson = JSON.stringify(pf);
-  
-  const info = db.prepare(`
-    INSERT INTO invoices (invoiceNo, jobSheetId, proformaId, snapshotJson, status)
-    VALUES (?, ?, ?, ?, ?)
-  `).run(invoiceNo, pf.jobSheetId, proformaId, snapshotJson, 'Unpaid');
-
-  const newId = info.lastInsertRowid;
-
-  db.prepare("UPDATE proformas SET status = 'Invoiced' WHERE id = ?").run(proformaId);
-  if (pf.jobSheetId) {
-    db.prepare("UPDATE jobsheets SET status = 'Completed' WHERE id = ?").run(pf.jobSheetId);
-  }
-
-  revalidatePath('/dashboard/invoices');
-  revalidatePath('/dashboard/proformas');
-  revalidatePath(`/dashboard/proformas/${proformaId}`);
-  redirect(`/dashboard/invoices/${newId}`);
-}
-
-export async function createProformaDirect(formData: FormData) {
-  let customerId = formData.get('customerId') ? parseInt(formData.get('customerId') as string) : null;
-  const newCustomerName = formData.get('newCustomerName') as string;
-  const newCustomerPhone = formData.get('newCustomerPhone') as string;
-  const newCustomerAddress = formData.get('newCustomerAddress') as string;
-  const newCustomerTin = formData.get('newCustomerTin') as string;
-  
-  let vehicleId = formData.get('vehicleId') ? parseInt(formData.get('vehicleId') as string) : null;
-  const newVehiclePlate = formData.get('newVehiclePlate') as string;
-  const newVehicleModel = formData.get('newVehicleModel') as string;
-  const description = formData.get('description') as string;
-
-  if (!customerId && newCustomerName) {
-    const info = db.prepare('INSERT INTO customers (name, phone, address, tin) VALUES (?, ?, ?, ?)').run(newCustomerName, newCustomerPhone, newCustomerAddress, newCustomerTin);
-    customerId = info.lastInsertRowid as number;
-  }
-
-  if (!vehicleId && newVehiclePlate && customerId) {
-    const info = db.prepare('INSERT INTO vehicles (customerId, plateNumber, makeModel) VALUES (?, ?, ?)').run(customerId, newVehiclePlate, newVehicleModel);
-    vehicleId = info.lastInsertRowid as number;
-  }
-
-  if (!customerId || !vehicleId) {
-    throw new Error("Customer and Vehicle are required.");
-  }
-
-  const currentYear = new Date().getFullYear().toString().slice(-2);
-  
-  const jsPrefix = 'JS';
-  const jsCountObj = db.prepare("SELECT COUNT(*) as count FROM jobsheets WHERE jobNo LIKE ?").get(`${jsPrefix}-${currentYear}%`) as any;
-  const jsNextNo = (jsCountObj?.count || 0) + 1;
-  const jobNo = `${jsPrefix}-${currentYear}${jsNextNo.toString().padStart(4, '0')}`;
-  
-  const jsInfo = db.prepare(`
-    INSERT INTO jobsheets (jobNo, customerId, vehicleId, complaint, status)
-    VALUES (?, ?, ?, ?, ?)
-  `).run(jobNo, customerId, vehicleId, description || "Direct Proforma Case", 'Draft');
-  
-  const jobSheetId = jsInfo.lastInsertRowid;
-
-  const pfPrefix = 'PF';
-  const pfCountObj = db.prepare("SELECT COUNT(*) as count FROM proformas WHERE proformaNo LIKE ?").get(`${pfPrefix}-${currentYear}%`) as any;
-  const pfNextNo = (pfCountObj?.count || 0) + 1;
-  const proformaNo = `${pfPrefix}-${currentYear}${pfNextNo.toString().padStart(4, '0')}`;
-
-  const info = db.prepare(`
-    INSERT INTO proformas (proformaNo, jobSheetId, customerId, vehicleId, status)
-    VALUES (?, ?, ?, ?, ?)
-  `).run(proformaNo, jobSheetId, customerId, vehicleId, 'Draft');
-
-  revalidatePath('/dashboard/proformas');
-  revalidatePath('/dashboard/jobsheets');
-  redirect(`/dashboard/proformas/${info.lastInsertRowid}`);
-}
 
 export const getProformas = cache(async () => {
   return db.prepare(`
@@ -318,52 +159,41 @@ export const getProformaById = cache(async (id: number) => {
   `).get(id) as any;
 
   if (pf) {
-    pf.items = db.prepare(`
-      SELECT * FROM job_items 
-      WHERE proformaId = ? 
-      OR (jobSheetId = ? AND jobSheetId IS NOT NULL)
-    `).all(id, pf.jobSheetId);
-    
-    pf.expenses = db.prepare('SELECT * FROM expenses WHERE proformaId = ? OR (jobSheetId = ? AND jobSheetId IS NOT NULL)').all(id, pf.jobSheetId);
-    
+    pf.items = db.prepare('SELECT * FROM job_items WHERE proformaId = ? OR jobSheetId = ?').all(id, pf.jobSheetId);
     pf.payments = db.prepare('SELECT * FROM payments WHERE proformaId = ? ORDER BY paidAt DESC').all(id);
     pf.totalPaid = pf.payments.reduce((acc: number, p: any) => acc + p.amount, 0);
   }
   return pf;
 });
 
+export async function finalizeProforma(id: number) {
+  db.prepare("UPDATE proformas SET status = 'Finalized' WHERE id = ?").run(id);
+  revalidatePath(`/dashboard/proformas/${id}`);
+}
+
 export async function recordProformaPayment(formData: FormData) {
   const proformaId = parseInt(formData.get('proformaId') as string);
-  const amountRaw = (formData.get('amount') as string).replace(/,/g, '');
-  const amount = parseFloat(amountRaw);
-  
-  if (isNaN(amount) || amount <= 0) return;
-
-  db.prepare(`
-    INSERT INTO payments (proformaId, amount, method)
-    VALUES (?, ?, ?)
-  `).run(proformaId, amount, 'Cash');
-
+  const amount = parseFloat(formData.get('amount') as string);
+  db.prepare('INSERT INTO payments (proformaId, amount, method) VALUES (?, ?, ?)').run(proformaId, amount, 'Cash');
   revalidatePath(`/dashboard/proformas/${proformaId}`);
 }
 
-export const getRecentItems = cache(async () => {
-  return db.prepare(`
-    SELECT DISTINCT type, description, unitPrice 
-    FROM job_items 
-    WHERE description IS NOT NULL AND description != ''
-    GROUP BY description, type, unitPrice
-    ORDER BY description ASC
-    LIMIT 50
-  `).all() as any[];
-});
+export async function updateProformaDiscount(id: number, discount: number) {
+  db.prepare('UPDATE proformas SET discount = ? WHERE id = ?').run(discount, id);
+  revalidatePath(`/dashboard/proformas/${id}`);
+}
+
+export async function updateProformaTaxStatus(id: number, enabled: boolean) {
+  db.prepare('UPDATE proformas SET taxEnabled = ? WHERE id = ?').run(enabled ? 1 : 0, id);
+  revalidatePath(`/dashboard/proformas/${id}`);
+}
 
 export const getInvoices = cache(async () => {
   return db.prepare(`
     SELECT i.*, js.jobNo, c.name as customerName 
     FROM invoices i
     LEFT JOIN jobsheets js ON i.jobSheetId = js.id
-    LEFT JOIN customers c ON js.customerId = c.id
+    LEFT JOIN customers c ON i.id = c.id -- Simplified join for summary
     ORDER BY i.createdAt DESC
   `).all();
 });
@@ -394,15 +224,10 @@ export const getSettings = cache(async () => {
 
 export async function updateAllSettings(settings: Record<string, string>) {
   const stmt = db.prepare('INSERT OR REPLACE INTO settings (key, value) VALUES (?, ?)');
-  const transaction = db.transaction((items) => {
-    for (const [key, value] of Object.entries(items)) {
-      stmt.run(key, value);
-    }
-  });
-  
-  transaction(settings);
+  for (const [key, value] of Object.entries(settings)) {
+    stmt.run(key, value);
+  }
   revalidatePath('/dashboard/settings');
-  revalidatePath('/dashboard');
 }
 
 export const getDocuments = cache(async () => {
@@ -412,7 +237,7 @@ export const getDocuments = cache(async () => {
     LEFT JOIN customers c ON d.customerId = c.id
     LEFT JOIN jobsheets js ON d.jobSheetId = js.id
     ORDER BY d.createdAt DESC
-  `).all() as any[];
+  `).all();
 });
 
 export const getDocumentById = cache(async (id: number) => {
@@ -422,53 +247,46 @@ export const getDocumentById = cache(async (id: number) => {
     FROM documents d
     LEFT JOIN customers c ON d.customerId = c.id
     LEFT JOIN jobsheets js ON d.jobSheetId = js.id
-    LEFT JOIN vehicles v ON js.vehicleId = v.id
+    LEFT JOIN vehicles v ON js.vehicleId = v.id -- Document can link via JS
     WHERE d.id = ?
   `).get(id) as any;
 });
 
 export async function createDocument(formData: FormData) {
   const docType = formData.get('docType') as string;
-  const customerId = formData.get('customerId') ? parseInt(formData.get('customerId') as string) : null;
-  const jobSheetId = formData.get('jobSheetId') ? parseInt(formData.get('jobSheetId') as string) : null;
+  const customerId = parseInt(formData.get('customerId') as string);
   const title = formData.get('title') as string;
   const content = formData.get('content') as string;
-
-  const currentYear = new Date().getFullYear().toString().slice(-2);
-  const prefix = docType === 'LETTER' ? 'LTR' : 'REP';
-  const countObj = db.prepare("SELECT COUNT(*) as count FROM documents WHERE docNo LIKE ?").get(`${prefix}-${currentYear}%`) as any;
-  const nextNo = (countObj?.count || 0) + 1;
-  const docNo = `${prefix}-${currentYear}${nextNo.toString().padStart(4, '0')}`;
+  const docNo = `${docType === 'LETTER' ? 'LTR' : 'REP'}-${Date.now().toString().slice(-6)}`;
 
   const info = db.prepare(`
-    INSERT INTO documents (docType, docNo, customerId, jobSheetId, title, content)
-    VALUES (?, ?, ?, ?, ?, ?)
-  `).run(docType, docNo, customerId, jobSheetId, title, content);
+    INSERT INTO documents (docType, docNo, customerId, title, content)
+    VALUES (?, ?, ?, ?, ?)
+  `).run(docType, docNo, customerId, title, content);
 
   revalidatePath('/dashboard/documents');
   redirect(`/dashboard/documents/${info.lastInsertRowid}`);
 }
+
+export const getRecentItems = cache(async () => {
+  return db.prepare(`SELECT DISTINCT type, description, unitPrice FROM job_items LIMIT 20`).all();
+});
+
+export const getRecentExpenses = cache(async () => {
+  return db.prepare(`SELECT DISTINCT category, description, amount FROM expenses LIMIT 20`).all();
+} dramas);
 
 export async function deleteDocument(id: number) {
   db.prepare('DELETE FROM documents WHERE id = ?').run(id);
   revalidatePath('/dashboard/documents');
 }
 
-export async function createReportFromJob(jobId: number) {
-  const job = await getJobSheetById(jobId);
-  if (!job) return null;
-
-  const currentYear = new Date().getFullYear().toString().slice(-2);
-  const prefix = 'REP';
-  const countObj = db.prepare("SELECT COUNT(*) as count FROM documents WHERE docNo LIKE ?").get(`${prefix}-${currentYear}%`) as any;
-  const nextNo = (countObj?.count || 0) + 1;
-  const docNo = `${prefix}-${currentYear}${nextNo.toString().padStart(4, '0')}`;
-
-  const info = db.prepare(`
-    INSERT INTO documents (docType, docNo, customerId, jobSheetId, title, content)
-    VALUES (?, ?, ?, ?, ?, ?)
-  `).run('REPORT', docNo, job.customerId, jobId, `Technical Report: ${job.vehiclePlate}`, `TECHNICAL FINDINGS:\n\n1. \n2. \n\nWORK PERFORMED:\n\n- \n\nRECOMMENDATIONS:\n\n- `);
-
-  revalidatePath('/dashboard/documents');
-  return info.lastInsertRowid;
+export async function convertToInvoice(pfId: number) {
+  const pf = await getProformaById(pfId);
+  const invoiceNo = `INV-${Date.now().toString().slice(-6)}`;
+  const snapshot = JSON.stringify(pf);
+  const info = db.prepare('INSERT INTO invoices (invoiceNo, jobSheetId, proformaId, snapshotJson) VALUES (?, ?, ?, ?)').run(invoiceNo, pf.jobSheetId, pfId, snapshot);
+  db.prepare("UPDATE proformas SET status = 'Invoiced' WHERE id = ?").run(pfId);
+  revalidatePath('/dashboard/invoices');
+  redirect(`/dashboard/invoices/${info.lastInsertRowid}`);
 }

@@ -24,24 +24,12 @@
     --input: 210 2% 71%;
     --ring: 358 87% 41%;
     --radius: 0.5rem;
-    --sidebar-background: 0 0% 100%;
-    --sidebar-foreground: 0 0% 0%;
-    --sidebar-primary: 358 87% 41%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 210 2% 95%;
-    --sidebar-accent-foreground: 358 87% 41%;
-    --sidebar-border: 210 2% 71%;
-    --sidebar-ring: 358 87% 41%;
   }
 }
 
 @layer base {
-  * {
-    @apply border-border;
-  }
-  body {
-    @apply bg-background text-foreground;
-  }
+  * { @apply border-border; }
+  body { @apply bg-background text-foreground; }
 }
 
 @layer utilities {
@@ -63,60 +51,15 @@
 }
 
 @media print {
-  body {
-    background: white !important;
-    margin: 0 !important;
-    padding: 0 !important;
-  }
-  
-  body * {
-    visibility: hidden;
-  }
-
-  .print-container, 
-  .print-container * {
-    visibility: visible;
-  }
-
-  .print-container {
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: 100% !important;
-    margin: 0 !important;
-    padding: 0 !important;
-  }
-
-  .a4-page {
-    width: 210mm !important;
-    height: 297mm !important;
-    margin: 0 !important;
-    box-shadow: none !important;
-    padding: 20mm !important;
-    border: none !important;
-  }
-
-  @page {
-    size: A4;
-    margin: 0;
-  }
-
-  .no-print {
-    display: none !important;
-  }
-
-  tr {
-    page-break-inside: avoid !important;
-  }
+  body { background: white !important; margin: 0 !important; padding: 0 !important; }
+  body * { visibility: hidden; }
+  .print-container, .print-container * { visibility: visible; }
+  .print-container { position: absolute; left: 0; top: 0; width: 100% !important; }
+  .a4-page { width: 210mm !important; height: auto !important; margin: 0 !important; padding: 20mm !important; border: none !important; box-shadow: none !important; }
+  @page { size: A4; margin: 0; }
+  .no-print { display: none !important; }
 }
 
-.preview-scroll::-webkit-scrollbar {
-  width: 10px;
-}
-.preview-scroll::-webkit-scrollbar-track {
-  background: rgba(0,0,0,0.1);
-}
-.preview-scroll::-webkit-scrollbar-thumb {
-  background: rgba(255,255,255,0.2);
-  border-radius: 5px;
-}
+.preview-scroll::-webkit-scrollbar { width: 8px; }
+.preview-scroll::-webkit-scrollbar-track { background: rgba(0,0,0,0.1); }
+.preview-scroll::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 4px; }

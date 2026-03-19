@@ -1,6 +1,5 @@
 import Database from 'better-sqlite3';
 import path from 'path';
-import fs from 'fs';
 
 const DB_PATH = process.env.NODE_ENV === 'production' 
   ? '/tmp/garage.db' 
@@ -12,7 +11,6 @@ const db = new Database(DB_PATH);
 db.pragma('journal_mode = WAL');
 db.pragma('synchronous = NORMAL');
 db.pragma('temp_store = MEMORY');
-db.pragma('mmap_size = 30000000000');
 
 db.exec(`
   CREATE TABLE IF NOT EXISTS customers (
@@ -129,53 +127,29 @@ db.exec(`
     FOREIGN KEY(jobSheetId) REFERENCES jobsheets(id)
   );
 
-  -- Indexes for Performance
   CREATE INDEX IF NOT EXISTS idx_vehicles_cust ON vehicles(customerId);
   CREATE INDEX IF NOT EXISTS idx_jobsheets_cust ON jobsheets(customerId);
-  CREATE INDEX IF NOT EXISTS idx_jobsheets_veh ON jobsheets(vehicleId);
   CREATE INDEX IF NOT EXISTS idx_items_js ON job_items(jobSheetId);
-  CREATE INDEX IF NOT EXISTS idx_items_pf ON job_items(proformaId);
-  CREATE INDEX IF NOT EXISTS idx_pf_js ON proformas(jobSheetId);
-  CREATE INDEX IF NOT EXISTS idx_pf_cust ON proformas(customerId);
-  CREATE INDEX IF NOT EXISTS idx_pf_veh ON proformas(vehicleId);
-  CREATE INDEX IF NOT EXISTS idx_inv_js ON invoices(jobSheetId);
-  CREATE INDEX IF NOT EXISTS idx_inv_pf ON invoices(proformaId);
-  CREATE INDEX IF NOT EXISTS idx_pay_inv ON payments(invoiceId);
-  CREATE INDEX IF NOT EXISTS idx_pay_pf ON payments(proformaId);
-  CREATE INDEX IF NOT EXISTS idx_exp_js ON expenses(jobSheetId);
-  CREATE INDEX IF NOT EXISTS idx_exp_pf ON expenses(proformaId);
-  CREATE INDEX IF NOT EXISTS idx_doc_cust ON documents(customerId);
-  CREATE INDEX IF NOT EXISTS idx_doc_js ON documents(jobSheetId);
 `);
 
-// Migration safety
-try { db.exec("ALTER TABLE customers ADD COLUMN tin TEXT;"); } catch (e) {}
-try { db.exec("ALTER TABLE proformas ADD COLUMN customerId INTEGER;"); } catch (e) {}
-try { db.exec("ALTER TABLE proformas ADD COLUMN vehicleId INTEGER;"); } catch (e) {}
-try { db.exec("ALTER TABLE job_items ADD COLUMN proformaId INTEGER;"); } catch (e) {}
-try { db.exec("ALTER TABLE expenses ADD COLUMN proformaId INTEGER;"); } catch (e) {}
-try { db.exec("ALTER TABLE payments ADD COLUMN proformaId INTEGER;"); } catch (e) {}
-
-const customerCount = db.prepare('SELECT count(*) as count FROM customers').get() as { count: number };
-if (customerCount.count === 0) {
-  db.prepare('INSERT INTO customers (name, phone, address, tin) VALUES (?, ?, ?, ?)').run('Baraka Joseph', '0712 000 000', 'Posta, Dar es Salaam', '123-456-789');
-  db.prepare('INSERT INTO vehicles (customerId, plateNumber, makeModel) VALUES (?, ?, ?)').run(1, 'T 123 ABC', 'Toyota Hilux');
-  db.prepare('INSERT INTO jobsheets (jobNo, customerId, vehicleId, complaint, status) VALUES (?, ?, ?, ?, ?)').run('JS-250001', 1, 1, 'Oil change and brake check', 'Draft');
-  db.prepare('INSERT INTO job_items (jobSheetId, type, description, qty, unitPrice, subtotal) VALUES (?, ?, ?, ?, ?, ?)').run(1, 'PART', 'Oil Filter', 1, 35000, 35000);
-  db.prepare('INSERT INTO job_items (jobSheetId, type, description, qty, unitPrice, subtotal) VALUES (?, ?, ?, ?, ?, ?)').run(1, 'LABOUR', 'General Service', 1, 50000, 50000);
-  
-  db.prepare('INSERT INTO settings (key, value) VALUES (?, ?)').run('garage_name', 'M. A. C. GARAGE');
-  db.prepare('INSERT INTO settings (key, value) VALUES (?, ?)').run('garage_mailbox', 'P.O. Box 7005, Arusha');
-  db.prepare('INSERT INTO settings (key, value) VALUES (?, ?)').run('garage_address', 'Arusha, Tanzania');
-  db.prepare('INSERT INTO settings (key, value) VALUES (?, ?)').run('garage_phone', '(+255) 754-349749');
-  db.prepare('INSERT INTO settings (key, value) VALUES (?, ?)').run('garage_tin', '108-133-805');
-  db.prepare('INSERT INTO settings (key, value) VALUES (?, ?)').run('bank_name', 'CRDB');
-  db.prepare('INSERT INTO settings (key, value) VALUES (?, ?)').run('bank_branch', 'TFA');
-  db.prepare('INSERT INTO settings (key, value) VALUES (?, ?)').run('bank_account_name', 'M. A. C. GARAGE');
-  db.prepare('INSERT INTO settings (key, value) VALUES (?, ?)').run('bank_account_number', '0150457890500');
-  db.prepare('INSERT INTO settings (key, value) VALUES (?, ?)').run('bank_swift', 'CORUTZTZ');
-  db.prepare('INSERT INTO settings (key, value) VALUES (?, ?)').run('tax_rate', '18');
-  db.prepare('INSERT INTO settings (key, value) VALUES (?, ?)').run('garage_terms', '1. Vehicle received for repair/service as per customer complaint.\n2. Garage is not responsible for loss of personal valuables left inside the vehicle.\n3. All repairs are subject to official approval and invoicing.\n4. Vehicles not collected within 48 hours after completion may attract storage charges.');
+// Seed initial settings if empty
+const settingsCount = db.prepare('SELECT count(*) as count FROM settings').get() as any;
+if (settingsCount.count === 0) {
+  const defaultSettings = [
+    ['garage_name', 'M. A. C. GARAGE'],
+    ['garage_mailbox', 'P.O. Box 7005, Arusha'],
+    ['garage_address', 'Arusha, Tanzania'],
+    ['garage_phone', '+255 754-349749'],
+    ['garage_tin', '108-133-805'],
+    ['tax_rate', '18'],
+    ['bank_name', 'CRDB'],
+    ['bank_account_name', 'M. A. C. GARAGE'],
+    ['bank_account_number', '0150457890500'],
+    ['bank_swift', 'CORUTZTZ'],
+    ['garage_terms', 'Standard repair conditions apply.']
+  ];
+  const insert = db.prepare('INSERT INTO settings (key, value) VALUES (?, ?)');
+  defaultSettings.forEach(([k, v]) => insert.run(k, v));
 }
 
 export default db;
