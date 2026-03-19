@@ -1,3 +1,4 @@
+
 'use server'
 
 import db from './db';
@@ -274,7 +275,7 @@ export const getRecentItems = cache(async () => {
 
 export const getRecentExpenses = cache(async () => {
   return db.prepare(`SELECT DISTINCT category, description, amount FROM expenses LIMIT 20`).all();
-} dramas);
+});
 
 export async function deleteDocument(id: number) {
   db.prepare('DELETE FROM documents WHERE id = ?').run(id);
@@ -289,4 +290,76 @@ export async function convertToInvoice(pfId: number) {
   db.prepare("UPDATE proformas SET status = 'Invoiced' WHERE id = ?").run(pfId);
   revalidatePath('/dashboard/invoices');
   redirect(`/dashboard/invoices/${info.lastInsertRowid}`);
+}
+
+export async function createProformaFromJob(jobId: number) {
+  const job = await getJobSheetById(jobId);
+  const proformaNo = `PF-${Date.now().toString().slice(-6)}`;
+  
+  const info = db.prepare(`
+    INSERT INTO proformas (proformaNo, jobSheetId, customerId, vehicleId, status)
+    VALUES (?, ?, ?, ?, ?)
+  `).run(proformaNo, jobId, job.customerId, job.vehicleId, 'Draft');
+  
+  revalidatePath(`/dashboard/jobsheets/${jobId}`);
+  return info.lastInsertRowid;
+}
+
+export async function createReportFromJob(jobId: number) {
+  const job = await getJobSheetById(jobId);
+  const docNo = `REP-${Date.now().toString().slice(-6)}`;
+  
+  const info = db.prepare(`
+    INSERT INTO documents (docType, docNo, customerId, jobSheetId, title, content)
+    VALUES (?, ?, ?, ?, ?, ?)
+  `).run('REPORT', docNo, job.customerId, jobId, `Inspection Report for ${job.vehiclePlate}`, job.complaint);
+  
+  revalidatePath(`/dashboard/jobsheets/${jobId}`);
+  return info.lastInsertRowid;
+}
+
+export async function saveProformaDraft(id: number) {
+  db.prepare("UPDATE proformas SET status = 'Draft' WHERE id = ?").run(id);
+  revalidatePath(`/dashboard/proformas/${id}`);
+}
+
+export async function createProformaDirect(formData: FormData) {
+  let customerId = formData.get('customerId') ? parseInt(formData.get('customerId') as string) : null;
+  const newCustomerName = formData.get('newCustomerName') as string;
+  const newCustomerPhone = formData.get('newCustomerPhone') as string;
+  const newCustomerAddress = formData.get('newCustomerAddress') as string;
+  const newCustomerTin = formData.get('newCustomerTin') as string;
+  
+  let vehicleId = formData.get('vehicleId') ? parseInt(formData.get('vehicleId') as string) : null;
+  const newVehiclePlate = formData.get('newVehiclePlate') as string;
+  const newVehicleModel = formData.get('newVehicleModel') as string;
+
+  if (!customerId && newCustomerName) {
+    const info = db.prepare('INSERT INTO customers (name, phone, address, tin) VALUES (?, ?, ?, ?)').run(newCustomerName, newCustomerPhone, newCustomerAddress, newCustomerTin);
+    customerId = info.lastInsertRowid as number;
+  }
+
+  if (!vehicleId && newVehiclePlate && customerId) {
+    const info = db.prepare('INSERT INTO vehicles (customerId, plateNumber, makeModel) VALUES (?, ?, ?)').run(customerId, newVehiclePlate, newVehicleModel);
+    vehicleId = info.lastInsertRowid as number;
+  }
+
+  const description = formData.get('description') as string;
+  const jobNo = `JS-${Date.now().toString().slice(-6)}`;
+  const proformaNo = `PF-${Date.now().toString().slice(-6)}`;
+
+  // Create Job Sheet first
+  const jobInfo = db.prepare(`
+    INSERT INTO jobsheets (jobNo, customerId, vehicleId, complaint, status)
+    VALUES (?, ?, ?, ?, ?)
+  `).run(jobNo, customerId, vehicleId, description, 'Draft');
+
+  // Create Proforma linked to Job Sheet
+  const pfInfo = db.prepare(`
+    INSERT INTO proformas (proformaNo, jobSheetId, customerId, vehicleId, status)
+    VALUES (?, ?, ?, ?, ?)
+  `).run(proformaNo, jobInfo.lastInsertRowid, customerId, vehicleId, 'Draft');
+
+  revalidatePath('/dashboard/proformas');
+  redirect(`/dashboard/proformas/${pfInfo.lastInsertRowid}`);
 }

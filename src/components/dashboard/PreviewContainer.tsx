@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { useState } from 'react';
@@ -38,7 +39,7 @@ export function PreviewContainer({
           </div>
           <div className="hidden sm:block">
             <h2 className="text-sm font-bold tracking-tight uppercase tracking-widest leading-none">{title}</h2>
-            <p className="text-[10px] text-white/40 mt-1 uppercase font-bold">Standard Viewport</p>
+            <p className="text-[10px] text-white/40 mt-1 uppercase font-bold">Standard A4 Format</p>
           </div>
         </div>
 
@@ -46,7 +47,7 @@ export function PreviewContainer({
           <Button variant="ghost" size="icon" onClick={handleZoomOut} className="h-8 w-8 text-white/70 hover:text-white">
             <ZoomOut className="h-4 w-4" />
           </Button>
-          <button onClick={handleResetZoom} className="px-2 text-[10px] font-bold min-w-[45px] hover:text-[#c10d12]">
+          <button onClick={handleResetZoom} className="px-2 text-[10px] font-bold min-w-[45px] hover:text-primary">
             {zoom}%
           </button>
           <Button variant="ghost" size="icon" onClick={handleZoomIn} className="h-8 w-8 text-white/70 hover:text-white">
@@ -58,7 +59,7 @@ export function PreviewContainer({
           <Button onClick={onDownload} variant="outline" className="h-10 border-white/20 bg-white/5 text-white text-xs font-bold hidden sm:flex">
             <Download className="mr-2 h-4 w-4" /> PDF
           </Button>
-          <Button onClick={onPrint} className="h-10 bg-[#c10d12] text-white hover:bg-[#a00b0f] text-xs font-bold">
+          <Button onClick={onPrint} className="h-10 bg-primary text-white hover:bg-red-700 text-xs font-bold">
             <Printer className="mr-2 h-4 w-4" /> PRINT
           </Button>
           <Button variant="ghost" size="icon" onClick={onClose} className="h-10 w-10 text-white/50 hover:text-white">
@@ -73,7 +74,8 @@ export function PreviewContainer({
           style={{ 
             transform: `scale(${scale})`,
             width: '210mm',
-            marginBottom: `${Math.max(20, (scale - 1) * 300)}mm`
+            // Ensure the container height reflects the scaled content so scrollbars work
+            marginBottom: `${Math.max(40, (scale - 1) * 500)}mm`
           }}
         >
           {children}

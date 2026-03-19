@@ -1,3 +1,4 @@
+
 'use client'
 
 import { cn } from '@/lib/utils';
@@ -36,7 +37,7 @@ export function ProformaDocument({ proforma, settings, className }: ProformaDocu
           )}
         </div>
         <div className="text-right flex flex-col justify-center">
-          <h1 className="text-2xl font-bold text-[#c10d12] uppercase leading-none tracking-tighter mb-1">
+          <h1 className="text-2xl font-bold text-primary uppercase leading-none tracking-tighter mb-1">
             {settings.garage_name}
           </h1>
           <div className="text-[10px] font-bold text-zinc-500 uppercase tracking-tight flex flex-col items-end">
@@ -47,7 +48,7 @@ export function ProformaDocument({ proforma, settings, className }: ProformaDocu
         </div>
       </div>
 
-      <div className="flex justify-between items-center mb-8 bg-[#c10d12] text-white p-4 rounded shadow-sm shrink-0">
+      <div className="flex justify-between items-center mb-8 bg-primary text-white p-4 rounded shadow-sm shrink-0">
         <h2 className="text-lg font-bold uppercase tracking-widest">PROFORMA INVOICE</h2>
         <div className="text-right">
           <p className="text-[10px] font-bold opacity-70 uppercase tracking-tighter leading-none">QUOTATION NUMBER</p>
@@ -118,7 +119,7 @@ export function ProformaDocument({ proforma, settings, className }: ProformaDocu
           )}
           <div className="pt-4 border-t-2 border-zinc-200 flex justify-between items-center mb-2">
             <span className="font-bold text-xs uppercase tracking-widest">Grand Total:</span>
-            <span className="font-bold text-2xl text-[#c10d12] whitespace-nowrap tracking-tighter">TZS {total.toLocaleString()}</span>
+            <span className="font-bold text-2xl text-primary whitespace-nowrap tracking-tighter">TZS {total.toLocaleString()}</span>
           </div>
           <div className="flex justify-between text-[10px] pt-2 text-green-700 font-bold border-t border-dashed border-zinc-300">
             <span>PAID TO DATE:</span>
