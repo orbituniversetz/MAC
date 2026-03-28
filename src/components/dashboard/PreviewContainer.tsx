@@ -39,7 +39,7 @@ export function PreviewContainer({
           </div>
           <div className="hidden sm:block">
             <h2 className="text-sm font-bold tracking-tight uppercase tracking-widest leading-none">{title}</h2>
-            <p className="text-[10px] text-white/40 mt-1 uppercase font-bold">Standard A4 Format</p>
+            <p className="text-[10px] text-white/40 mt-1 uppercase font-bold">A4 PREVIEW MODE</p>
           </div>
         </div>
 
@@ -68,13 +68,15 @@ export function PreviewContainer({
         </div>
       </div>
 
-      <div className="flex-1 overflow-auto preview-scroll bg-zinc-900/90 flex justify-center p-4 sm:p-12">
+      <div className="flex-1 overflow-auto preview-scroll bg-zinc-900/95 flex justify-center p-4 sm:p-12">
+        {/* Scroll Canvas: explicitly holds the scaled height */}
         <div 
           className="relative transition-transform duration-200 origin-top print-container h-fit"
           style={{ 
             transform: `scale(${scale})`,
             width: '210mm',
-            // Ensure the container height reflects the scaled content so scrollbars work
+            /* Ensures scrollbars work by pushing height footer */
+            paddingBottom: '40mm', 
             marginBottom: `${Math.max(40, (scale - 1) * 500)}mm`
           }}
         >

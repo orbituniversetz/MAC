@@ -93,7 +93,7 @@ export default async function JobSheetDetailPage({ params }: { params: Promise<{
         </div>
       </div>
 
-      {/* Uniform Large Viewable Preview */}
+      {/* Expanded Inline Preview Section */}
       <div className="max-w-6xl mx-auto space-y-6">
         <h3 className="font-bold text-lg text-zinc-500 uppercase tracking-widest px-4">Document Preview</h3>
         <div className="bg-gray-100 border rounded-2xl shadow-inner overflow-y-auto p-4 sm:p-12 flex justify-center min-h-[2000px]">
