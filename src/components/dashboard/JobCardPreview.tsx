@@ -23,7 +23,7 @@ export function JobCardPreview({ job, settings, mode }: JobCardPreviewProps) {
   }, []);
 
   const isInternal = mode === 'INTERNAL';
-  const docId = `jobcard-document-${isInternal ? 'internal' : 'customer'}`;
+  const docId = isInternal ? "jobcard-document-internal" : "jobcard-document-customer";
 
   const handlePrint = () => {
     window.print();
@@ -33,39 +33,43 @@ export function JobCardPreview({ job, settings, mode }: JobCardPreviewProps) {
     const element = document.getElementById(docId);
     if (!element) return;
 
-    const canvas = await html2canvas(element, {
-      scale: 2.0,
-      useCORS: true,
-      logging: false,
-      backgroundColor: '#ffffff'
-    });
-    
-    const imgData = canvas.toDataURL('image/jpeg', 0.85);
-    const pdf = new jsPDF({
-      orientation: 'portrait',
-      unit: 'mm',
-      format: 'a4',
-      compress: true
-    });
+    try {
+      const canvas = await html2canvas(element, {
+        scale: 2,
+        useCORS: true,
+        logging: false,
+        backgroundColor: '#ffffff',
+        windowWidth: element.scrollWidth,
+        windowHeight: element.scrollHeight
+      });
+      
+      const imgData = canvas.toDataURL('image/jpeg', 0.95);
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = pdf.internal.pageSize.getHeight();
+      const canvasWidth = canvas.width;
+      const canvasHeight = canvas.height;
+      
+      const imgHeightInPdf = (canvasHeight * pdfWidth) / canvasWidth;
+      let heightLeft = imgHeightInPdf;
+      let position = 0;
 
-    const pdfWidth = pdf.internal.pageSize.getWidth();
-    const pdfHeight = pdf.internal.pageSize.getHeight();
-    const pxToMm = 210 / (canvas.width / 2);
-    
-    const imgHeightInMm = canvas.height * pxToMm;
-    let heightLeft = imgHeightInMm;
-    let position = 0;
-
-    while (heightLeft > 0) {
-      pdf.addImage(imgData, 'JPEG', 0, -position, pdfWidth, imgHeightInMm, undefined, 'FAST');
+      pdf.addImage(imgData, 'JPEG', 0, position, pdfWidth, imgHeightInPdf, undefined, 'FAST');
       heightLeft -= pdfHeight;
-      position += pdfHeight;
-      if (heightLeft > 0) {
-        pdf.addPage();
-      }
-    }
 
-    pdf.save(`JOB CARD ${isInternal ? 'INTERNAL' : 'CUSTOMER'} ${job.jobNo}.pdf`);
+      while (heightLeft > 0) {
+        position = heightLeft - imgHeightInPdf;
+        pdf.addPage();
+        pdf.addImage(imgData, 'JPEG', 0, position, pdfWidth, imgHeightInPdf, undefined, 'FAST');
+        heightLeft -= pdfHeight;
+      }
+
+      const filename = `JOBCARD-${isInternal ? 'INTERNAL' : 'CUSTOMER'}-${job.jobNo}.pdf`;
+      pdf.save(filename);
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+    }
   };
 
   if (!mounted) return null;
