@@ -194,7 +194,7 @@ export const getInvoices = cache(async () => {
     SELECT i.*, js.jobNo, c.name as customerName 
     FROM invoices i
     LEFT JOIN jobsheets js ON i.jobSheetId = js.id
-    LEFT JOIN customers c ON i.id = c.id -- Simplified join for summary
+    LEFT JOIN customers c ON i.id = c.id
     ORDER BY i.createdAt DESC
   `).all();
 });
@@ -248,7 +248,7 @@ export const getDocumentById = cache(async (id: number) => {
     FROM documents d
     LEFT JOIN customers c ON d.customerId = c.id
     LEFT JOIN jobsheets js ON d.jobSheetId = js.id
-    LEFT JOIN vehicles v ON js.vehicleId = v.id -- Document can link via JS
+    LEFT JOIN vehicles v ON js.vehicleId = v.id
     WHERE d.id = ?
   `).get(id) as any;
 });
@@ -348,13 +348,11 @@ export async function createProformaDirect(formData: FormData) {
   const jobNo = `JS-${Date.now().toString().slice(-6)}`;
   const proformaNo = `PF-${Date.now().toString().slice(-6)}`;
 
-  // Create Job Sheet first
   const jobInfo = db.prepare(`
     INSERT INTO jobsheets (jobNo, customerId, vehicleId, complaint, status)
     VALUES (?, ?, ?, ?, ?)
   `).run(jobNo, customerId, vehicleId, description, 'Draft');
 
-  // Create Proforma linked to Job Sheet
   const pfInfo = db.prepare(`
     INSERT INTO proformas (proformaNo, jobSheetId, customerId, vehicleId, status)
     VALUES (?, ?, ?, ?, ?)
