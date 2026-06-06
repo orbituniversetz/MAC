@@ -1,4 +1,3 @@
-
 'use client';
 
 import React, { useState } from 'react';
@@ -32,6 +31,7 @@ export function PreviewContainer({
 
   return (
     <div className="fixed inset-0 z-[9999] flex flex-col bg-zinc-950 no-print">
+      {/* Dynamic Toolbar */}
       <div className="flex h-16 w-full items-center justify-between border-b border-white/10 bg-zinc-900 px-6 text-white shadow-2xl shrink-0">
         <div className="flex items-center gap-3">
           <div className="p-2 bg-zinc-800 rounded-lg">
@@ -39,15 +39,16 @@ export function PreviewContainer({
           </div>
           <div className="hidden sm:block">
             <h2 className="text-sm font-bold tracking-tight uppercase tracking-widest leading-none">{title}</h2>
-            <p className="text-[10px] text-white/40 mt-1 uppercase font-bold">Standard A4 Format</p>
+            <p className="text-[10px] text-white/40 mt-1 uppercase font-bold">Export Ready A4 Protocol</p>
           </div>
         </div>
 
+        {/* Zoom Controls */}
         <div className="flex items-center gap-1 bg-zinc-800 p-1 rounded-lg border border-white/5 mx-4">
           <Button variant="ghost" size="icon" onClick={handleZoomOut} className="h-8 w-8 text-white/70 hover:text-white">
             <ZoomOut className="h-4 w-4" />
           </Button>
-          <button onClick={handleResetZoom} className="px-2 text-[10px] font-bold min-w-[45px] hover:text-primary">
+          <button onClick={handleResetZoom} className="px-2 text-[10px] font-bold min-w-[45px] hover:text-primary transition-colors">
             {zoom}%
           </button>
           <Button variant="ghost" size="icon" onClick={handleZoomIn} className="h-8 w-8 text-white/70 hover:text-white">
@@ -55,9 +56,10 @@ export function PreviewContainer({
           </Button>
         </div>
 
+        {/* Actions */}
         <div className="flex items-center gap-3">
-          <Button onClick={onDownload} variant="outline" className="h-10 border-white/20 bg-white/5 text-white text-xs font-bold hidden sm:flex">
-            <Download className="mr-2 h-4 w-4" /> PDF
+          <Button onClick={onDownload} variant="outline" className="h-10 border-white/20 bg-white/5 text-white text-xs font-bold hidden sm:flex hover:bg-white/10">
+            <Download className="mr-2 h-4 w-4" /> EXPORT PDF
           </Button>
           <Button onClick={onPrint} className="h-10 bg-primary text-white hover:bg-red-700 text-xs font-bold">
             <Printer className="mr-2 h-4 w-4" /> PRINT
@@ -68,14 +70,16 @@ export function PreviewContainer({
         </div>
       </div>
 
+      {/* Optimized Scroll Viewport */}
       <div className="flex-1 overflow-auto preview-scroll bg-zinc-900/95 flex justify-center p-4 sm:p-12">
         <div 
-          className="relative transition-transform duration-200 origin-top print-container"
+          className="relative transition-transform duration-200 origin-top print-container shadow-2xl"
           style={{ 
             transform: `scale(${scale})`,
             width: '210mm',
             height: 'fit-content',
             paddingBottom: '40mm', 
+            // Ensures the scroll height reflects the visually scaled size
             marginBottom: `${Math.max(40, (scale - 1) * 1000)}px`
           }}
         >

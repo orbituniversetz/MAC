@@ -55,9 +55,11 @@ export function JobCardPreview({ job, settings, mode }: JobCardPreviewProps) {
       let heightLeft = imgHeightInPdf;
       let position = 0;
 
+      // Add first page
       pdf.addImage(imgData, 'JPEG', 0, position, pdfWidth, imgHeightInPdf, undefined, 'FAST');
       heightLeft -= pdfHeight;
 
+      // Add additional pages if content overflows A4 height
       while (heightLeft > 0) {
         position = heightLeft - imgHeightInPdf;
         pdf.addPage();
