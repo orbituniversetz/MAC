@@ -1,7 +1,9 @@
 
 import { SidebarNav } from '@/components/dashboard/SidebarNav';
 import { getSettings } from '@/lib/actions';
-import { cn } from '@/lib/utils';
+
+// Ensure the dashboard is always rendered dynamically to avoid build-time database access
+export const dynamic = 'force-dynamic';
 
 export default async function DashboardLayout({
   children,

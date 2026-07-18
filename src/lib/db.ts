@@ -1,11 +1,34 @@
+
 import Database from 'better-sqlite3';
 import path from 'path';
+import fs from 'fs';
+import os from 'os';
 
-const DB_PATH = process.env.NODE_ENV === 'production' 
-  ? '/tmp/garage.db' 
-  : path.join(process.cwd(), 'garage.db');
+// Determine the database path
+// In production (Electron), we store it in a persistent folder in the user's home directory
+// During build/dev, we use the project root
+const isProd = process.env.NODE_ENV === 'production';
+const dbName = 'garage.db';
 
-const db = new Database(DB_PATH);
+let dbPath;
+
+if (isProd) {
+  // For Windows/Linux compatibility in production, use a folder in home directory
+  const dataDir = path.join(os.homedir(), '.garageflow_desk');
+  if (!fs.existsSync(dataDir)) {
+    try {
+      fs.mkdirSync(dataDir, { recursive: true });
+    } catch (e) {
+      // Fallback to current directory if home dir is not writable
+      dbPath = path.join(process.cwd(), dbName);
+    }
+  }
+  dbPath = path.join(dataDir, dbName);
+} else {
+  dbPath = path.join(process.cwd(), dbName);
+}
+
+const db = new Database(dbPath);
 
 // Performance Optimizations
 db.pragma('journal_mode = WAL');
@@ -80,6 +103,7 @@ db.exec(`
     status TEXT DEFAULT 'Unpaid',
     snapshotJson TEXT,
     createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
+    customerId INTEGER,
     FOREIGN KEY(jobSheetId) REFERENCES jobsheets(id),
     FOREIGN KEY(proformaId) REFERENCES proformas(id)
   );
