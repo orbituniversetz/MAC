@@ -32,13 +32,13 @@ if (isElectron) {
 }
 
 // Ensure the directory exists before attempting to open the database
-const dbDir = path.dirname(dbPath);
-if (!fs.existsSync(dbDir)) {
-  try {
+try {
+  const dbDir = path.dirname(dbPath);
+  if (!fs.existsSync(dbDir)) {
     fs.mkdirSync(dbDir, { recursive: true });
-  } catch (e) {
-    console.error('Could not create DB directory:', e);
   }
+} catch (e) {
+  console.error('Could not ensure DB directory:', e);
 }
 
 const db = new Database(dbPath);
