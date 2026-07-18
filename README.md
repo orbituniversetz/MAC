@@ -8,7 +8,23 @@ A professional, offline-first Garage Management System designed for automotive r
 - **Proformas**: High-fidelity quotations with automated VAT and discount handling.
 - **Invoices**: One-click generation of official Tax Invoices from paid quotations.
 - **Expenses**: Link costs directly to jobs for accurate Net Profit (P&L) tracking.
-- **Document Engine**: Export A4 PDFs for Job Cards, Invoices, and Technical Reports.
+- **Document Engine**: Export A4 PDFs for Job Cards, Invoices, and Technical Reports with staple-friendly margins.
+
+## GitHub Auto-Updates (Advanced)
+
+To enable the app to "fetch for updates" from GitHub:
+
+1. **GitHub Setup**: 
+   - Upload your source code to a GitHub repository.
+   - Edit `package.json` and replace `YOUR_GITHUB_USERNAME` and `YOUR_REPO_NAME` with your actual details.
+2. **Build Token**:
+   - Create a [GitHub Personal Access Token](https://github.com/settings/tokens) with `repo` scope.
+   - Set it as an environment variable `GH_TOKEN` on your build machine.
+3. **Release**:
+   - Run `npm run dist`.
+   - Upload the generated `.exe` and `latest.yml` from the `dist` folder to a new **GitHub Release**.
+4. **Automatic Fetch**: 
+   - The app is configured in `electron-main.js` to automatically check GitHub for newer versions on startup and prompt the user to install.
 
 ## Moving from Mac to Windows
 

@@ -1,7 +1,7 @@
-
-const { app, BrowserWindow } = require('electron');
+const { app, BrowserWindow, dialog } = require('electron');
 const { spawn } = require('child_process');
 const path = require('path');
+const { autoUpdater } = require('electron-updater');
 
 let mainWindow;
 let nextProcess;
@@ -22,11 +22,37 @@ function createWindow() {
   mainWindow.on('closed', () => {
     mainWindow = null;
   });
+
+  // Check for updates once the window is ready
+  mainWindow.once('ready-to-show', () => {
+    autoUpdater.checkForUpdatesAndNotify();
+  });
 }
+
+// Auto-updater events
+autoUpdater.on('update-available', () => {
+  dialog.showMessageBox({
+    type: 'info',
+    title: 'Update Available',
+    message: 'A new version of GarageFlow Desk is available. Downloading now...',
+  });
+});
+
+autoUpdater.on('update-downloaded', () => {
+  dialog.showMessageBox({
+    type: 'info',
+    title: 'Update Ready',
+    message: 'The new version has been downloaded. Restart the application to apply the updates.',
+    buttons: ['Restart', 'Later']
+  }).then((result) => {
+    if (result.response === 0) {
+      autoUpdater.quitAndInstall();
+    }
+  });
+});
 
 app.on('ready', () => {
   // Start the Next.js production server
-  // Note: npm must be installed on the machine building/running this
   nextProcess = spawn('npm', ['run', 'start'], {
     shell: true,
     env: { ...process.env, NODE_ENV: 'production' }

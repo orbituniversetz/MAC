@@ -45,11 +45,12 @@
     "@radix-ui/react-toast": "^1.2.0",
     "@radix-ui/react-tooltip": "^1.1.0",
     "recharts": "^2.12.7",
-    "embla-carousel-react": "^8.1.3"
+    "embla-carousel-react": "^8.1.3",
+    "electron-updater": "6.1.7"
   },
   "devDependencies": {
     "electron": "^31.0.0",
-    "electron-builder": "^24.13.3",
+    "electron-builder": "24.13.3",
     "tailwindcss": "^3.4.1",
     "typescript": "^5",
     "@types/node": "^20",
@@ -59,6 +60,13 @@
   "build": {
     "appId": "com.garageflow.desk",
     "productName": "GarageFlow Desk",
+    "publish": [
+      {
+        "provider": "github",
+        "owner": "YOUR_GITHUB_USERNAME",
+        "repo": "YOUR_REPO_NAME"
+      }
+    ],
     "directories": {
       "output": "dist"
     },
