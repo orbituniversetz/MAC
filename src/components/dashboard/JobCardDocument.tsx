@@ -1,4 +1,3 @@
-
 'use client'
 
 import { cn } from '@/lib/utils';
@@ -43,201 +42,175 @@ export function JobCardDocument({ job, settings, isInternal = false, className }
           )}
         </div>
         <div className="text-right flex flex-col justify-center">
-          <h1 className="text-2xl font-black text-[#c10d12] uppercase leading-none tracking-tighter mb-1">{settings.garage_name}</h1>
+          <h1 className="text-2xl font-bold text-[#c10d12] uppercase leading-none tracking-tighter mb-1">{settings.garage_name}</h1>
           <div className="text-[10px] text-zinc-500 font-bold leading-tight uppercase tracking-tight flex flex-col items-end">
             <p>{settings.garage_mailbox}</p>
             <p>{settings.garage_address}</p>
-            <p className="text-zinc-800 font-black">TEL: {settings.garage_phone} | TIN: {settings.garage_tin}</p>
+            <p className="text-zinc-800 font-bold">TEL: {settings.garage_phone} | TIN: {settings.garage_tin}</p>
           </div>
         </div>
       </div>
 
-      {/* Title Bar */}
-      <div className="flex justify-between items-center mb-6 bg-zinc-950 text-white p-3 rounded shadow-sm shrink-0">
+      {/* Title Bar - Arranged like Invoice banner */}
+      <div className="flex justify-between items-center mb-8 bg-zinc-950 text-white p-4 rounded shadow-sm shrink-0">
         <div className="flex items-center gap-3">
-          {isInternal ? <ShieldCheck className="h-4 w-4 text-blue-400" /> : <User className="h-4 w-4 text-red-400" />}
-          <h2 className="text-xs font-bold uppercase tracking-widest">
-            {isInternal ? 'Internal Management Copy' : 'Customer Copy – Vehicle Receipt'}
+          {isInternal ? <ShieldCheck className="h-5 w-5 text-blue-400" /> : <User className="h-5 w-5 text-red-400" />}
+          <h2 className="text-lg font-bold uppercase tracking-widest">
+            {isInternal ? 'INTERNAL MANAGEMENT COPY' : 'VEHICLE JOB CARD'}
           </h2>
         </div>
         <div className="text-right">
-          <p className="text-[8px] font-bold opacity-70 leading-none mb-1 uppercase tracking-widest">JOB NUMBER</p>
-          <p className="text-lg font-black leading-none tracking-tighter">{job.jobNo}</p>
+          <p className="text-[9px] font-bold uppercase tracking-widest opacity-70 leading-none">JOB NUMBER</p>
+          <p className="text-xl font-bold leading-none tracking-tighter">{job.jobNo}</p>
         </div>
       </div>
 
-      {/* Info Grid */}
-      <div className="grid grid-cols-2 gap-8 mb-6 shrink-0">
-        <div className="space-y-4">
-          <div>
-            <h3 className="text-[9px] font-black text-zinc-400 uppercase tracking-widest mb-1">Customer Details</h3>
-            <p className="font-black text-base text-zinc-900 leading-tight">{job.customerName}</p>
-            <p className="text-xs font-bold text-zinc-600">{job.customerPhone}</p>
-            <p className="text-[10px] text-zinc-500 italic">{job.customerAddress || 'Address not registered'}</p>
-            {job.customerTin && <p className="text-[9px] font-black mt-1 bg-zinc-100 px-2 py-0.5 rounded-full inline-block">TIN: {job.customerTin}</p>}
-          </div>
-          <div>
-            <h3 className="text-[9px] font-black text-zinc-400 uppercase tracking-widest mb-1">Date Received</h3>
-            <p className="text-xs font-bold">{new Date(job.openedAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}</p>
+      {/* Info Grid - Arranged like Invoice Billing/Vehicle Grid */}
+      <div className="grid grid-cols-2 gap-12 mb-8 shrink-0">
+        <div>
+          <h3 className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest mb-3">Customer Billing Info</h3>
+          <div className="space-y-1">
+            <p className="font-bold text-lg text-zinc-900 leading-tight">{job.customerName}</p>
+            <p className="text-sm font-medium text-zinc-600">{job.customerAddress || 'No Address Registered'}</p>
+            <p className="text-xs font-bold bg-zinc-100 px-2 py-0.5 rounded-full inline-block mt-1">TIN: {job.customerTin || 'N/A'}</p>
+            <p className="text-sm font-medium text-zinc-600">Tel: {job.customerPhone}</p>
+            <p className="text-[10px] font-bold text-zinc-400 mt-2">DATE RECEIVED: {new Date(job.openedAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}</p>
           </div>
         </div>
         
-        <div className="bg-zinc-50 p-4 rounded-xl border border-zinc-100 flex flex-col justify-center">
-          <h3 className="text-[9px] font-black text-zinc-400 uppercase tracking-widest mb-2">Vehicle Reference</h3>
-          <div className="flex items-start justify-between">
-            <div>
-              <p className="text-xl font-black text-zinc-900 tracking-tighter leading-none mb-1">{job.vehiclePlate}</p>
-              <p className="text-xs font-bold text-zinc-600 uppercase tracking-tight">{job.vehicleModel}</p>
+        <div className="bg-zinc-50 p-5 rounded-2xl border border-zinc-100 flex flex-col justify-center">
+          <h3 className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest mb-3">Vehicle Details</h3>
+          <div className="space-y-2 text-sm">
+            <p><span className="font-bold text-zinc-400 uppercase text-[9px] tracking-widest w-24 inline-block">Registration:</span> <span className="font-bold text-zinc-900">{job.vehiclePlate}</span></p>
+            <p><span className="font-bold text-zinc-400 uppercase text-[9px] tracking-widest w-24 inline-block">Make/Model:</span> <span className="font-medium text-zinc-700">{job.vehicleModel}</span></p>
+            <div className="pt-3 mt-1 border-t border-zinc-200">
+              <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest mb-1">Work Requested</p>
+              <p className="text-xs text-zinc-800 italic leading-snug">"{job.complaint || 'General mechanical inspection and service.'}"</p>
             </div>
-            <Wrench className="h-8 w-8 text-zinc-200" />
           </div>
-        </div>
-      </div>
-
-      {/* Complaint Section */}
-      <div className="mb-6 shrink-0">
-        <h3 className="text-[9px] font-black text-zinc-400 uppercase tracking-widest mb-2 flex items-center gap-2">
-          <div className="w-1.5 h-1.5 rounded-full bg-[#c10d12]" />
-          Work Requested / Complaint
-        </h3>
-        <div className="p-4 border-2 border-dashed border-zinc-100 rounded-xl min-h-[60px] bg-white text-[13px] text-zinc-800 leading-relaxed italic">
-          {job.complaint || 'General mechanical inspection and service.'}
         </div>
       </div>
 
       {isInternal && job.mechanicNotes && (
         <div className="mb-6 bg-blue-50/50 p-4 rounded-xl border border-blue-100 shrink-0">
-          <h3 className="text-[9px] font-black text-blue-400 uppercase tracking-widest mb-1">Internal Technician Notes</h3>
+          <h3 className="text-[9px] font-bold text-blue-400 uppercase tracking-widest mb-1">Internal Technician Notes</h3>
           <p className="text-xs text-blue-900 leading-relaxed font-medium">{job.mechanicNotes}</p>
         </div>
       )}
 
-      {/* Dynamic Content area that expands - Now visible for both customer and internal */}
+      {/* Dynamic Content area */}
       <div className="space-y-8 mb-8">
         <div>
-          <h3 className="text-[9px] font-black text-zinc-400 uppercase tracking-widest mb-2 text-center">
-            {isInternal ? 'Parts & Labour Income' : 'Service & Repair Summary'}
-          </h3>
-          <table className="w-full text-xs">
+          <table className="w-full border-collapse">
             <thead>
-              <tr className="border-b-2 border-zinc-900 bg-zinc-50">
-                <th className="py-2 text-left px-2">Description</th>
-                <th className="py-2 text-center w-20 px-2">Type</th>
-                <th className="py-2 text-center w-12 px-2">Qty</th>
-                <th className="py-2 text-right w-28 px-2">Total</th>
+              <tr className="bg-zinc-900 text-white">
+                <th className="p-3 text-left text-[10px] font-bold uppercase">Service / Part Description</th>
+                <th className="p-3 text-center text-[10px] font-bold uppercase w-16">Qty</th>
+                <th className="p-3 text-center text-[10px] font-bold uppercase w-24">Type</th>
+                <th className="p-3 text-right text-[10px] font-bold uppercase w-32">Total (TZS)</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-zinc-100">
               {job.items?.map((item: any) => (
-                <tr key={item.id}>
-                  <td className="py-2 font-bold uppercase text-zinc-900 px-2">{item.description}</td>
-                  <td className="py-2 text-center px-2">
-                    <span className="bg-zinc-100 px-1.5 py-0.5 rounded text-[8px] font-black text-zinc-500 uppercase">{item.type}</span>
+                <tr key={item.id} className="text-xs">
+                  <td className="p-3.5 font-bold text-zinc-900 uppercase tracking-tight">{item.description}</td>
+                  <td className="p-3.5 text-center text-zinc-800">{item.qty}</td>
+                  <td className="p-3.5 text-center">
+                    <span className="bg-zinc-100 px-2 py-0.5 rounded text-[8px] font-bold text-zinc-500 uppercase">{item.type}</span>
                   </td>
-                  <td className="py-2 text-center font-bold px-2">{item.qty}</td>
-                  <td className="py-2 text-right font-black px-2 whitespace-nowrap">TZS {item.subtotal.toLocaleString()}</td>
+                  <td className="p-3.5 text-right font-bold whitespace-nowrap text-zinc-900">{item.subtotal.toLocaleString()}</td>
                 </tr>
               ))}
               {(!job.items || job.items.length === 0) && (
                 <tr>
-                  <td colSpan={4} className="py-8 text-center text-zinc-400 italic">No repair items recorded.</td>
+                  <td colSpan={4} className="py-12 text-center text-zinc-400 italic text-sm">No repair items recorded yet.</td>
                 </tr>
               )}
             </tbody>
-            <tfoot>
-              <tr className="border-t-2 border-zinc-900 bg-zinc-50 font-black">
-                <td colSpan={3} className="py-2 text-right uppercase text-[9px] px-2 tracking-widest">Gross Total:</td>
-                <td className="py-2 text-right px-2 whitespace-nowrap">TZS {totalIncome.toLocaleString()}</td>
-              </tr>
-            </tfoot>
           </table>
         </div>
 
-        {/* Expenses and Profitability - INTERNAL ONLY */}
+        {/* Expenses and Profitability - INTERNAL ONLY - Arranged like Invoice Totals Box */}
         {isInternal && (
-          <>
+          <div className="grid grid-cols-2 gap-12">
             <div>
-              <h3 className="text-[9px] font-black text-red-400 uppercase tracking-widest mb-2 text-center">
-                Actual Job Expenses (Costs)
-              </h3>
-              <table className="w-full text-xs">
+              <h3 className="text-[10px] font-bold text-red-400 uppercase tracking-widest mb-3">Actual Job Expenses (Costs)</h3>
+              <table className="w-full text-[11px] border-collapse">
                 <thead>
-                  <tr className="border-red-900 bg-red-50 border-b-2">
-                    <th className="py-2 text-left px-2">Description</th>
-                    <th className="py-2 text-center w-24 px-2">Category</th>
-                    <th className="py-2 text-right w-28 px-2">Amount</th>
+                  <tr className="border-b border-red-100 bg-red-50/50">
+                    <th className="py-2 text-left px-2 text-[9px] uppercase text-red-800">Description</th>
+                    <th className="py-2 text-right px-2 text-[9px] uppercase text-red-800">Amount</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-red-100">
+                <tbody className="divide-y divide-red-50">
                   {job.expenses?.map((exp: any) => (
                     <tr key={exp.id}>
-                      <td className="py-2 font-bold text-zinc-900 px-2 uppercase">{exp.description}</td>
-                      <td className="py-2 text-center px-2">
-                        <span className="bg-red-100 px-1.5 py-0.5 rounded text-[8px] font-black text-red-500 uppercase">{exp.category}</span>
-                      </td>
-                      <td className="py-2 text-right font-black px-2 whitespace-nowrap text-red-600">TZS {exp.amount.toLocaleString()}</td>
+                      <td className="py-1.5 font-medium text-zinc-800 px-2 uppercase">{exp.description}</td>
+                      <td className="py-1.5 text-right font-bold px-2 text-red-600">{exp.amount.toLocaleString()}</td>
                     </tr>
                   ))}
                 </tbody>
-                <tfoot>
-                  <tr className="border-t-2 border-red-900 bg-red-50 font-black">
-                    <td colSpan={2} className="py-2 text-right uppercase text-[9px] px-2 tracking-widest text-red-900">Total Costs:</td>
-                    <td className="py-2 text-right px-2 whitespace-nowrap text-red-600">TZS {totalExpenses.toLocaleString()}</td>
-                  </tr>
-                </tfoot>
               </table>
             </div>
 
-            <div className="flex justify-end pt-2">
+            <div className="flex justify-end">
               <div className={cn(
-                "border-2 p-4 rounded-2xl min-w-[280px]",
-                isProfit ? 'border-green-600 bg-green-50' : 'border-red-600 bg-red-50'
+                "w-72 space-y-2 p-6 rounded-3xl border shadow-sm",
+                isProfit ? 'bg-green-50 border-green-100' : 'bg-red-50 border-red-100'
               )}>
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-[9px] font-black uppercase tracking-widest text-zinc-500">Net Profitability</span>
-                  {isProfit ? <TrendingUp className="h-5 w-5 text-green-600" /> : <TrendingDown className="h-5 w-5 text-red-600" />}
+                <div className="flex justify-between text-xs font-bold uppercase tracking-tight text-zinc-500">
+                  <span>Gross Income:</span>
+                  <span>{totalIncome.toLocaleString()}</span>
                 </div>
-                <div className="flex justify-between items-center font-black">
-                  <span className="text-[10px] uppercase">Net {isProfit ? 'Profit' : 'Loss'}:</span>
-                  <span className={cn("text-xl whitespace-nowrap", isProfit ? 'text-green-700' : 'text-red-700')}>
+                <div className="flex justify-between text-xs font-bold uppercase tracking-tight text-red-600">
+                  <span>Total Costs:</span>
+                  <span>({totalExpenses.toLocaleString()})</span>
+                </div>
+                <div className={cn(
+                  "pt-4 border-t-2 flex justify-between items-center",
+                  isProfit ? 'border-green-200' : 'border-red-200'
+                )}>
+                  <span className="font-bold text-xs uppercase tracking-widest">Net {isProfit ? 'Profit' : 'Loss'}:</span>
+                  <span className={cn(
+                    "font-bold text-2xl tracking-tighter",
+                    isProfit ? 'text-green-700' : 'text-red-700'
+                  )}>
                     TZS {Math.abs(netProfit).toLocaleString()}
                   </span>
                 </div>
               </div>
             </div>
-          </>
+          </div>
         )}
       </div>
 
-      {/* Footer Area - Pushed to bottom of content */}
+      {/* Footer Area */}
       <div className="mt-auto pt-8 border-t border-zinc-100">
-        <div className="mb-6 p-4 bg-zinc-50 rounded-xl border border-zinc-100 shrink-0">
-          <h3 className="text-[9px] font-black text-zinc-400 uppercase tracking-widest mb-2">Terms and Conditions</h3>
-          <div className="text-[9px] text-zinc-600 whitespace-pre-wrap italic leading-relaxed font-medium">
-            {settings.garage_terms || 'Standard repair conditions apply. All parts installed remain property of the garage until fully settled.'}
-          </div>
-        </div>
-
-        <div className={cn("grid grid-cols-2 gap-12 shrink-0", !isInternal && "mt-0")}>
-          <div className="space-y-4">
-            <div className="border-t border-zinc-200 pt-2">
-              <p className="text-[8px] font-black uppercase tracking-widest text-zinc-400 mb-1">
-                {isInternal ? 'Mechanic/Supervisor' : 'Garage Representative'}
-              </p>
-              <p className="text-xs font-black uppercase text-zinc-900">{settings.garage_name}</p>
+        <div className="grid grid-cols-2 gap-12">
+          <div className="p-5 bg-zinc-50 rounded-2xl border border-zinc-100 shadow-sm">
+            <h3 className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest mb-2">Terms and Conditions</h3>
+            <div className="text-[9px] text-zinc-500 whitespace-pre-wrap italic leading-relaxed font-medium">
+              {settings.garage_terms || 'Standard repair conditions apply. All parts installed remain property of the garage until fully settled.'}
             </div>
           </div>
-          <div className="space-y-4">
-            <div className="border-t border-zinc-200 pt-2">
-              <p className="text-[8px] font-black uppercase tracking-widest text-zinc-400 mb-1">
-                {isInternal ? 'Admin Approval' : 'Customer Signature'}
-              </p>
-              <p className="text-[10px] text-zinc-500 italic leading-snug font-bold">
-                {isInternal 
-                  ? 'I verify the work and internal costs recorded.'
-                  : 'I authorize the repair work and agree to terms.'}
-              </p>
+          <div className="flex flex-col justify-end space-y-6">
+            <div className="grid grid-cols-2 gap-8">
+              <div className="text-center space-y-2">
+                <div className="h-10 border-b border-zinc-300 opacity-50"></div>
+                <p className="text-[9px] font-bold uppercase tracking-widest text-zinc-400">
+                  {isInternal ? 'Supervisor' : 'Garage Rep'}
+                </p>
+              </div>
+              <div className="text-center space-y-2">
+                <div className="h-10 border-b border-zinc-300 opacity-50"></div>
+                <p className="text-[9px] font-bold uppercase tracking-widest text-zinc-400">
+                  {isInternal ? 'Admin Approval' : 'Customer'}
+                </p>
+              </div>
             </div>
+            <p className="text-[10px] text-center text-zinc-900 uppercase font-bold tracking-widest">
+              {settings.garage_name} Management
+            </p>
           </div>
         </div>
       </div>
