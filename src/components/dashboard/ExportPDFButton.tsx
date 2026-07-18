@@ -29,20 +29,30 @@ export function ExportPDFButton({ targetId, filename }: ExportPDFButtonProps) {
 
     setIsExporting(true);
     try {
+      // Standard A4 dimensions in mm: 210 x 297
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = pdf.internal.pageSize.getHeight();
+
       const canvas = await html2canvas(element, {
-        scale: 2,
+        scale: 2, // 300 DPI equivalent
         useCORS: true,
         logging: false,
         backgroundColor: '#ffffff',
-        windowWidth: element.scrollWidth,
-        windowHeight: element.scrollHeight
+        width: element.scrollWidth,
+        height: element.scrollHeight,
+        onclone: (clonedDoc) => {
+          const clonedElement = clonedDoc.getElementById(targetId);
+          if (clonedElement) {
+            // Strip UI effects for clean PDF output
+            clonedElement.style.transform = 'none';
+            clonedElement.style.boxShadow = 'none';
+            clonedElement.style.margin = '0';
+          }
+        }
       });
       
-      const imgData = canvas.toDataURL('image/jpeg', 0.95);
-      const pdf = new jsPDF('p', 'mm', 'a4');
-      
-      const pdfWidth = pdf.internal.pageSize.getWidth();
-      const pdfHeight = pdf.internal.pageSize.getHeight();
+      const imgData = canvas.toDataURL('image/jpeg', 0.98);
       const canvasWidth = canvas.width;
       const canvasHeight = canvas.height;
       
@@ -50,11 +60,12 @@ export function ExportPDFButton({ targetId, filename }: ExportPDFButtonProps) {
       let heightLeft = imgHeightInPdf;
       let position = 0;
 
-      // Add first page
+      // Page 1
       pdf.addImage(imgData, 'JPEG', 0, position, pdfWidth, imgHeightInPdf, undefined, 'FAST');
       heightLeft -= pdfHeight;
 
-      // Multi-page logic with threshold to avoid blank second pages
+      // Add remaining pages if content overflows A4 height
+      // Threshold of 2mm to avoid tiny blank pages
       while (heightLeft > 2) {
         position = heightLeft - imgHeightInPdf;
         pdf.addPage();
@@ -66,14 +77,14 @@ export function ExportPDFButton({ targetId, filename }: ExportPDFButtonProps) {
       
       toast({
         title: "Export Successful",
-        description: "Your PDF has been generated and downloaded."
+        description: "Your A4 PDF has been generated and downloaded."
       });
     } catch (error) {
       console.error('Error generating PDF:', error);
       toast({
         variant: "destructive",
         title: "Export Failed",
-        description: "There was an error generating the PDF."
+        description: "There was an error generating the A4 PDF."
       });
     } finally {
       setIsExporting(false);

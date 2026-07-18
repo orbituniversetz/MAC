@@ -42,13 +42,13 @@ export function PreviewContainer({
 
     setIsExporting(true);
     try {
-      // Create PDF at A4 dimensions
+      // Standard A4 dimensions (210mm x 297mm)
       const pdf = new jsPDF('p', 'mm', 'a4');
       const pdfWidth = pdf.internal.pageSize.getWidth();
       const pdfHeight = pdf.internal.pageSize.getHeight();
 
       const canvas = await html2canvas(element, {
-        scale: 2, // High resolution (300dpi equivalent)
+        scale: 2, // High-fidelity capture
         useCORS: true,
         logging: false,
         backgroundColor: '#ffffff',
@@ -57,6 +57,7 @@ export function PreviewContainer({
         onclone: (clonedDoc) => {
           const clonedElement = clonedDoc.getElementById(documentId);
           if (clonedElement) {
+            // Strip CSS effects that would look weird in a flattened PDF
             clonedElement.style.transform = 'none';
             clonedElement.style.boxShadow = 'none';
             clonedElement.style.margin = '0';
@@ -72,12 +73,12 @@ export function PreviewContainer({
       let heightLeft = imgHeightInPdf;
       let position = 0;
 
-      // Page 1
+      // Add Page 1
       pdf.addImage(imgData, 'JPEG', 0, position, pdfWidth, imgHeightInPdf, undefined, 'FAST');
       heightLeft -= pdfHeight;
 
-      // Paging loop with a 5mm threshold to ignore minor overflow/margins
-      while (heightLeft > 5) {
+      // Paging loop with a 2mm threshold to avoid blank/tiny sliver pages
+      while (heightLeft > 2) {
         position = heightLeft - imgHeightInPdf;
         pdf.addPage();
         pdf.addImage(imgData, 'JPEG', 0, position, pdfWidth, imgHeightInPdf, undefined, 'FAST');
@@ -85,10 +86,10 @@ export function PreviewContainer({
       }
 
       pdf.save(`${filename}.pdf`);
-      toast({ title: "Export Success", description: "Document exactly as previewed saved as PDF." });
+      toast({ title: "Export Success", description: "Document exactly as previewed saved as A4 PDF." });
     } catch (error) {
       console.error('PDF Error:', error);
-      toast({ variant: "destructive", title: "Export Failed", description: "Check console for details." });
+      toast({ variant: "destructive", title: "Export Failed", description: "Could not generate A4 PDF." });
     } finally {
       setIsExporting(false);
     }
@@ -106,7 +107,7 @@ export function PreviewContainer({
           </div>
           <div className="hidden sm:block">
             <h2 className="text-sm font-bold tracking-tight uppercase tracking-widest leading-none">{title}</h2>
-            <p className="text-[10px] text-white/40 mt-1 uppercase font-bold">High-Fidelity Export Protocol</p>
+            <p className="text-[10px] text-white/40 mt-1 uppercase font-bold">A4 High-Fidelity Export Protocol</p>
           </div>
         </div>
 
@@ -132,7 +133,7 @@ export function PreviewContainer({
             className="h-10 border-white/20 bg-white/5 text-white text-xs font-bold hidden sm:flex hover:bg-white/10"
           >
             {isExporting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Download className="mr-2 h-4 w-4" />}
-            EXPORT PDF
+            EXPORT A4 PDF
           </Button>
           <Button onClick={handlePrint} className="h-10 bg-primary text-white hover:bg-red-700 text-xs font-bold">
             <Printer className="mr-2 h-4 w-4" /> PRINT
