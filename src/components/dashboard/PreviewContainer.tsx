@@ -63,12 +63,12 @@ export function PreviewContainer({
       let heightLeft = imgHeightInPdf;
       let position = 0;
 
-      // First page
+      // Add first page
       pdf.addImage(imgData, 'JPEG', 0, position, pdfWidth, imgHeightInPdf, undefined, 'FAST');
       heightLeft -= pdfHeight;
 
-      // Multi-page logic
-      while (heightLeft > 0) {
+      // Multi-page logic with threshold to avoid blank/tiny sliver pages
+      while (heightLeft > 2) { // 2mm threshold: ignore tiny amounts of white space at bottom
         position = heightLeft - imgHeightInPdf;
         pdf.addPage();
         pdf.addImage(imgData, 'JPEG', 0, position, pdfWidth, imgHeightInPdf, undefined, 'FAST');

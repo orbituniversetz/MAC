@@ -51,10 +51,12 @@ export function ProformaPreview({ proforma, settings }: ProformaPreviewProps) {
       let heightLeft = imgHeightInPdf;
       let position = 0;
 
+      // Add first page
       pdf.addImage(imgData, 'JPEG', 0, position, pdfWidth, imgHeightInPdf, undefined, 'FAST');
       heightLeft -= pdfHeight;
 
-      while (heightLeft > 0) {
+      // Multi-page logic with threshold
+      while (heightLeft > 2) {
         position = heightLeft - imgHeightInPdf;
         pdf.addPage();
         pdf.addImage(imgData, 'JPEG', 0, position, pdfWidth, imgHeightInPdf, undefined, 'FAST');
@@ -79,8 +81,8 @@ export function ProformaPreview({ proforma, settings }: ProformaPreviewProps) {
         <PreviewContainer
           title={`Proforma Preview - ${proforma.proformaNo}`}
           onClose={() => setIsOpen(false)}
-          onPrint={handlePrint}
-          onDownload={handleDownloadPDF}
+          documentId="proforma-document"
+          filename={`PROFORMA-${proforma.proformaNo}`}
           icon={<Eye className="h-5 w-5 text-[#c10d12]" />}
         >
           <ProformaDocument proforma={proforma} settings={settings} />

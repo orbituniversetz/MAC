@@ -55,8 +55,8 @@ export function DocumentPreview({ doc, settings }: DocumentPreviewProps) {
       pdf.addImage(imgData, 'JPEG', 0, position, pdfWidth, imgHeightInPdf, undefined, 'FAST');
       heightLeft -= pdfHeight;
 
-      // Add additional pages if needed
-      while (heightLeft > 0) {
+      // Multi-page logic with threshold
+      while (heightLeft > 2) {
         position = heightLeft - imgHeightInPdf;
         pdf.addPage();
         pdf.addImage(imgData, 'JPEG', 0, position, pdfWidth, imgHeightInPdf, undefined, 'FAST');
@@ -81,8 +81,8 @@ export function DocumentPreview({ doc, settings }: DocumentPreviewProps) {
         <PreviewContainer
           title={`Document Preview - ${doc.docNo}`}
           onClose={() => setIsOpen(false)}
-          onPrint={handlePrint}
-          onDownload={handleDownloadPDF}
+          documentId="document-paper"
+          filename={`${doc.docType}-${doc.docNo}`}
           icon={doc.docType === 'LETTER' ? <Mail className="h-5 w-5 text-[#c10d12]" /> : <FileText className="h-5 w-5 text-[#c10d12]" />}
         >
           <DocumentPaper doc={doc} settings={settings} />
