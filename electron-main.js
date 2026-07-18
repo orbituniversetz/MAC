@@ -6,6 +6,10 @@ const { autoUpdater } = require('electron-updater');
 let mainWindow;
 let nextProcess;
 
+// Configure auto-updater
+autoUpdater.autoDownload = true;
+autoUpdater.autoInstallOnAppQuit = true;
+
 function createWindow() {
   mainWindow = new BrowserWindow({
     width: 1280,
@@ -30,25 +34,29 @@ function createWindow() {
 }
 
 // Auto-updater events
-autoUpdater.on('update-available', () => {
+autoUpdater.on('update-available', (info) => {
   dialog.showMessageBox({
     type: 'info',
     title: 'Update Available',
-    message: 'A new version of GarageFlow Desk is available. Downloading now...',
+    message: `A new version (${info.version}) of GarageFlow Desk is available. It is being downloaded in the background.`,
   });
 });
 
-autoUpdater.on('update-downloaded', () => {
+autoUpdater.on('update-downloaded', (info) => {
   dialog.showMessageBox({
     type: 'info',
     title: 'Update Ready',
-    message: 'The new version has been downloaded. Restart the application to apply the updates.',
-    buttons: ['Restart', 'Later']
+    message: `Version ${info.version} has been downloaded. Restart the application now to apply the updates?`,
+    buttons: ['Restart Now', 'Later']
   }).then((result) => {
     if (result.response === 0) {
       autoUpdater.quitAndInstall();
     }
   });
+});
+
+autoUpdater.on('error', (err) => {
+  console.error('Auto-updater error:', err);
 });
 
 app.on('ready', () => {

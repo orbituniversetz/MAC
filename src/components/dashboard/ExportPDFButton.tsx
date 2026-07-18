@@ -29,13 +29,17 @@ export function ExportPDFButton({ targetId, filename }: ExportPDFButtonProps) {
 
     setIsExporting(true);
     try {
-      // Standard A4 dimensions in mm: 210 x 297
+      // Strictly enforce A4 dimensions (210mm x 297mm)
       const pdf = new jsPDF('p', 'mm', 'a4');
       const pdfWidth = pdf.internal.pageSize.getWidth();
       const pdfHeight = pdf.internal.pageSize.getHeight();
+      
+      const stapleMargin = 20;
+      const bottomMargin = 10;
+      const effectivePageHeight = pdfHeight - stapleMargin - bottomMargin;
 
       const canvas = await html2canvas(element, {
-        scale: 2, // 300 DPI equivalent
+        scale: 2, // High resolution capture
         useCORS: true,
         logging: false,
         backgroundColor: '#ffffff',
@@ -44,7 +48,6 @@ export function ExportPDFButton({ targetId, filename }: ExportPDFButtonProps) {
         onclone: (clonedDoc) => {
           const clonedElement = clonedDoc.getElementById(targetId);
           if (clonedElement) {
-            // Strip UI effects for clean PDF output
             clonedElement.style.transform = 'none';
             clonedElement.style.boxShadow = 'none';
             clonedElement.style.margin = '0';
@@ -64,27 +67,26 @@ export function ExportPDFButton({ targetId, filename }: ExportPDFButtonProps) {
       pdf.addImage(imgData, 'JPEG', 0, position, pdfWidth, imgHeightInPdf, undefined, 'FAST');
       heightLeft -= pdfHeight;
 
-      // Add remaining pages if content overflows A4 height
-      // Threshold of 2mm to avoid tiny blank pages
+      // Subsequent pages with staple spacing
       while (heightLeft > 2) {
-        position = heightLeft - imgHeightInPdf;
+        position = heightLeft - imgHeightInPdf + stapleMargin;
         pdf.addPage();
         pdf.addImage(imgData, 'JPEG', 0, position, pdfWidth, imgHeightInPdf, undefined, 'FAST');
-        heightLeft -= pdfHeight;
+        heightLeft -= effectivePageHeight;
       }
 
       pdf.save(filename.endsWith('.pdf') ? filename : `${filename}.pdf`);
       
       toast({
-        title: "Export Successful",
-        description: "Your A4 PDF has been generated and downloaded."
+        title: "A4 PDF Exported",
+        description: "Generated with professional margins and resolution."
       });
     } catch (error) {
       console.error('Error generating PDF:', error);
       toast({
         variant: "destructive",
         title: "Export Failed",
-        description: "There was an error generating the A4 PDF."
+        description: "An error occurred during A4 PDF generation."
       });
     } finally {
       setIsExporting(false);
@@ -103,7 +105,7 @@ export function ExportPDFButton({ targetId, filename }: ExportPDFButtonProps) {
       ) : (
         <Download className="mr-2 h-4 w-4" />
       )}
-      {isExporting ? 'Exporting...' : 'Export PDF'}
+      {isExporting ? 'Generating...' : 'Export A4 PDF'}
     </Button>
   );
 }

@@ -22,7 +22,7 @@ export function JobCardDocument({ job, settings, isInternal = false, className }
       id={isInternal ? "jobcard-document-internal" : "jobcard-document-customer"} 
       className={cn("a4-page font-sans shadow-lg", className)}
     >
-      {/* Header - Logo Left, Text Right */}
+      {/* Header - Branding */}
       <div className="flex items-center justify-between mb-4 border-b-2 border-zinc-100 pb-4 shrink-0 avoid-break">
         <div className="flex items-center">
           {settings.garage_logo ? (
@@ -45,6 +45,7 @@ export function JobCardDocument({ job, settings, isInternal = false, className }
         </div>
       </div>
 
+      {/* Banner */}
       <div className="flex justify-between items-center mb-8 bg-zinc-950 text-white p-4 rounded shadow-sm shrink-0 avoid-break">
         <div className="inline-flex items-center gap-2">
           {isInternal ? <ShieldCheck className="h-4 w-4 text-blue-400" /> : <User className="h-4 w-4 text-red-400" />}
@@ -56,6 +57,7 @@ export function JobCardDocument({ job, settings, isInternal = false, className }
         </div>
       </div>
 
+      {/* Info Grid */}
       <div className="grid grid-cols-2 gap-12 mb-8 avoid-break">
         <div>
           <h3 className="text-[10px] font-black text-zinc-400 uppercase tracking-widest mb-3">Customer Information</h3>
@@ -79,6 +81,7 @@ export function JobCardDocument({ job, settings, isInternal = false, className }
         </div>
       </div>
 
+      {/* Main Table */}
       <div className="mb-8 flex-1">
         <table className="w-full border-collapse">
           <thead>
@@ -110,6 +113,7 @@ export function JobCardDocument({ job, settings, isInternal = false, className }
         </table>
       </div>
 
+      {/* Totals & Internal Expenses */}
       {isInternal ? (
         <div className="grid grid-cols-2 gap-12 mb-8 avoid-break border-t-2 border-zinc-100 pt-8">
           <div>
@@ -170,6 +174,7 @@ export function JobCardDocument({ job, settings, isInternal = false, className }
         </div>
       )}
 
+      {/* Footer - Terms & Signatures */}
       <div className="mt-auto pt-8 border-t border-zinc-100 shrink-0 avoid-break">
         <div className="grid grid-cols-2 gap-12">
           <div className="p-5 bg-zinc-50 rounded-2xl border border-zinc-100 shadow-sm">

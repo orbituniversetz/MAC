@@ -42,17 +42,18 @@ export function PreviewContainer({
 
     setIsExporting(true);
     try {
+      // Create high-res A4 PDF
       const pdf = new jsPDF('p', 'mm', 'a4');
-      const pdfWidth = pdf.internal.pageSize.getWidth();
-      const pdfHeight = pdf.internal.pageSize.getHeight();
+      const pdfWidth = pdf.internal.pageSize.getWidth(); // 210mm
+      const pdfHeight = pdf.internal.pageSize.getHeight(); // 297mm
       
-      // Constants for professional paging
-      const stapleMargin = 20; // 20mm space at top of subsequent pages for stapling
+      // Configuration for professional multi-page splitting
+      const stapleMargin = 20; // 20mm top margin on page 2+ for stapling
       const bottomMargin = 10;
       const effectivePageHeight = pdfHeight - stapleMargin - bottomMargin;
 
       const canvas = await html2canvas(element, {
-        scale: 2,
+        scale: 2, // 300 DPI resolution
         useCORS: true,
         logging: false,
         backgroundColor: '#ffffff',
@@ -61,6 +62,7 @@ export function PreviewContainer({
         onclone: (clonedDoc) => {
           const clonedElement = clonedDoc.getElementById(documentId);
           if (clonedElement) {
+            // Strip UI-only styling for clean capture
             clonedElement.style.transform = 'none';
             clonedElement.style.boxShadow = 'none';
             clonedElement.style.margin = '0';
@@ -76,29 +78,22 @@ export function PreviewContainer({
       let heightLeft = imgHeightInPdf;
       let position = 0;
 
-      // --- PAGE 1 ---
-      // We don't usually need staple space on the very first page top (branding is there)
+      // Page 1: Standard branding top
       pdf.addImage(imgData, 'JPEG', 0, position, pdfWidth, imgHeightInPdf, undefined, 'FAST');
       heightLeft -= pdfHeight;
 
-      // --- SUBSEQUENT PAGES ---
+      // Subsequent pages: Add staple margin at top
       while (heightLeft > 2) {
-        // Move to the next "slice" of the image
-        // We subtract effectivePageHeight to account for the staple gap we want to leave
         position = heightLeft - imgHeightInPdf + stapleMargin; 
-        
         pdf.addPage();
-        
-        // Add image at the offset position (leaving 'stapleMargin' empty at the top)
         pdf.addImage(imgData, 'JPEG', 0, position, pdfWidth, imgHeightInPdf, undefined, 'FAST');
-        
         heightLeft -= effectivePageHeight;
       }
 
       pdf.save(`${filename}.pdf`);
       toast({ 
-        title: "Export Success", 
-        description: "A4 PDF generated with staple-friendly margins." 
+        title: "A4 Export Success", 
+        description: "PDF generated with professional staple margins." 
       });
     } catch (error) {
       console.error('PDF Error:', error);
@@ -119,7 +114,7 @@ export function PreviewContainer({
           </div>
           <div className="hidden sm:block">
             <h2 className="text-sm font-bold tracking-tight uppercase tracking-widest leading-none">{title}</h2>
-            <p className="text-[10px] text-white/40 mt-1 uppercase font-bold">A4 Multi-Page Print Protocol</p>
+            <p className="text-[10px] text-white/40 mt-1 uppercase font-bold">A4 High-Fidelity Print Protocol</p>
           </div>
         </div>
 
