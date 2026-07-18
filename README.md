@@ -4,11 +4,12 @@ A professional, offline-first Garage Management System designed for automotive r
 
 ## Features
 - **Dashboard**: Real-time business metrics and profit tracking.
-- **Job Sheets**: Document-centric repair lifecycle management with high-res A4 previews.
+- **Job Sheets**: Document-centric repair lifecycle management with high-res A4 previews and intelligent paging.
 - **Proformas**: High-fidelity quotations with automated VAT and discount handling.
 - **Invoices**: One-click generation of official Tax Invoices from paid quotations.
 - **Expenses**: Link costs directly to jobs for accurate Net Profit (P&L) tracking.
-- **A4 Document Engine**: Export professional A4 PDFs for Job Cards, Invoices, and Technical Reports with staple-friendly margins.
+- **A4 Document Engine**: Export professional A4 PDFs with high resolution and staple-friendly margins.
+- **Auto-Updates**: Seamless version tracking via GitHub releases.
 
 ## GitHub Auto-Updates
 
@@ -24,12 +25,12 @@ To enable the app to "fetch for updates" from GitHub:
 3. **Automatic Fetch**: 
    - The app is configured to automatically check your GitHub repository for newer versions on startup and prompt the user to install.
 
-## Installation & Setup
+## Installation & Setup (Windows)
 
 1. **Prerequisites**: 
    - Install [Node.js (LTS)](https://nodejs.org/).
 2. **Setup**:
-   - Open a terminal in the project directory.
+   - Open a terminal (PowerShell) in the project directory.
    - Run `npm install` to install required libraries.
 3. **Build**:
    - Run `npm run dist`.

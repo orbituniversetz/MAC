@@ -22,7 +22,7 @@ export function JobCardDocument({ job, settings, isInternal = false, className }
       id={isInternal ? "jobcard-document-internal" : "jobcard-document-customer"} 
       className={cn("a4-page font-sans shadow-lg", className)}
     >
-      {/* Header - Branding */}
+      {/* Header - High Fidelity Branding */}
       <div className="flex items-center justify-between mb-4 border-b-2 border-zinc-100 pb-4 shrink-0 avoid-break">
         <div className="flex items-center">
           {settings.garage_logo ? (
@@ -37,7 +37,7 @@ export function JobCardDocument({ job, settings, isInternal = false, className }
         </div>
         <div className="text-right flex flex-col justify-center">
           <h1 className="text-2xl font-black text-[#c10d12] uppercase leading-none tracking-tighter mb-1">{settings.garage_name}</h1>
-          <div className="text-[10px] text-zinc-500 font-bold leading-tight uppercase tracking-tight">
+          <div className="text-[10px] text-zinc-500 font-bold leading-tight uppercase tracking-tight flex flex-col items-end">
             <p>{settings.garage_mailbox}</p>
             <p>{settings.garage_address}</p>
             <p className="text-zinc-800 font-black">Tel: {settings.garage_phone} | TIN: {settings.garage_tin}</p>
@@ -45,7 +45,7 @@ export function JobCardDocument({ job, settings, isInternal = false, className }
         </div>
       </div>
 
-      {/* Banner */}
+      {/* Banner - Matches Invoice Style */}
       <div className="flex justify-between items-center mb-8 bg-zinc-950 text-white p-4 rounded shadow-sm shrink-0 avoid-break">
         <div className="inline-flex items-center gap-2">
           {isInternal ? <ShieldCheck className="h-4 w-4 text-blue-400" /> : <User className="h-4 w-4 text-red-400" />}
@@ -57,31 +57,31 @@ export function JobCardDocument({ job, settings, isInternal = false, className }
         </div>
       </div>
 
-      {/* Info Grid */}
+      {/* Info Grid - Matches Invoice Style */}
       <div className="grid grid-cols-2 gap-12 mb-8 avoid-break">
         <div>
           <h3 className="text-[10px] font-black text-zinc-400 uppercase tracking-widest mb-3">Customer Information</h3>
           <div className="space-y-1">
             <p className="font-black text-lg text-zinc-900 leading-tight">{job.customerName}</p>
             <p className="text-sm font-bold text-zinc-600 leading-snug">{job.customerAddress || 'No Address Provided'}</p>
-            <div className="flex gap-4 mt-2">
+            <div className="flex flex-col gap-1 mt-2">
                 {job.customerPhone && <p className="text-xs font-black text-zinc-800">TEL: {job.customerPhone}</p>}
-                {job.customerTin && <p className="text-xs font-black text-zinc-800">TIN: {job.customerTin}</p>}
+                {job.customerTin && <p className="text-xs font-black bg-zinc-100 px-2 py-0.5 rounded-full w-fit">TIN: {job.customerTin}</p>}
             </div>
           </div>
         </div>
 
         <div className="bg-zinc-50 p-5 rounded-2xl border border-zinc-100 flex flex-col justify-center">
-          <p className="text-[10px] font-black text-zinc-400 uppercase tracking-widest mb-2">Vehicle Details</p>
+          <h3 className="text-[10px] font-black text-zinc-400 uppercase tracking-widest mb-3">Vehicle Details</h3>
           <p className="text-lg font-black tracking-tight text-zinc-900">{job.vehiclePlate} <span className="text-zinc-400 font-bold ml-2">({job.vehicleModel})</span></p>
           <div className="pt-2 border-t border-zinc-200 mt-2">
-            <p className="text-[9px] font-black text-zinc-400 uppercase tracking-widest mb-1">Work Requested</p>
-            <p className="text-xs text-zinc-800 italic leading-snug">"{job.complaint || 'General repair and mechanical inspection.'}"</p>
+            <p className="text-[9px] font-black text-zinc-400 uppercase tracking-widest mb-1">Work Requested / Complaint</p>
+            <p className="text-xs text-zinc-800 italic leading-snug font-bold">"{job.complaint || 'General repair and mechanical inspection.'}"</p>
           </div>
         </div>
       </div>
 
-      {/* Main Table */}
+      {/* Main Table - Matches Invoice Style */}
       <div className="mb-8 flex-1">
         <table className="w-full border-collapse">
           <thead>
@@ -106,73 +106,79 @@ export function JobCardDocument({ job, settings, isInternal = false, className }
               ))
             ) : (
               <tr>
-                <td colSpan={4} className="p-12 text-center text-zinc-300 italic text-sm">No items recorded in this job card.</td>
+                <td colSpan={4} className="p-12 text-center text-zinc-300 italic text-sm">No repair items recorded for this job.</td>
               </tr>
             )}
           </tbody>
         </table>
       </div>
 
-      {/* Totals & Internal Expenses */}
-      {isInternal ? (
-        <div className="grid grid-cols-2 gap-12 mb-8 avoid-break border-t-2 border-zinc-100 pt-8">
-          <div>
-            <h3 className="text-[10px] font-black text-red-600 uppercase tracking-widest mb-3">Internal Job Expenses (Costs)</h3>
-            <table className="w-full text-[10px] border-collapse">
-              <thead>
-                <tr className="border-b-2 border-red-100 bg-red-50/30">
-                  <th className="py-2 text-left px-2 font-black uppercase text-red-800">Cost Description</th>
-                  <th className="py-2 text-right px-2 font-black uppercase text-red-800">Amount</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-red-50">
-                {job.expenses?.map((exp: any) => (
-                  <tr key={exp.id}>
-                    <td className="py-1.5 font-bold text-zinc-800 px-2 uppercase">{exp.description}</td>
-                    <td className="py-1.5 text-right font-black px-2 text-red-600">{exp.amount.toLocaleString()}</td>
+      {/* Totals & Internal Expenses - Aligned to match Invoice/Proforma layout */}
+      <div className="grid grid-cols-2 gap-12 mb-8 avoid-break">
+        <div>
+          {isInternal && job.expenses?.length > 0 && (
+            <>
+              <h3 className="text-[10px] font-black text-red-600 uppercase tracking-widest mb-3">Internal Job Expenses (Costs)</h3>
+              <table className="w-full text-[10px] border-collapse">
+                <thead>
+                  <tr className="border-b-2 border-red-100 bg-red-50/30">
+                    <th className="py-2 text-left px-2 font-black uppercase text-red-800">Cost Description</th>
+                    <th className="py-2 text-right px-2 font-black uppercase text-red-800">Amount</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-          <div className="flex justify-end">
-            <div className={cn(
-              "w-72 space-y-2 p-6 rounded-3xl border shadow-sm",
-              isProfit ? 'bg-green-50 border-green-100' : 'bg-red-50 border-red-100'
-            )}>
-              <div className="flex justify-between text-xs font-bold uppercase tracking-tight text-zinc-500">
-                <span>Gross Income:</span>
-                <span className="text-zinc-900">{totalIncome.toLocaleString()}</span>
-              </div>
-              <div className="flex justify-between text-xs font-bold uppercase tracking-tight text-red-600">
-                <span>Total Costs:</span>
-                <span>({totalExpenses.toLocaleString()})</span>
-              </div>
-              <div className={cn(
-                "pt-4 border-t-2 flex justify-between items-center",
-                isProfit ? 'border-green-200' : 'border-red-200'
-              )}>
-                <span className="font-black text-xs uppercase tracking-widest">Net Profit:</span>
-                <span className={cn(
-                  "font-black text-2xl tracking-tighter",
-                  isProfit ? 'text-green-700' : 'text-red-700'
-                )}>
-                  TZS {Math.abs(netProfit).toLocaleString()}
-                </span>
-              </div>
-            </div>
-          </div>
+                </thead>
+                <tbody className="divide-y divide-red-50">
+                  {job.expenses?.map((exp: any) => (
+                    <tr key={exp.id}>
+                      <td className="py-1.5 font-bold text-zinc-800 px-2 uppercase">{exp.description}</td>
+                      <td className="py-1.5 text-right font-black px-2 text-red-600">{exp.amount.toLocaleString()}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </>
+          )}
         </div>
-      ) : (
-        <div className="flex justify-end mb-8 shrink-0 avoid-break">
-            <div className="w-72 space-y-2 bg-zinc-50 p-6 rounded-3xl border border-zinc-100 shadow-sm">
-                <div className="flex justify-between items-center font-black">
-                    <span className="text-xs uppercase tracking-widest text-zinc-500">Gross Total:</span>
-                    <span className="text-xl text-[#c10d12]">TZS {totalIncome.toLocaleString()}</span>
+        
+        <div className="flex justify-end">
+          <div className={cn(
+            "w-72 space-y-2 p-6 rounded-3xl border shadow-sm",
+            isInternal ? (isProfit ? 'bg-green-50 border-green-100' : 'bg-red-50 border-red-100') : "bg-zinc-50 border-zinc-100"
+          )}>
+            <div className="flex justify-between text-xs font-bold uppercase tracking-tight text-zinc-500">
+              <span>Gross Income:</span>
+              <span className="text-zinc-900">{totalIncome.toLocaleString()}</span>
+            </div>
+            
+            {isInternal && (
+              <>
+                <div className="flex justify-between text-xs font-bold uppercase tracking-tight text-red-600">
+                  <span>Total Costs:</span>
+                  <span>({totalExpenses.toLocaleString()})</span>
                 </div>
-            </div>
+                <div className={cn(
+                  "pt-4 border-t-2 flex justify-between items-center",
+                  isProfit ? 'border-green-200' : 'border-red-200'
+                )}>
+                  <span className="font-black text-xs uppercase tracking-widest">Net Profit:</span>
+                  <span className={cn(
+                    "font-black text-2xl tracking-tighter",
+                    isProfit ? 'text-green-700' : 'text-red-700'
+                  )}>
+                    TZS {Math.abs(netProfit).toLocaleString()}
+                  </span>
+                </div>
+              </>
+            )}
+
+            {!isInternal && (
+              <div className="pt-4 border-t-2 border-zinc-200 flex justify-between items-center">
+                <span className="font-black text-xs uppercase tracking-widest">Total Value:</span>
+                <span className="font-black text-2xl text-[#c10d12] whitespace-nowrap tracking-tighter">TZS {totalIncome.toLocaleString()}</span>
+              </div>
+            )}
+          </div>
         </div>
-      )}
+      </div>
 
       {/* Footer - Terms & Signatures */}
       <div className="mt-auto pt-8 border-t border-zinc-100 shrink-0 avoid-break">

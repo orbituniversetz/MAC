@@ -34,7 +34,8 @@ export function ExportPDFButton({ targetId, filename }: ExportPDFButtonProps) {
       const pdfWidth = pdf.internal.pageSize.getWidth();
       const pdfHeight = pdf.internal.pageSize.getHeight();
       
-      const stapleMargin = 20;
+      // Configuration for professional multi-page splitting
+      const stapleMargin = 20; // 20mm top margin on page 2+ for stapling
       const bottomMargin = 10;
       const effectivePageHeight = pdfHeight - stapleMargin - bottomMargin;
 
@@ -48,6 +49,7 @@ export function ExportPDFButton({ targetId, filename }: ExportPDFButtonProps) {
         onclone: (clonedDoc) => {
           const clonedElement = clonedDoc.getElementById(targetId);
           if (clonedElement) {
+            // Strip UI-only styling for clean capture
             clonedElement.style.transform = 'none';
             clonedElement.style.boxShadow = 'none';
             clonedElement.style.margin = '0';
