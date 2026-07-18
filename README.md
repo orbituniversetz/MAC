@@ -4,26 +4,12 @@ A professional, offline-first Garage Management System designed for automotive r
 
 ## Features
 - **Dashboard**: Real-time business metrics and profit tracking.
-- **Job Sheets**: Document-centric repair lifecycle management with high-res A4 previews and intelligent paging.
+- **Job Sheets**: Professional A4 documentation with high-fidelity branding, customer complaints, and internal cost tracking.
 - **Proformas**: High-fidelity quotations with automated VAT and discount handling.
 - **Invoices**: One-click generation of official Tax Invoices from paid quotations.
-- **Expenses**: Link costs directly to jobs for accurate Net Profit (P&L) tracking.
-- **A4 Document Engine**: Export professional A4 PDFs with high resolution and staple-friendly margins.
+- **A4 Document Engine**: Export professional A4 PDFs with high resolution and staple-friendly margins (20mm top margin on page 2+).
 - **Auto-Updates**: Seamless version tracking via GitHub releases.
-
-## GitHub Auto-Updates
-
-To enable the app to "fetch for updates" from GitHub:
-
-1. **GitHub Setup**: 
-   - Ensure your code is hosted at `https://github.com/orbituniversetz/MAC`.
-2. **Release Process**:
-   - Create a [GitHub Personal Access Token](https://github.com/settings/tokens) with `repo` scope.
-   - Set it as an environment variable `GH_TOKEN` on your build machine.
-   - Run `npm run dist`.
-   - Go to the `dist` folder and upload the generated `.exe` and `latest.yml` to a new **GitHub Release**.
-3. **Automatic Fetch**: 
-   - The app is configured to automatically check your GitHub repository for newer versions on startup and prompt the user to install.
+- **Offline First**: Uses a local SQLite database for speed and reliability without needing internet.
 
 ## Installation & Setup (Windows)
 
@@ -39,8 +25,20 @@ To enable the app to "fetch for updates" from GitHub:
    - Open `GarageFlow Desk.exe`. 
    - This is a **Portable Executable**; you can copy it to your Desktop or a USB stick and run it instantly.
 
+## GitHub Auto-Updates
+
+To enable the app to "fetch for updates" from your repository:
+
+1. **Release Process**:
+   - Create a [GitHub Personal Access Token](https://github.com/settings/tokens) with `repo` scope.
+   - Set it as an environment variable `GH_TOKEN` on your build machine.
+   - Run `npm run dist`.
+   - Go to the `dist` folder and upload the generated `.exe` and `latest.yml` to a new **GitHub Release** at `https://github.com/orbituniversetz/MAC`.
+2. **Automatic Fetch**: 
+   - The app will automatically check for newer versions on startup and prompt to install.
+
 ## Data & Backups
-- The app uses a local SQLite database (`garage.db`).
+- The app uses a local SQLite database (`garage.db`) stored in your user folder: `%USERPROFILE%/.garageflow_desk/`.
 - Use the **Backup Manager** tab within the app to export your data regularly.
 
 ## Development
