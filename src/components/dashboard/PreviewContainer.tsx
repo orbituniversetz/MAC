@@ -1,31 +1,89 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Printer, Download, X, ZoomIn, ZoomOut } from 'lucide-react';
+import { Printer, Download, X, ZoomIn, ZoomOut, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import jsPDF from 'jspdf';
+import html2canvas from 'html2canvas';
+import { useToast } from '@/hooks/use-toast';
 
 interface PreviewContainerProps {
   title: string;
   onClose: () => void;
-  onPrint: () => void;
-  onDownload: () => void;
   children: React.ReactNode;
   icon?: React.ReactNode;
+  documentId: string;
+  filename: string;
 }
 
 export function PreviewContainer({ 
   title, 
   onClose, 
-  onPrint, 
-  onDownload, 
   children,
-  icon
+  icon,
+  documentId,
+  filename
 }: PreviewContainerProps) {
   const [zoom, setZoom] = useState(100);
+  const [isExporting, setIsExporting] = useState(false);
+  const { toast } = useToast();
 
   const handleZoomIn = () => setZoom(prev => Math.min(prev + 10, 200));
   const handleZoomOut = () => setZoom(prev => Math.max(prev - 10, 50));
   const handleResetZoom = () => setZoom(100);
+
+  const handlePrint = () => {
+    window.print();
+  };
+
+  const handleDownloadPDF = async () => {
+    const element = document.getElementById(documentId);
+    if (!element) return;
+
+    setIsExporting(true);
+    try {
+      const canvas = await html2canvas(element, {
+        scale: 2,
+        useCORS: true,
+        logging: false,
+        backgroundColor: '#ffffff',
+        windowWidth: element.scrollWidth,
+        windowHeight: element.scrollHeight
+      });
+      
+      const imgData = canvas.toDataURL('image/jpeg', 0.95);
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = pdf.internal.pageSize.getHeight();
+      const canvasWidth = canvas.width;
+      const canvasHeight = canvas.height;
+      
+      const imgHeightInPdf = (canvasHeight * pdfWidth) / canvasWidth;
+      let heightLeft = imgHeightInPdf;
+      let position = 0;
+
+      // First page
+      pdf.addImage(imgData, 'JPEG', 0, position, pdfWidth, imgHeightInPdf, undefined, 'FAST');
+      heightLeft -= pdfHeight;
+
+      // Multi-page logic
+      while (heightLeft > 0) {
+        position = heightLeft - imgHeightInPdf;
+        pdf.addPage();
+        pdf.addImage(imgData, 'JPEG', 0, position, pdfWidth, imgHeightInPdf, undefined, 'FAST');
+        heightLeft -= pdfHeight;
+      }
+
+      pdf.save(`${filename}.pdf`);
+      toast({ title: "Export Success", description: "Document saved as PDF." });
+    } catch (error) {
+      console.error('PDF Error:', error);
+      toast({ variant: "destructive", title: "Export Failed", description: "Check logs." });
+    } finally {
+      setIsExporting(false);
+    }
+  };
 
   const scale = zoom / 100;
 
@@ -39,7 +97,7 @@ export function PreviewContainer({
           </div>
           <div className="hidden sm:block">
             <h2 className="text-sm font-bold tracking-tight uppercase tracking-widest leading-none">{title}</h2>
-            <p className="text-[10px] text-white/40 mt-1 uppercase font-bold">Export Ready A4 Protocol</p>
+            <p className="text-[10px] text-white/40 mt-1 uppercase font-bold">A4 Export Protocol v2.0</p>
           </div>
         </div>
 
@@ -58,10 +116,16 @@ export function PreviewContainer({
 
         {/* Actions */}
         <div className="flex items-center gap-3">
-          <Button onClick={onDownload} variant="outline" className="h-10 border-white/20 bg-white/5 text-white text-xs font-bold hidden sm:flex hover:bg-white/10">
-            <Download className="mr-2 h-4 w-4" /> EXPORT PDF
+          <Button 
+            onClick={handleDownloadPDF} 
+            disabled={isExporting}
+            variant="outline" 
+            className="h-10 border-white/20 bg-white/5 text-white text-xs font-bold hidden sm:flex hover:bg-white/10"
+          >
+            {isExporting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Download className="mr-2 h-4 w-4" />}
+            EXPORT PDF
           </Button>
-          <Button onClick={onPrint} className="h-10 bg-primary text-white hover:bg-red-700 text-xs font-bold">
+          <Button onClick={handlePrint} className="h-10 bg-primary text-white hover:bg-red-700 text-xs font-bold">
             <Printer className="mr-2 h-4 w-4" /> PRINT
           </Button>
           <Button variant="ghost" size="icon" onClick={onClose} className="h-10 w-10 text-white/50 hover:text-white">
@@ -79,8 +143,7 @@ export function PreviewContainer({
             width: '210mm',
             height: 'fit-content',
             paddingBottom: '40mm', 
-            // Ensures the scroll height reflects the visually scaled size
-            marginBottom: `${Math.max(40, (scale - 1) * 1000)}px`
+            marginBottom: `${Math.max(40, (scale - 1) * 2000)}px`
           }}
         >
           {children}

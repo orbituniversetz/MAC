@@ -1,4 +1,3 @@
-
 import { getJobSheetById, getSettings, createProformaFromJob, createReportFromJob, deleteJobItem, getRecentItems, deleteExpense, getRecentExpenses } from '@/lib/actions';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -18,6 +17,7 @@ import { JobCardPreview } from '@/components/dashboard/JobCardPreview';
 import { JobCardDocument } from '@/components/dashboard/JobCardDocument';
 import { AddItemForm } from '@/components/dashboard/AddItemForm';
 import { AddExpenseForm } from '@/components/dashboard/AddExpenseForm';
+import { ExportPDFButton } from '@/components/dashboard/ExportPDFButton';
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
 
@@ -32,7 +32,6 @@ export default async function JobSheetDetailPage({ params }: { params: Promise<{
     return (
       <div className="flex flex-col items-center justify-center h-[50vh] space-y-4">
         <h2 className="text-2xl font-bold text-gray-800">Job Not Found</h2>
-        <p className="text-muted-foreground">The job sheet you are looking for does not exist.</p>
         <Button asChild variant="outline">
           <Link href="/dashboard/jobsheets">Back to Job Sheets</Link>
         </Button>
@@ -77,6 +76,7 @@ export default async function JobSheetDetailPage({ params }: { params: Promise<{
         <div className="flex flex-wrap gap-2">
           <JobCardPreview job={job} settings={settings} mode="CUSTOMER" />
           <JobCardPreview job={job} settings={settings} mode="INTERNAL" />
+          <ExportPDFButton targetId="jobcard-document-customer" filename={`JOBCARD-${job.jobNo}`} />
           
           <Separator orientation="vertical" className="h-10 hidden md:block mx-1" />
           
@@ -93,7 +93,6 @@ export default async function JobSheetDetailPage({ params }: { params: Promise<{
         </div>
       </div>
 
-      {/* Expanded Inline Preview Section */}
       <div className="max-w-6xl mx-auto space-y-6">
         <h3 className="font-bold text-lg text-zinc-500 uppercase tracking-widest px-4">Document Preview</h3>
         <div className="bg-gray-100 border rounded-2xl shadow-inner overflow-y-auto p-4 sm:p-12 flex justify-center min-h-[2000px]">
@@ -136,14 +135,8 @@ export default async function JobSheetDetailPage({ params }: { params: Promise<{
                       </TableCell>
                     </TableRow>
                   ))}
-                  {job.items.length === 0 && (
-                    <TableRow>
-                      <TableCell colSpan={6} className="text-center py-4 text-muted-foreground italic">No items added yet.</TableCell>
-                    </TableRow>
-                  )}
                 </TableBody>
               </Table>
-
               <AddItemForm jobId={job.id} proformaId={null} recentItems={recentItems} />
             </CardContent>
           </Card>
@@ -180,18 +173,9 @@ export default async function JobSheetDetailPage({ params }: { params: Promise<{
                       </TableCell>
                     </TableRow>
                   ))}
-                  {job.expenses.length === 0 && (
-                    <TableRow>
-                      <TableCell colSpan={4} className="text-center py-4 text-muted-foreground italic">No expenses recorded for this job.</TableCell>
-                    </TableRow>
-                  )}
                 </TableBody>
               </Table>
-              <AddExpenseForm 
-                jobSheetId={job.id} 
-                recentExpenses={recentExpenses} 
-                jobItems={job.items} 
-              />
+              <AddExpenseForm jobSheetId={job.id} recentExpenses={recentExpenses} jobItems={job.items} />
             </CardContent>
           </Card>
         </div>
@@ -214,14 +198,11 @@ export default async function JobSheetDetailPage({ params }: { params: Promise<{
                 <span className="font-medium text-red-600">TZS {totalExpenses.toLocaleString()}</span>
               </div>
               <Separator />
-              <div className="flex flex-col gap-1">
-                <div className="flex justify-between items-center">
-                  <span className="font-bold text-gray-700">Net {isProfit ? 'Profit' : 'Loss'}:</span>
-                  <span className={cn("font-black text-2xl", isProfit ? "text-green-600" : "text-red-600")}>
-                    TZS {Math.abs(netProfit).toLocaleString()}
-                  </span>
-                </div>
-                <p className="text-[10px] text-muted-foreground text-right italic">Calculated as Income - Expenses</p>
+              <div className="flex justify-between items-center">
+                <span className="font-bold text-gray-700">Net {isProfit ? 'Profit' : 'Loss'}:</span>
+                <span className={cn("font-black text-2xl", isProfit ? "text-green-600" : "text-red-600")}>
+                  TZS {Math.abs(netProfit).toLocaleString()}
+                </span>
               </div>
             </CardContent>
           </Card>
@@ -247,15 +228,6 @@ export default async function JobSheetDetailPage({ params }: { params: Promise<{
                 <p className="text-xs text-muted-foreground uppercase font-bold">Complaint</p>
                 <p className="text-sm italic">"{job.complaint}"</p>
               </div>
-              {job.mechanicNotes && (
-                <>
-                  <Separator />
-                  <div>
-                    <p className="text-xs text-muted-foreground uppercase font-bold">Internal Notes</p>
-                    <p className="text-sm text-gray-600">{job.mechanicNotes}</p>
-                  </div>
-                </>
-              )}
             </CardContent>
           </Card>
         </div>
