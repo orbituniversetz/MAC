@@ -12,11 +12,6 @@ interface JobCardDocumentProps {
 }
 
 export function JobCardDocument({ job, settings, isInternal = false, className }: JobCardDocumentProps) {
-  const totalIncome = job.items?.reduce((acc: number, item: any) => acc + item.subtotal, 0) || 0;
-  const totalExpenses = job.expenses ? job.expenses.reduce((acc: number, exp: any) => acc + exp.amount, 0) : 0;
-  const netProfit = totalIncome - totalExpenses;
-  const isProfit = netProfit >= 0;
-
   return (
     <div 
       id={isInternal ? "jobcard-document-internal" : "jobcard-document-customer"} 
@@ -113,7 +108,7 @@ export function JobCardDocument({ job, settings, isInternal = false, className }
         </table>
       </div>
 
-      {/* Totals & Internal Expenses - Aligned to match Invoice/Proforma layout */}
+      {/* Internal Expenses Section - Aligned with the layout */}
       <div className="grid grid-cols-2 gap-12 mb-8 avoid-break">
         <div>
           {isInternal && job.expenses?.length > 0 && (
@@ -137,46 +132,6 @@ export function JobCardDocument({ job, settings, isInternal = false, className }
               </table>
             </>
           )}
-        </div>
-        
-        <div className="flex justify-end">
-          <div className={cn(
-            "w-72 space-y-2 p-6 rounded-3xl border shadow-sm",
-            isInternal ? (isProfit ? 'bg-green-50 border-green-100' : 'bg-red-50 border-red-100') : "bg-zinc-50 border-zinc-100"
-          )}>
-            <div className="flex justify-between text-xs font-bold uppercase tracking-tight text-zinc-500">
-              <span>Gross Income:</span>
-              <span className="text-zinc-900">{totalIncome.toLocaleString()}</span>
-            </div>
-            
-            {isInternal && (
-              <>
-                <div className="flex justify-between text-xs font-bold uppercase tracking-tight text-red-600">
-                  <span>Total Costs:</span>
-                  <span>({totalExpenses.toLocaleString()})</span>
-                </div>
-                <div className={cn(
-                  "pt-4 border-t-2 flex justify-between items-center",
-                  isProfit ? 'border-green-200' : 'border-red-200'
-                )}>
-                  <span className="font-black text-xs uppercase tracking-widest">Net Profit:</span>
-                  <span className={cn(
-                    "font-black text-2xl tracking-tighter",
-                    isProfit ? 'text-green-700' : 'text-red-700'
-                  )}>
-                    TZS {Math.abs(netProfit).toLocaleString()}
-                  </span>
-                </div>
-              </>
-            )}
-
-            {!isInternal && (
-              <div className="pt-4 border-t-2 border-zinc-200 flex justify-between items-center">
-                <span className="font-black text-xs uppercase tracking-widest">Total Value:</span>
-                <span className="font-black text-2xl text-[#c10d12] whitespace-nowrap tracking-tighter">TZS {totalIncome.toLocaleString()}</span>
-              </div>
-            )}
-          </div>
         </div>
       </div>
 
