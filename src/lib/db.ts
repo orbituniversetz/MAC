@@ -31,6 +31,16 @@ if (isElectron) {
   dbPath = path.join(process.cwd(), dbName);
 }
 
+// Ensure the directory exists before attempting to open the database
+const dbDir = path.dirname(dbPath);
+if (!fs.existsSync(dbDir)) {
+  try {
+    fs.mkdirSync(dbDir, { recursive: true });
+  } catch (e) {
+    console.error('Could not create DB directory:', e);
+  }
+}
+
 const db = new Database(dbPath);
 
 // Performance Optimizations

@@ -10,8 +10,7 @@
     "start": "next start -p 9002",
     "lint": "next lint",
     "electron-dev": "electron .",
-    "dist": "npm run build && electron-builder",
-    "postinstall": "electron-rebuild -f -w better-sqlite3"
+    "dist": "npm run build && electron-builder"
   },
   "dependencies": {
     "next": "15.5.9",
