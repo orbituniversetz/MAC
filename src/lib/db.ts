@@ -3,46 +3,45 @@ import path from 'path';
 import fs from 'fs';
 import os from 'os';
 
-// Detect if we are running inside Electron or just standard Node (build/dev)
+// Detect environment
 const isElectron = typeof process !== 'undefined' && process.versions && !!process.versions.electron;
 const dbName = 'garage.db';
 
-let dbPath;
+let dbPath: string;
 
 if (isElectron) {
-  // In production (Electron), we store it in a persistent folder in the user's home directory
+  // Production (Electron EXE)
   const dataDir = path.join(os.homedir(), '.garageflow_desk');
   if (!fs.existsSync(dataDir)) {
     try {
       fs.mkdirSync(dataDir, { recursive: true });
     } catch (e) {
-      console.error('Failed to create data directory, falling back to local path');
+      console.error('Failed to create data directory');
     }
   }
-  
-  if (fs.existsSync(dataDir)) {
-    dbPath = path.join(dataDir, dbName);
-  } else {
-    dbPath = path.join(process.cwd(), dbName);
-  }
+  dbPath = path.join(dataDir, dbName);
 } else {
-  // During Next.js build or dev mode, use the project root
-  dbPath = path.join(process.cwd(), dbName);
-}
-
-// Ensure the directory exists before attempting to open the database
-try {
-  const dbDir = path.dirname(dbPath);
-  if (!fs.existsSync(dbDir)) {
-    fs.mkdirSync(dbDir, { recursive: true });
+  // Local Web / Development
+  // We use a dedicated folder in the project root to ensure it's not deleted by Next.js builds
+  const localDataDir = path.join(process.cwd(), 'local_data');
+  if (!fs.existsSync(localDataDir)) {
+    try {
+      fs.mkdirSync(localDataDir, { recursive: true });
+    } catch (e) {}
   }
-} catch (e) {
-  console.error('Could not ensure DB directory:', e);
+  dbPath = path.join(localDataDir, dbName);
 }
 
-const db = new Database(dbPath);
+// Ensure database path is absolute and directory exists
+const finalDbPath = path.resolve(dbPath);
+const dbDir = path.dirname(finalDbPath);
+if (!fs.existsSync(dbDir)) {
+  fs.mkdirSync(dbDir, { recursive: true });
+}
 
-// Performance Optimizations
+const db = new Database(finalDbPath);
+
+// Performance Optimizations for SQLite
 db.pragma('journal_mode = WAL');
 db.pragma('synchronous = NORMAL');
 db.pragma('temp_store = MEMORY');
@@ -182,7 +181,7 @@ if (settingsCount.count === 0) {
     ['bank_account_name', 'M. A. C. GARAGE'],
     ['bank_account_number', '0150457890500'],
     ['bank_swift', 'CORUTZTZ'],
-    ['garage_terms', 'Standard repair conditions apply.']
+    ['garage_terms', 'The vehicle is accepted for inspection, diagnosis, or repair as requested by the customer.\n\nFinal repair costs will be communicated to the customer for approval before work begins.\n\nThe garage is not responsible for personal belongings left inside the vehicle. Customers should remove valuables before leaving the vehicle.\n\nThe garage may conduct test drives for diagnostic or quality assurance purposes.\n\n\nThe garage is not responsible for damages resulting from pre-existing mechanical conditions or previously damaged parts.\n\nPayment must be completed before the vehicle is released unless otherwise agreed in writing.']
   ];
   const insert = db.prepare('INSERT INTO settings (key, value) VALUES (?, ?)');
   defaultSettings.forEach(([k, v]) => insert.run(k, v));

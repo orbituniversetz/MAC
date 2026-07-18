@@ -1,6 +1,7 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import { Inter } from 'next/font/google';
 import './globals.css';
+import { Toaster } from '@/components/ui/toaster';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -9,8 +10,20 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: 'GarageFlow Desk | Offline Garage Management',
-  description: 'A complete offline garage management system for single users.',
+  title: 'GarageFlow Desk | Professional Garage Management',
+  description: 'A complete offline-first garage management system.',
+  manifest: '/manifest.json',
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'default',
+    title: 'GarageFlow Desk',
+  },
+};
+
+export const viewport: Viewport = {
+  themeColor: '#c10d12',
+  width: 'device-width',
+  initialScale: 1,
 };
 
 export default function RootLayout({
@@ -20,7 +33,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={inter.variable}>
-      <body className="font-body antialiased">{children}</body>
+      <body className="font-body antialiased">
+        {children}
+        <Toaster />
+      </body>
     </html>
   );
 }
