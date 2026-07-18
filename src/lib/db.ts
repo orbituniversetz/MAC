@@ -4,27 +4,30 @@ import path from 'path';
 import fs from 'fs';
 import os from 'os';
 
-// Determine the database path
-// In production (Electron), we store it in a persistent folder in the user's home directory
-// During build/dev, we use the project root
-const isProd = process.env.NODE_ENV === 'production';
+// Detect if we are running inside Electron or just standard Node (build/dev)
+const isElectron = typeof process !== 'undefined' && process.versions && !!process.versions.electron;
 const dbName = 'garage.db';
 
 let dbPath;
 
-if (isProd) {
-  // For Windows/Linux compatibility in production, use a folder in home directory
+if (isElectron) {
+  // In production (Electron), we store it in a persistent folder in the user's home directory
   const dataDir = path.join(os.homedir(), '.garageflow_desk');
   if (!fs.existsSync(dataDir)) {
     try {
       fs.mkdirSync(dataDir, { recursive: true });
     } catch (e) {
-      // Fallback to current directory if home dir is not writable
-      dbPath = path.join(process.cwd(), dbName);
+      console.error('Failed to create data directory, falling back to local path');
     }
   }
-  dbPath = path.join(dataDir, dbName);
+  
+  if (fs.existsSync(dataDir)) {
+    dbPath = path.join(dataDir, dbName);
+  } else {
+    dbPath = path.join(process.cwd(), dbName);
+  }
 } else {
+  // During Next.js build or dev mode, use the project root
   dbPath = path.join(process.cwd(), dbName);
 }
 
