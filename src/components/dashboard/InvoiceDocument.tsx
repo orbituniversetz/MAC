@@ -1,4 +1,3 @@
-
 'use client'
 
 import { cn } from '@/lib/utils';
@@ -23,7 +22,7 @@ export function InvoiceDocument({ invoice, settings, className }: InvoiceDocumen
   return (
     <div id="invoice-document" className={cn("a4-page font-sans", className)}>
       {/* Header - Logo Left, Text Right */}
-      <div className="flex items-center justify-between mb-4 border-b-2 border-zinc-100 pb-4 shrink-0">
+      <div className="flex items-center justify-between mb-4 border-b-2 border-zinc-100 pb-4 shrink-0 avoid-break">
         <div className="flex items-center">
           {settings.garage_logo ? (
             <div className="relative h-20 w-20 overflow-hidden shrink-0">
@@ -47,7 +46,7 @@ export function InvoiceDocument({ invoice, settings, className }: InvoiceDocumen
         </div>
       </div>
 
-      <div className="flex justify-between items-center mb-8 bg-zinc-950 text-white p-4 rounded shadow-sm shrink-0">
+      <div className="flex justify-between items-center mb-8 bg-zinc-950 text-white p-4 rounded shadow-sm shrink-0 avoid-break">
         <h2 className="text-lg font-bold uppercase tracking-widest">TAX INVOICE</h2>
         <div className="text-right">
           <p className="text-[9px] font-black uppercase tracking-widest opacity-70 leading-none">INVOICE NUMBER</p>
@@ -55,7 +54,7 @@ export function InvoiceDocument({ invoice, settings, className }: InvoiceDocumen
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-12 mb-8 shrink-0">
+      <div className="grid grid-cols-2 gap-12 mb-8 shrink-0 avoid-break">
         <div>
           <h3 className="text-[10px] font-black text-zinc-400 uppercase tracking-widest mb-3">Customer Billing Info</h3>
           <div className="space-y-1">
@@ -89,7 +88,7 @@ export function InvoiceDocument({ invoice, settings, className }: InvoiceDocumen
           </thead>
           <tbody className="divide-y divide-zinc-100 font-bold">
             {snapshot.items?.map((item: any) => (
-              <tr key={item.id} className="text-xs">
+              <tr key={item.id} className="text-xs avoid-break">
                 <td className="p-4 font-black text-zinc-900 uppercase tracking-tight">{item.description}</td>
                 <td className="p-4 text-center text-zinc-800">{item.qty}</td>
                 <td className="p-4 text-right whitespace-nowrap text-zinc-600">{item.unitPrice.toLocaleString()}</td>
@@ -100,7 +99,7 @@ export function InvoiceDocument({ invoice, settings, className }: InvoiceDocumen
         </table>
       </div>
 
-      <div className="flex justify-end mb-12 shrink-0">
+      <div className="flex justify-end mb-12 shrink-0 avoid-break">
         <div className="w-72 space-y-2 bg-zinc-50 p-6 rounded-3xl border border-zinc-100 shadow-sm">
           <div className="flex justify-between text-xs font-bold uppercase tracking-tight">
             <span className="text-zinc-500">Subtotal:</span>
@@ -125,7 +124,7 @@ export function InvoiceDocument({ invoice, settings, className }: InvoiceDocumen
         </div>
       </div>
 
-      <div className="mt-auto pt-8 border-t-4 border-zinc-950 shrink-0">
+      <div className="mt-auto pt-8 border-t-4 border-zinc-950 shrink-0 avoid-break">
         <div className="grid grid-cols-2 gap-12">
           <div>
             <h3 className="text-[10px] font-black text-zinc-400 uppercase tracking-widest mb-4">Payment Instructions</h3>

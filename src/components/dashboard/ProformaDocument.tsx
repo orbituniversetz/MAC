@@ -1,4 +1,3 @@
-
 'use client'
 
 import { cn } from '@/lib/utils';
@@ -24,7 +23,7 @@ export function ProformaDocument({ proforma, settings, className }: ProformaDocu
 
   return (
     <div id="proforma-document" className={cn("a4-page font-sans", className)}>
-      <div className="flex items-center justify-between mb-4 border-b-2 border-zinc-100 pb-4 shrink-0">
+      <div className="flex items-center justify-between mb-4 border-b-2 border-zinc-100 pb-4 shrink-0 avoid-break">
         <div className="flex items-center">
           {settings.garage_logo ? (
             <div className="relative h-20 w-20 overflow-hidden shrink-0">
@@ -48,7 +47,7 @@ export function ProformaDocument({ proforma, settings, className }: ProformaDocu
         </div>
       </div>
 
-      <div className="flex justify-between items-center mb-8 bg-primary text-white p-4 rounded shadow-sm shrink-0">
+      <div className="flex justify-between items-center mb-8 bg-primary text-white p-4 rounded shadow-sm shrink-0 avoid-break">
         <h2 className="text-lg font-bold uppercase tracking-widest">PROFORMA INVOICE</h2>
         <div className="text-right">
           <p className="text-[10px] font-bold opacity-70 uppercase tracking-tighter leading-none">QUOTATION NUMBER</p>
@@ -56,7 +55,7 @@ export function ProformaDocument({ proforma, settings, className }: ProformaDocu
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-12 mb-8 shrink-0">
+      <div className="grid grid-cols-2 gap-12 mb-8 shrink-0 avoid-break">
         <div>
           <h3 className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest mb-2">Quotation For</h3>
           <div className="space-y-1">
@@ -88,7 +87,7 @@ export function ProformaDocument({ proforma, settings, className }: ProformaDocu
           </thead>
           <tbody className="divide-y divide-zinc-100">
             {proforma.items?.map((item: any) => (
-              <tr key={item.id} className="text-xs">
+              <tr key={item.id} className="text-xs avoid-break">
                 <td className="p-3.5 font-bold text-zinc-900 uppercase tracking-tight">{item.description}</td>
                 <td className="p-3.5 text-center font-medium">{item.qty}</td>
                 <td className="p-3.5 text-right font-medium whitespace-nowrap text-zinc-600">{item.unitPrice.toLocaleString()}</td>
@@ -99,7 +98,7 @@ export function ProformaDocument({ proforma, settings, className }: ProformaDocu
         </table>
       </div>
 
-      <div className="flex justify-end mb-10 shrink-0">
+      <div className="flex justify-end mb-10 shrink-0 avoid-break">
         <div className="w-72 space-y-2 bg-zinc-50 p-6 rounded-3xl border border-zinc-100 shadow-sm">
           <div className="flex justify-between text-xs font-bold uppercase tracking-tight">
             <span className="text-zinc-500">Subtotal:</span>
@@ -133,7 +132,7 @@ export function ProformaDocument({ proforma, settings, className }: ProformaDocu
       </div>
 
       <div className={cn(
-        "p-6 rounded-2xl mb-10 flex justify-between items-center border-2 shrink-0",
+        "p-6 rounded-2xl mb-10 flex justify-between items-center border-2 shrink-0 avoid-break",
         isFullyPaid ? "bg-green-600 border-green-700 text-white shadow-lg" : "bg-zinc-900 border-zinc-950 text-white shadow-md"
       )}>
         <div>
@@ -146,7 +145,7 @@ export function ProformaDocument({ proforma, settings, className }: ProformaDocu
         </div>
       </div>
 
-      <div className="mt-auto pt-8 border-t border-zinc-100 shrink-0">
+      <div className="mt-auto pt-8 border-t border-zinc-100 shrink-0 avoid-break">
         <div className="grid grid-cols-2 gap-12">
           <div>
             <h3 className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest mb-4">Banking Instructions</h3>

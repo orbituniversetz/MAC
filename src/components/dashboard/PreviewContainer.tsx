@@ -42,13 +42,17 @@ export function PreviewContainer({
 
     setIsExporting(true);
     try {
-      // Standard A4 dimensions (210mm x 297mm)
       const pdf = new jsPDF('p', 'mm', 'a4');
       const pdfWidth = pdf.internal.pageSize.getWidth();
       const pdfHeight = pdf.internal.pageSize.getHeight();
+      
+      // Constants for professional paging
+      const stapleMargin = 20; // 20mm space at top of subsequent pages for stapling
+      const bottomMargin = 10;
+      const effectivePageHeight = pdfHeight - stapleMargin - bottomMargin;
 
       const canvas = await html2canvas(element, {
-        scale: 2, // High-fidelity capture
+        scale: 2,
         useCORS: true,
         logging: false,
         backgroundColor: '#ffffff',
@@ -57,7 +61,6 @@ export function PreviewContainer({
         onclone: (clonedDoc) => {
           const clonedElement = clonedDoc.getElementById(documentId);
           if (clonedElement) {
-            // Strip CSS effects that would look weird in a flattened PDF
             clonedElement.style.transform = 'none';
             clonedElement.style.boxShadow = 'none';
             clonedElement.style.margin = '0';
@@ -73,20 +76,30 @@ export function PreviewContainer({
       let heightLeft = imgHeightInPdf;
       let position = 0;
 
-      // Add Page 1
+      // --- PAGE 1 ---
+      // We don't usually need staple space on the very first page top (branding is there)
       pdf.addImage(imgData, 'JPEG', 0, position, pdfWidth, imgHeightInPdf, undefined, 'FAST');
       heightLeft -= pdfHeight;
 
-      // Paging loop with a 2mm threshold to avoid blank/tiny sliver pages
+      // --- SUBSEQUENT PAGES ---
       while (heightLeft > 2) {
-        position = heightLeft - imgHeightInPdf;
+        // Move to the next "slice" of the image
+        // We subtract effectivePageHeight to account for the staple gap we want to leave
+        position = heightLeft - imgHeightInPdf + stapleMargin; 
+        
         pdf.addPage();
+        
+        // Add image at the offset position (leaving 'stapleMargin' empty at the top)
         pdf.addImage(imgData, 'JPEG', 0, position, pdfWidth, imgHeightInPdf, undefined, 'FAST');
-        heightLeft -= pdfHeight;
+        
+        heightLeft -= effectivePageHeight;
       }
 
       pdf.save(`${filename}.pdf`);
-      toast({ title: "Export Success", description: "Document exactly as previewed saved as A4 PDF." });
+      toast({ 
+        title: "Export Success", 
+        description: "A4 PDF generated with staple-friendly margins." 
+      });
     } catch (error) {
       console.error('PDF Error:', error);
       toast({ variant: "destructive", title: "Export Failed", description: "Could not generate A4 PDF." });
@@ -99,7 +112,6 @@ export function PreviewContainer({
 
   return (
     <div className="fixed inset-0 z-[9999] flex flex-col bg-zinc-950 no-print">
-      {/* Dynamic Toolbar */}
       <div className="flex h-16 w-full items-center justify-between border-b border-white/10 bg-zinc-900 px-6 text-white shadow-2xl shrink-0">
         <div className="flex items-center gap-3">
           <div className="p-2 bg-zinc-800 rounded-lg">
@@ -107,11 +119,10 @@ export function PreviewContainer({
           </div>
           <div className="hidden sm:block">
             <h2 className="text-sm font-bold tracking-tight uppercase tracking-widest leading-none">{title}</h2>
-            <p className="text-[10px] text-white/40 mt-1 uppercase font-bold">A4 High-Fidelity Export Protocol</p>
+            <p className="text-[10px] text-white/40 mt-1 uppercase font-bold">A4 Multi-Page Print Protocol</p>
           </div>
         </div>
 
-        {/* Zoom Controls */}
         <div className="flex items-center gap-1 bg-zinc-800 p-1 rounded-lg border border-white/5 mx-4">
           <Button variant="ghost" size="icon" onClick={handleZoomOut} className="h-8 w-8 text-white/70 hover:text-white">
             <ZoomOut className="h-4 w-4" />
@@ -124,7 +135,6 @@ export function PreviewContainer({
           </Button>
         </div>
 
-        {/* Actions */}
         <div className="flex items-center gap-3">
           <Button 
             onClick={handleDownloadPDF} 
@@ -133,7 +143,7 @@ export function PreviewContainer({
             className="h-10 border-white/20 bg-white/5 text-white text-xs font-bold hidden sm:flex hover:bg-white/10"
           >
             {isExporting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Download className="mr-2 h-4 w-4" />}
-            EXPORT A4 PDF
+            DOWNLOAD A4 PDF
           </Button>
           <Button onClick={handlePrint} className="h-10 bg-primary text-white hover:bg-red-700 text-xs font-bold">
             <Printer className="mr-2 h-4 w-4" /> PRINT
@@ -144,7 +154,6 @@ export function PreviewContainer({
         </div>
       </div>
 
-      {/* Optimized Scroll Viewport */}
       <div className="flex-1 overflow-auto preview-scroll bg-zinc-900/95 flex justify-center p-4 sm:p-12">
         <div 
           className="relative transition-transform duration-200 origin-top print-container shadow-2xl"

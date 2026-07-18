@@ -1,4 +1,3 @@
-
 'use client'
 
 import { cn } from '@/lib/utils';
@@ -15,7 +14,7 @@ export function DocumentPaper({ doc, settings, className }: DocumentPaperProps) 
   return (
     <div id="document-paper" className={cn("a4-page font-sans", className)}>
       {/* Header - Logo Left, Text Right */}
-      <div className="flex items-center justify-between mb-4 border-b-2 border-zinc-100 pb-4">
+      <div className="flex items-center justify-between mb-4 border-b-2 border-zinc-100 pb-4 shrink-0 avoid-break">
         <div className="flex items-center">
           {settings.garage_logo ? (
             <div className="relative h-20 w-20 overflow-hidden shrink-0">
@@ -43,7 +42,7 @@ export function DocumentPaper({ doc, settings, className }: DocumentPaperProps) 
         </div>
       </div>
 
-      <div className="flex justify-between items-center mb-10 border-b-4 border-zinc-900 pb-2">
+      <div className="flex justify-between items-center mb-10 border-b-4 border-zinc-900 pb-2 shrink-0 avoid-break">
         <div className="inline-flex items-center gap-2 bg-zinc-950 text-white px-4 py-1.5 rounded text-[10px] font-black uppercase tracking-widest">
           {doc.docType === 'LETTER' ? <Mail className="h-3.5 w-3.5" /> : <FileText className="h-3.5 w-3.5" />}
           {doc.docType === 'LETTER' ? 'Official Correspondence' : 'Technical Inspection Report'}
@@ -55,7 +54,7 @@ export function DocumentPaper({ doc, settings, className }: DocumentPaperProps) 
         </div>
       </div>
 
-      <div className="mb-12 space-y-8">
+      <div className="mb-12 space-y-8 avoid-break">
         <div className="space-y-1">
           <p className="text-[10px] font-black uppercase text-zinc-400 tracking-widest mb-1">Recipient Address</p>
           <p className="font-black text-lg text-zinc-900 leading-tight">{doc.customerName}</p>
@@ -71,7 +70,7 @@ export function DocumentPaper({ doc, settings, className }: DocumentPaperProps) 
         )}
       </div>
 
-      <div className="mb-8">
+      <div className="mb-8 avoid-break">
         <h2 className="text-lg font-bold uppercase border-b-2 border-zinc-900 inline-block pb-1 tracking-tight text-zinc-900">
           {doc.title}
         </h2>
@@ -81,7 +80,7 @@ export function DocumentPaper({ doc, settings, className }: DocumentPaperProps) 
         {doc.content}
       </div>
 
-      <div className="mt-auto space-y-12">
+      <div className="mt-auto space-y-12 shrink-0 avoid-break">
         <div className="p-6 bg-zinc-50 rounded-2xl border border-zinc-100">
           <h3 className="text-[10px] font-black text-zinc-400 uppercase tracking-widest mb-2">Standard Notice</h3>
           <p className="text-[10px] text-zinc-500 italic leading-relaxed">This document serves as an official communication. Any technical findings are based on the inspection performed on the date stated above.</p>
