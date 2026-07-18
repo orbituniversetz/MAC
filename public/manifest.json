@@ -1,8 +1,9 @@
+
 {
   "name": "GarageFlow Desk",
   "short_name": "GarageFlow",
-  "description": "Professional Offline Garage Management System",
-  "start_url": "/dashboard",
+  "description": "Professional Offline-First Garage Management System",
+  "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#c10d12",
@@ -16,8 +17,7 @@
     {
       "src": "https://picsum.photos/seed/garage/512/512",
       "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any maskable"
+      "type": "image/png"
     }
   ]
 }

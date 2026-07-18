@@ -1,3 +1,4 @@
+
 import Database from 'better-sqlite3';
 import path from 'path';
 import fs from 'fs';
@@ -5,48 +6,44 @@ import os from 'os';
 
 // Detect environment
 const isElectron = typeof process !== 'undefined' && process.versions && !!process.versions.electron;
+const isBuild = process.env.NEXT_PHASE === 'phase-production-build';
 const dbName = 'garage.db';
 
 let dbPath: string;
 
-if (isElectron) {
-  // Production (Electron EXE)
+if (isBuild) {
+  // During build, use a temporary local file
+  dbPath = path.join(process.cwd(), 'local_data', 'build-temp.db');
+} else if (isElectron) {
   const dataDir = path.join(os.homedir(), '.garageflow_desk');
-  if (!fs.existsSync(dataDir)) {
-    try {
-      fs.mkdirSync(dataDir, { recursive: true });
-    } catch (e) {
-      console.error('Failed to create data directory');
-    }
-  }
   dbPath = path.join(dataDir, dbName);
 } else {
-  // Local Web / Development
-  // We use a dedicated folder in the project root to ensure it's not deleted by Next.js builds
+  // Standard PWA / Local Web Server mode
   const localDataDir = path.join(process.cwd(), 'local_data');
-  if (!fs.existsSync(localDataDir)) {
-    try {
-      fs.mkdirSync(localDataDir, { recursive: true });
-    } catch (e) {}
-  }
   dbPath = path.join(localDataDir, dbName);
 }
 
-// Ensure database path is absolute and directory exists
-const finalDbPath = path.resolve(dbPath);
-const dbDir = path.dirname(finalDbPath);
+// Ensure directory exists
+const dbDir = path.dirname(dbPath);
 if (!fs.existsSync(dbDir)) {
   fs.mkdirSync(dbDir, { recursive: true });
 }
 
-const db = new Database(finalDbPath);
+const db = new Database(dbPath);
 
-// Performance Optimizations for SQLite
+// Performance Optimizations
 db.pragma('journal_mode = WAL');
 db.pragma('synchronous = NORMAL');
-db.pragma('temp_store = MEMORY');
 
 db.exec(`
+  CREATE TABLE IF NOT EXISTS users (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    username TEXT UNIQUE NOT NULL,
+    password TEXT NOT NULL,
+    role TEXT DEFAULT 'admin',
+    createdAt DATETIME DEFAULT CURRENT_TIMESTAMP
+  );
+
   CREATE TABLE IF NOT EXISTS customers (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT NOT NULL,
@@ -164,10 +161,14 @@ db.exec(`
 
   CREATE INDEX IF NOT EXISTS idx_vehicles_cust ON vehicles(customerId);
   CREATE INDEX IF NOT EXISTS idx_jobsheets_cust ON jobsheets(customerId);
-  CREATE INDEX IF NOT EXISTS idx_items_js ON job_items(jobSheetId);
 `);
 
-// Seed initial settings if empty
+// Seed default admin and settings
+const userCount = db.prepare('SELECT count(*) as count FROM users').get() as any;
+if (userCount.count === 0) {
+  db.prepare('INSERT INTO users (username, password, role) VALUES (?, ?, ?)').run('admin', 'admin123', 'admin');
+}
+
 const settingsCount = db.prepare('SELECT count(*) as count FROM settings').get() as any;
 if (settingsCount.count === 0) {
   const defaultSettings = [
@@ -181,10 +182,11 @@ if (settingsCount.count === 0) {
     ['bank_account_name', 'M. A. C. GARAGE'],
     ['bank_account_number', '0150457890500'],
     ['bank_swift', 'CORUTZTZ'],
-    ['garage_terms', 'The vehicle is accepted for inspection, diagnosis, or repair as requested by the customer.\n\nFinal repair costs will be communicated to the customer for approval before work begins.\n\nThe garage is not responsible for personal belongings left inside the vehicle. Customers should remove valuables before leaving the vehicle.\n\nThe garage may conduct test drives for diagnostic or quality assurance purposes.\n\n\nThe garage is not responsible for damages resulting from pre-existing mechanical conditions or previously damaged parts.\n\nPayment must be completed before the vehicle is released unless otherwise agreed in writing.']
+    ['garage_terms', 'Standard mechanical repair conditions apply. All work is guaranteed.']
   ];
   const insert = db.prepare('INSERT INTO settings (key, value) VALUES (?, ?)');
   defaultSettings.forEach(([k, v]) => insert.run(k, v));
 }
 
+export { dbPath };
 export default db;

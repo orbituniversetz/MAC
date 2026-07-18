@@ -1,10 +1,12 @@
 
 'use server'
 
-import db from './db';
+import db, { dbPath } from './db';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { cache } from 'react';
+import fs from 'fs';
+import path from 'path';
 
 export const getDashboardStats = cache(async () => {
   const openJobs = db.prepare("SELECT COUNT(*) as count FROM jobsheets WHERE status != 'Closed'").get() as any;
@@ -20,6 +22,30 @@ export const getDashboardStats = cache(async () => {
     netProfit: (totalSales?.total || 0) - (totalExpenses?.total || 0)
   };
 });
+
+// Database Backup/Restore Actions
+export async function exportDatabase() {
+  try {
+    const data = fs.readFileSync(dbPath);
+    const base64 = data.toString('base64');
+    return { success: true, data: base64, filename: `garage_backup_${Date.now()}.sqlite` };
+  } catch (error) {
+    return { success: false, error: 'Failed to read database file' };
+  }
+}
+
+export async function importDatabase(base64Data: string) {
+  try {
+    const buffer = Buffer.from(base64Data, 'base64');
+    // Ensure WAL mode is closed before overwriting
+    db.close();
+    fs.writeFileSync(dbPath, buffer);
+    // Force process restart or just notify user to restart app
+    return { success: true };
+  } catch (error) {
+    return { success: false, error: 'Failed to write database file' };
+  }
+}
 
 export const getJobSheets = cache(async () => {
   return db.prepare(`
