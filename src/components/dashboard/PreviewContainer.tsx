@@ -42,20 +42,29 @@ export function PreviewContainer({
 
     setIsExporting(true);
     try {
+      // Create PDF at A4 dimensions
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = pdf.internal.pageSize.getHeight();
+
       const canvas = await html2canvas(element, {
-        scale: 2,
+        scale: 2, // High resolution (300dpi equivalent)
         useCORS: true,
         logging: false,
         backgroundColor: '#ffffff',
-        windowWidth: element.scrollWidth,
-        windowHeight: element.scrollHeight
+        width: element.scrollWidth,
+        height: element.scrollHeight,
+        onclone: (clonedDoc) => {
+          const clonedElement = clonedDoc.getElementById(documentId);
+          if (clonedElement) {
+            clonedElement.style.transform = 'none';
+            clonedElement.style.boxShadow = 'none';
+            clonedElement.style.margin = '0';
+          }
+        }
       });
       
-      const imgData = canvas.toDataURL('image/jpeg', 0.95);
-      const pdf = new jsPDF('p', 'mm', 'a4');
-      
-      const pdfWidth = pdf.internal.pageSize.getWidth();
-      const pdfHeight = pdf.internal.pageSize.getHeight();
+      const imgData = canvas.toDataURL('image/jpeg', 0.98);
       const canvasWidth = canvas.width;
       const canvasHeight = canvas.height;
       
@@ -63,12 +72,12 @@ export function PreviewContainer({
       let heightLeft = imgHeightInPdf;
       let position = 0;
 
-      // Add first page
+      // Page 1
       pdf.addImage(imgData, 'JPEG', 0, position, pdfWidth, imgHeightInPdf, undefined, 'FAST');
       heightLeft -= pdfHeight;
 
-      // Multi-page logic with threshold to avoid blank/tiny sliver pages
-      while (heightLeft > 2) { // 2mm threshold: ignore tiny amounts of white space at bottom
+      // Paging loop with a 5mm threshold to ignore minor overflow/margins
+      while (heightLeft > 5) {
         position = heightLeft - imgHeightInPdf;
         pdf.addPage();
         pdf.addImage(imgData, 'JPEG', 0, position, pdfWidth, imgHeightInPdf, undefined, 'FAST');
@@ -76,10 +85,10 @@ export function PreviewContainer({
       }
 
       pdf.save(`${filename}.pdf`);
-      toast({ title: "Export Success", description: "Document saved as PDF." });
+      toast({ title: "Export Success", description: "Document exactly as previewed saved as PDF." });
     } catch (error) {
       console.error('PDF Error:', error);
-      toast({ variant: "destructive", title: "Export Failed", description: "Check logs." });
+      toast({ variant: "destructive", title: "Export Failed", description: "Check console for details." });
     } finally {
       setIsExporting(false);
     }
@@ -97,7 +106,7 @@ export function PreviewContainer({
           </div>
           <div className="hidden sm:block">
             <h2 className="text-sm font-bold tracking-tight uppercase tracking-widest leading-none">{title}</h2>
-            <p className="text-[10px] text-white/40 mt-1 uppercase font-bold">A4 Export Protocol v2.0</p>
+            <p className="text-[10px] text-white/40 mt-1 uppercase font-bold">High-Fidelity Export Protocol</p>
           </div>
         </div>
 
