@@ -154,12 +154,14 @@ db.exec(`
     docNo TEXT UNIQUE,
     customerId INTEGER,
     jobSheetId INTEGER,
+    vehicleId INTEGER,
     title TEXT,
     content TEXT,
     status TEXT DEFAULT 'Draft',
     createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY(customerId) REFERENCES customers(id),
-    FOREIGN KEY(jobSheetId) REFERENCES jobsheets(id)
+    FOREIGN KEY(jobSheetId) REFERENCES jobsheets(id),
+    FOREIGN KEY(vehicleId) REFERENCES vehicles(id)
   );
 
   CREATE INDEX IF NOT EXISTS idx_vehicles_cust ON vehicles(customerId);

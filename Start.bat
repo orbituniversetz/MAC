@@ -1,23 +1,21 @@
 @echo off
-echo Starting GarageFlow Desk Local Server...
-echo.
-
-:: Check for node
-where node >nul 2>1
+echo Starting GarageFlow Desk...
+echo Checking for Node.js...
+node -v >nul 2>&1
 if %errorlevel% neq 0 (
-    echo [ERROR] Node.js is not installed. Please install Node.js from https://nodejs.org/
+    echo Error: Node.js is not installed. Please install it from https://nodejs.org/
     pause
     exit /b
 )
 
-:: Install dependencies on first run
 if not exist node_modules (
-    echo [INFO] Installing system components (first-run only)...
+    echo First run setup: Installing dependencies...
     call npm install
 )
 
-:: Start the app
-echo [INFO] Server launching on http://localhost:9002
-echo.
-start "" http://localhost:9002
-npm run start
+echo Starting local server on port 9002...
+start /b npm run dev
+echo Waiting for server to initialize...
+timeout /t 6 /nobreak >nul
+echo Opening GarageFlow Desk...
+start http://localhost:9002

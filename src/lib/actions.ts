@@ -296,7 +296,7 @@ export const getDocumentById = cache(async (id: number) => {
     FROM documents d
     LEFT JOIN customers c ON d.customerId = c.id
     LEFT JOIN jobsheets js ON d.jobSheetId = js.id
-    LEFT JOIN vehicles v ON js.vehicleId = v.id
+    LEFT JOIN vehicles v ON d.vehicleId = v.id
     WHERE d.id = ?
   `).get(id) as any;
 });
@@ -334,7 +334,7 @@ export async function convertToInvoice(pfId: number) {
   const pf = await getProformaById(pfId);
   const invoiceNo = `INV-${Date.now().toString().slice(-6)}`;
   const snapshot = JSON.stringify(pf);
-  const info = db.prepare('INSERT INTO invoices (invoiceNo, jobSheetId, proformaId, snapshotJson) VALUES (?, ?, ?, ?)').run(invoiceNo, pf.jobSheetId, pfId, snapshot);
+  const info = db.prepare('INSERT INTO invoices (invoiceNo, jobSheetId, proformaId, snapshotJson, customerId) VALUES (?, ?, ?, ?, ?)').run(invoiceNo, pf.jobSheetId, pfId, snapshot, pf.customerId);
   db.prepare("UPDATE proformas SET status = 'Invoiced' WHERE id = ?").run(pfId);
   revalidatePath('/dashboard/invoices');
   redirect(`/dashboard/invoices/${info.lastInsertRowid}`);
