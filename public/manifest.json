@@ -1,8 +1,7 @@
-
 {
   "name": "GarageFlow Desk",
   "short_name": "GarageFlow",
-  "description": "Professional Garage Management System for Windows",
+  "description": "Professional Offline-First Garage Management System",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",

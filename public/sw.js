@@ -1,4 +1,3 @@
-
 const CACHE_NAME = 'garageflow-v1';
 const ASSETS_TO_CACHE = [
   '/',

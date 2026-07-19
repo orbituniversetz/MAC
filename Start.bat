@@ -1,27 +1,23 @@
-
 @echo off
-TITLE GarageFlow Desk Launcher
 echo Starting GarageFlow Desk Local Server...
-echo Please do not close this window while using the app.
 echo.
 
-:: Check for Node.js
-where node >nul 2>nul
+:: Check for node
+where node >nul 2>1
 if %errorlevel% neq 0 (
-    echo Error: Node.js is not installed. Please install Node.js from https://nodejs.org/
+    echo [ERROR] Node.js is not installed. Please install Node.js from https://nodejs.org/
     pause
-    exit
+    exit /b
 )
 
-:: Start the production server
-start /b npm run start
+:: Install dependencies on first run
+if not exist node_modules (
+    echo [INFO] Installing system components (first-run only)...
+    call npm install
+)
 
-echo Waiting for server to initialize...
-timeout /t 5 /nobreak >nul
-
-:: Open in default browser
-start http://localhost:9002
-
+:: Start the app
+echo [INFO] Server launching on http://localhost:9002
 echo.
-echo Application is running at http://localhost:9002
-echo You can now "Install" it as a PWA from your browser address bar.
+start "" http://localhost:9002
+npm run start

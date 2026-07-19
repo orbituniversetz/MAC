@@ -1,4 +1,3 @@
-
 import { getProformaById, getSettings, finalizeProforma, saveProformaDraft, getRecentItems, deleteJobItem, convertToInvoice, updateProformaDiscount, recordProformaPayment, updateProformaTaxStatus } from '@/lib/actions';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -126,12 +125,12 @@ export default async function ProformaDetailPage({ params }: { params: Promise<{
         </div>
       </div>
 
-      {/* Matching High-Fidelity Professional Inline Preview */}
+      {/* High-Fidelity Professional Document View */}
       <div className="max-w-6xl mx-auto space-y-6">
-        <h3 className="font-bold text-xs text-zinc-400 uppercase tracking-widest px-4">Professional Document Preview</h3>
+        <h3 className="font-bold text-xs text-zinc-400 uppercase tracking-widest px-4">Professional A4 Preview</h3>
         <div className="bg-zinc-100/50 border rounded-3xl shadow-inner overflow-y-auto p-4 sm:p-12 flex justify-center min-h-[1400px]">
-          <div className="origin-top shadow-2xl">
-            <ProformaDocument proforma={pf} settings={settings} />
+          <div className="origin-top shadow-2xl transition-transform">
+             <ProformaDocument proforma={pf} settings={settings} />
           </div>
         </div>
       </div>
