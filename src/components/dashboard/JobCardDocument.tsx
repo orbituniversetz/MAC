@@ -15,10 +15,10 @@ export function JobCardDocument({ job, settings, isInternal = false, className }
   return (
     <div 
       id={isInternal ? "jobcard-document-internal" : "jobcard-document-customer"} 
-      className={cn("space-y-8 print:space-y-0", className)}
+      className={cn("space-y-0", className)}
     >
       {/* PAGE 1: INTAKE RECEIPT */}
-      <div className="a4-page font-sans relative flex flex-col shadow-lg print:shadow-none">
+      <div className="a4-page font-sans relative flex flex-col shadow-lg print:shadow-none mb-8">
         {/* Header */}
         <div className="flex items-center justify-between mb-4 border-b-2 border-zinc-100 pb-4 shrink-0 avoid-break">
           <div className="flex items-center">
@@ -43,7 +43,7 @@ export function JobCardDocument({ job, settings, isInternal = false, className }
         </div>
 
         {/* Banner */}
-        <div className="flex justify-between items-center mb-8 bg-zinc-950 text-white p-4 rounded shadow-sm shrink-0 avoid-break">
+        <div className="flex justify-between items-center mb-6 bg-zinc-950 text-white p-4 rounded shadow-sm shrink-0 avoid-break">
           <div className="inline-flex items-center gap-2">
             {isInternal ? <ShieldCheck className="h-4 w-4 text-blue-400" /> : <User className="h-4 w-4 text-red-400" />}
             <h2 className="text-lg font-bold uppercase tracking-widest">{isInternal ? 'INTERNAL JOB RECORD' : 'VEHICLE JOB CARD'}</h2>
@@ -55,9 +55,9 @@ export function JobCardDocument({ job, settings, isInternal = false, className }
         </div>
 
         {/* Info Grid */}
-        <div className="grid grid-cols-2 gap-12 mb-8 avoid-break">
+        <div className="grid grid-cols-2 gap-12 mb-6 avoid-break">
           <div>
-            <h3 className="text-[10px] font-black text-zinc-400 uppercase tracking-widest mb-3">Customer Information</h3>
+            <h3 className="text-[10px] font-black text-zinc-400 uppercase tracking-widest mb-2">Customer Information</h3>
             <div className="space-y-1">
               <p className="font-black text-lg text-zinc-900 leading-tight">{job.customerName}</p>
               <p className="text-sm font-bold text-zinc-600 leading-snug">{job.customerAddress || 'No Address Provided'}</p>
@@ -69,7 +69,7 @@ export function JobCardDocument({ job, settings, isInternal = false, className }
           </div>
 
           <div className="bg-zinc-50 p-5 rounded-2xl border border-zinc-100 flex flex-col justify-center">
-            <h3 className="text-[10px] font-black text-zinc-400 uppercase tracking-widest mb-3">Vehicle Details</h3>
+            <h3 className="text-[10px] font-black text-zinc-400 uppercase tracking-widest mb-2">Vehicle Details</h3>
             <p className="text-lg font-black tracking-tight text-zinc-900">{job.vehiclePlate} <span className="text-zinc-400 font-bold ml-2">({job.vehicleModel})</span></p>
             <div className="pt-2 border-t border-zinc-200 mt-2">
               <p className="text-[9px] font-black text-zinc-400 uppercase tracking-widest mb-1">Work Requested / Complaint</p>
@@ -78,30 +78,30 @@ export function JobCardDocument({ job, settings, isInternal = false, className }
           </div>
         </div>
 
-        {/* Status Section */}
-        <div className="flex-1 flex flex-col justify-center items-center border-2 border-dashed border-zinc-100 rounded-3xl mb-8 avoid-break">
-          <Wrench className="h-12 w-12 text-zinc-50 mb-4" />
-          <p className="text-zinc-400 font-bold uppercase tracking-widest text-[10px] text-center px-12 leading-relaxed">
+        {/* Status Section - Scaled down to prevent Page 3 split */}
+        <div className="flex-1 flex flex-col justify-center items-center border-2 border-dashed border-zinc-100 rounded-3xl mb-6 avoid-break max-h-[300px]">
+          <Wrench className="h-10 w-10 text-zinc-50 mb-3" />
+          <p className="text-zinc-400 font-bold uppercase tracking-widest text-[9px] text-center px-12 leading-relaxed">
             Vehicle Intake confirmed. Full technical findings and repair items will be provided in the Technical Report and Proforma Invoice.
           </p>
         </div>
 
-        {/* Signatures for Page 1 */}
-        <div className="mt-auto pt-8 border-t border-zinc-100 avoid-break">
+        {/* Signatures for Page 1 - Compact */}
+        <div className="mt-auto pt-6 border-t border-zinc-100 avoid-break">
           <div className="grid grid-cols-2 gap-12">
-            <div className="space-y-4">
+            <div className="space-y-3">
               <p className="text-[10px] text-zinc-400 font-bold uppercase tracking-widest">Acknowledgment</p>
-              <p className="text-[10px] text-zinc-500 leading-relaxed italic">By signing this document, the customer authorizes the garage to perform the requested inspection and repairs as per the terms on Page 2.</p>
+              <p className="text-[9px] text-zinc-500 leading-relaxed italic">By signing this document, the customer authorizes the garage to perform the requested inspection and repairs as per the terms on Page 2.</p>
             </div>
-            <div className="flex flex-col justify-end space-y-6">
+            <div className="flex flex-col justify-end space-y-4">
               <div className="grid grid-cols-2 gap-8">
-                <div className="text-center space-y-2">
-                  <div className="h-10 border-b-2 border-zinc-300 opacity-50"></div>
-                  <p className="text-[9px] font-black uppercase tracking-widest text-zinc-400">Supervisor / Rep</p>
+                <div className="text-center space-y-1">
+                  <div className="h-8 border-b-2 border-zinc-300 opacity-50"></div>
+                  <p className="text-[8px] font-black uppercase tracking-widest text-zinc-400">Supervisor / Rep</p>
                 </div>
-                <div className="text-center space-y-2">
-                  <div className="h-10 border-b-2 border-zinc-300 opacity-50"></div>
-                  <p className="text-[9px] font-black uppercase tracking-widest text-zinc-400">Customer Authorization</p>
+                <div className="text-center space-y-1">
+                  <div className="h-8 border-b-2 border-zinc-300 opacity-50"></div>
+                  <p className="text-[8px] font-black uppercase tracking-widest text-zinc-400">Customer Authorization</p>
                 </div>
               </div>
             </div>
@@ -122,19 +122,19 @@ export function JobCardDocument({ job, settings, isInternal = false, className }
           </div>
         </div>
 
-        <div className="p-8 bg-zinc-50 rounded-3xl border-2 border-zinc-100 shadow-sm min-h-[200mm] avoid-break">
+        <div className="p-8 bg-zinc-50 rounded-3xl border-2 border-zinc-100 shadow-sm flex-1 avoid-break">
           <h3 className="text-xs font-black text-[#c10d12] uppercase tracking-widest mb-6 border-b border-red-100 pb-2">Job Sheet Terms (Customer Copy)</h3>
-          <div className="text-xs text-zinc-700 whitespace-pre-wrap leading-loose font-medium">
+          <div className="text-[11px] text-zinc-700 whitespace-pre-wrap leading-relaxed font-medium">
             {settings.garage_terms || 'Standard mechanical repair conditions apply. All work is guaranteed as per the workshop policy.'}
           </div>
         </div>
 
-        <div className="mt-12 pt-8 border-t-4 border-zinc-950 flex justify-between items-center shrink-0 avoid-break">
-          <div className="text-[10px] font-bold text-zinc-400 uppercase tracking-tighter">
+        <div className="mt-8 pt-6 border-t-4 border-zinc-950 flex justify-between items-center shrink-0 avoid-break">
+          <div className="text-[9px] font-bold text-zinc-400 uppercase tracking-tighter">
             <p>{settings.garage_name}</p>
             <p>Official Document - Page 2 of 2</p>
           </div>
-          <div className="h-16 w-16 opacity-10">
+          <div className="h-12 w-12 opacity-10">
              <Wrench className="h-full w-full" />
           </div>
         </div>
