@@ -62,7 +62,7 @@ export default async function JobSheetDetailPage({ params }: { params: Promise<{
 
   return (
     <div className="space-y-6">
-      {/* Navigation and Preview Controls - Matches Technical Reports Detail Header */}
+      {/* Navigation and Preview Controls */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <Link href="/dashboard/jobsheets" className="flex items-center text-sm text-muted-foreground hover:text-black transition-colors">
           <ChevronLeft className="h-4 w-4 mr-1" /> Back to Job Sheets
@@ -73,7 +73,7 @@ export default async function JobSheetDetailPage({ params }: { params: Promise<{
         </div>
       </div>
 
-      {/* Main Document Section - Prioritized at the top like Technical Reports */}
+      {/* Main Document Section */}
       <div className="max-w-6xl mx-auto space-y-6">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 sticky top-0 bg-white/80 backdrop-blur-sm p-4 border rounded-xl shadow-sm z-20">
             <div className="flex items-center gap-3">
@@ -81,7 +81,11 @@ export default async function JobSheetDetailPage({ params }: { params: Promise<{
                 <Badge className={cn(job.status === 'Draft' ? "bg-zinc-500" : "bg-[#c10d12]")}>{job.status}</Badge>
             </div>
             <div className="flex flex-wrap gap-2">
-                <ExportPDFButton targetId="jobcard-document-customer" filename={`JOBCARD-${job.jobNo}`} />
+                <ExportPDFButton 
+                  targetId="jobcard-document-customer" 
+                  filename={`JOBCARD-${job.jobNo}`} 
+                  forceSinglePage={true} 
+                />
                 <form action={handleCreateReport}>
                     <Button variant="outline" type="submit" size="sm" className="border-blue-200 hover:bg-blue-50 text-blue-700">
                         <FileBadge className="mr-2 h-4 w-4" /> Technical Report
@@ -102,7 +106,7 @@ export default async function JobSheetDetailPage({ params }: { params: Promise<{
         </div>
       </div>
 
-      {/* Management Grid - Moved below the fold to focus on documentation first */}
+      {/* Management Grid */}
       <div className="max-w-6xl mx-auto grid gap-6 md:grid-cols-3 pb-12">
         <div className="md:col-span-2 space-y-6">
           <Card className="shadow-sm border-zinc-200">

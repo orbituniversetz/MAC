@@ -10,9 +10,10 @@ import { useToast } from '@/hooks/use-toast';
 interface ExportPDFButtonProps {
   targetId: string;
   filename: string;
+  forceSinglePage?: boolean;
 }
 
-export function ExportPDFButton({ targetId, filename }: ExportPDFButtonProps) {
+export function ExportPDFButton({ targetId, filename, forceSinglePage = false }: ExportPDFButtonProps) {
   const [isExporting, setIsExporting] = useState(false);
   const { toast } = useToast();
 
@@ -57,27 +58,40 @@ export function ExportPDFButton({ targetId, filename }: ExportPDFButtonProps) {
       const canvasWidth = canvas.width;
       const canvasHeight = canvas.height;
       
-      const imgHeightInPdf = (canvasHeight * pdfWidth) / canvasWidth;
+      let imgWidthInPdf = pdfWidth;
+      let imgHeightInPdf = (canvasHeight * pdfWidth) / canvasWidth;
+
+      // Handle Single Page Scaling
+      if (forceSinglePage && imgHeightInPdf > pdfHeight) {
+        const ratio = pdfHeight / imgHeightInPdf;
+        imgHeightInPdf = pdfHeight;
+        imgWidthInPdf = pdfWidth * ratio;
+      }
+
+      // Center horizontally if scaled down
+      const xOffset = (pdfWidth - imgWidthInPdf) / 2;
       let heightLeft = imgHeightInPdf;
       let position = 0;
 
       // Page 1
-      pdf.addImage(imgData, 'JPEG', 0, position, pdfWidth, imgHeightInPdf, undefined, 'FAST');
-      heightLeft -= pdfHeight;
-
-      // Subsequent pages
-      while (heightLeft > 5) { // Small threshold to avoid tiny sliver pages
-        position = heightLeft - imgHeightInPdf; 
-        pdf.addPage();
-        pdf.addImage(imgData, 'JPEG', 0, position, pdfWidth, imgHeightInPdf, undefined, 'FAST');
+      pdf.addImage(imgData, 'JPEG', xOffset, position, imgWidthInPdf, imgHeightInPdf, undefined, 'FAST');
+      
+      if (!forceSinglePage) {
         heightLeft -= pdfHeight;
+        // Subsequent pages for multi-page documents (Invoices/Proformas)
+        while (heightLeft > 5) {
+          position = heightLeft - imgHeightInPdf; 
+          pdf.addPage();
+          pdf.addImage(imgData, 'JPEG', xOffset, position, imgWidthInPdf, imgHeightInPdf, undefined, 'FAST');
+          heightLeft -= pdfHeight;
+        }
       }
 
       pdf.save(filename.endsWith('.pdf') ? filename : `${filename}.pdf`);
       
       toast({
-        title: "A4 PDF Exported",
-        description: "Generated with professional document pagination."
+        title: forceSinglePage ? "Single Page PDF Exported" : "A4 PDF Exported",
+        description: forceSinglePage ? "Document scaled to fit on one page." : "Generated with professional document pagination."
       });
     } catch (error) {
       console.error('PDF Error:', error);
