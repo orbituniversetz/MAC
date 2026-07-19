@@ -12,11 +12,12 @@ import {
   TableHeader, 
   TableRow 
 } from '@/components/ui/table';
-import { ChevronLeft, Trash2, Save, Lock, FileCheck, Receipt, Banknote, CreditCard, History, AlertCircle, FileText } from 'lucide-react';
+import { ChevronLeft, Trash2, Save, Lock, FileCheck, Receipt, Banknote, CreditCard, History, FileText } from 'lucide-react';
 import { ProformaPreview } from '@/components/dashboard/ProformaPreview';
 import { ProformaDocument } from '@/components/dashboard/ProformaDocument';
 import { AddItemForm } from '@/components/dashboard/AddItemForm';
 import { EditItemDialog } from '@/components/dashboard/EditItemDialog';
+import { EditProformaDialog } from '@/components/dashboard/EditProformaDialog';
 import { Label } from '@/components/ui/label';
 import { PriceInput } from '@/components/dashboard/PriceInput';
 import { TaxToggle } from '@/components/dashboard/TaxToggle';
@@ -95,15 +96,16 @@ export default async function ProformaDetailPage({ params }: { params: Promise<{
         </div>
         
         <div className="flex flex-wrap gap-2">
+          <EditProformaDialog proforma={pf} />
           {!isFinalized && (
             <>
               <form action={handleSaveDraft}>
-                <Button variant="outline" type="submit">
+                <Button variant="outline" type="submit" className="font-bold">
                   <Save className="mr-2 h-4 w-4" /> Save Draft
                 </Button>
               </form>
               <form action={handleFinalize}>
-                <Button className="bg-black text-white hover:bg-gray-800" type="submit">
+                <Button className="bg-black text-white hover:bg-gray-800 font-bold" type="submit">
                   <Lock className="mr-2 h-4 w-4" /> Finalize
                 </Button>
               </form>
@@ -115,7 +117,7 @@ export default async function ProformaDetailPage({ params }: { params: Promise<{
           
           {isFinalized && !isInvoiced && isFullyPaid && (
             <form action={handleConvertToInvoice}>
-              <Button className="bg-[#c10d12] text-white hover:bg-[#a00b0f]" type="submit">
+              <Button className="bg-[#c10d12] text-white hover:bg-[#a00b0f] font-bold" type="submit">
                 <Receipt className="mr-2 h-4 w-4" /> Convert to Invoice
               </Button>
             </form>
@@ -123,7 +125,7 @@ export default async function ProformaDetailPage({ params }: { params: Promise<{
         </div>
       </div>
 
-      {/* High-Fidelity Professional Document View - Handles Multiple Pages */}
+      {/* High-Fidelity Multi-Page Preview */}
       <div className="max-w-6xl mx-auto space-y-6">
         <div className="flex items-center justify-between px-4">
           <h3 className="font-bold text-xs text-zinc-400 uppercase tracking-widest">High-Fidelity Multi-Page Preview</h3>

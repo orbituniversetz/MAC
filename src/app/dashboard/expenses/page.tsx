@@ -1,3 +1,4 @@
+
 import { getExpenses, deleteExpense, getJobSheets, getProformas, getRecentExpenses } from '@/lib/actions';
 import { 
   Table, 
@@ -10,8 +11,9 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Banknote, Trash2, Calendar, Link as LinkIcon } from 'lucide-react';
+import { Banknote, Trash2, Calendar, Link as LinkIcon, Edit2 } from 'lucide-react';
 import { AddExpenseForm } from '@/components/dashboard/AddExpenseForm';
+import { EditExpenseDialog } from '@/components/dashboard/EditExpenseDialog';
 
 export default async function ExpensesPage() {
   const expenses = await getExpenses();
@@ -49,7 +51,7 @@ export default async function ExpensesPage() {
                     <TableHead>Description</TableHead>
                     <TableHead>Linked To</TableHead>
                     <TableHead>Amount</TableHead>
-                    <TableHead className="text-right"></TableHead>
+                    <TableHead className="text-right">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -86,9 +88,10 @@ export default async function ExpensesPage() {
                           )}
                         </TableCell>
                         <TableCell className="font-bold text-red-600">-{exp.amount.toLocaleString()}</TableCell>
-                        <TableCell className="text-right">
+                        <TableCell className="text-right flex justify-end gap-1">
+                          <EditExpenseDialog expense={exp} />
                           <form action={async () => { 'use server'; await deleteExpense(exp.id, exp.jobSheetId, exp.proformaId); }}>
-                            <Button variant="ghost" size="icon" className="text-red-500 hover:text-red-700">
+                            <Button variant="ghost" size="icon" className="text-red-500 hover:text-red-700 h-8 w-8">
                               <Trash2 className="h-4 w-4" />
                             </Button>
                           </form>

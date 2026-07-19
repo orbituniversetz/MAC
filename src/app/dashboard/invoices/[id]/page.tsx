@@ -1,3 +1,4 @@
+
 import { getInvoiceById, getSettings } from '@/lib/actions';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -6,6 +7,7 @@ import Link from 'next/link';
 import { InvoicePreview } from '@/components/dashboard/InvoicePreview';
 import { InvoiceDocument } from '@/components/dashboard/InvoiceDocument';
 import { ExportPDFButton } from '@/components/dashboard/ExportPDFButton';
+import { EditInvoiceDialog } from '@/components/dashboard/EditInvoiceDialog';
 
 export default async function InvoiceDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -38,19 +40,22 @@ export default async function InvoiceDetailPage({ params }: { params: Promise<{ 
           <div>
             <h2 className="text-2xl font-bold tracking-tight">{inv.invoiceNo}</h2>
             <div className="flex gap-2">
-              <Badge className={inv.status === 'Paid' ? "bg-green-600" : "bg-red-600"}>{inv.status}</Badge>
+              <Badge className={inv.status === 'Paid' ? "bg-green-600" : inv.status === 'Cancelled' ? "bg-zinc-500" : "bg-red-600"}>
+                {inv.status}
+              </Badge>
               {inv.jobNo && <Badge variant="secondary">Job Ref: {inv.jobNo}</Badge>}
             </div>
           </div>
         </div>
         
         <div className="flex gap-2">
+          <EditInvoiceDialog invoice={inv} />
           <ExportPDFButton targetId="invoice-document" filename={`INVOICE-${inv.invoiceNo}`} />
           <InvoicePreview invoice={inv} settings={settings} />
         </div>
       </div>
 
-      {/* Main A4 High-Fidelity Preview - Handles Multi-Page Scrolling */}
+      {/* Main A4 High-Fidelity Preview */}
       <div className="max-w-6xl mx-auto space-y-6">
         <div className="flex items-center justify-between px-4">
           <h3 className="font-bold text-xs text-zinc-400 uppercase tracking-widest">High-Fidelity Document Preview</h3>

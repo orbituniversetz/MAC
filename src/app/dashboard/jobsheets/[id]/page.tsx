@@ -12,7 +12,7 @@ import {
   TableHeader, 
   TableRow 
 } from '@/components/ui/table';
-import { ChevronLeft, Trash2, FilePlus, TrendingUp, TrendingDown, Banknote, FileBadge } from 'lucide-react';
+import { ChevronLeft, Trash2, FilePlus, TrendingUp, TrendingDown, Banknote, FileBadge, Edit2 } from 'lucide-react';
 import { redirect } from 'next/navigation';
 import { JobCardPreview } from '@/components/dashboard/JobCardPreview';
 import { JobCardDocument } from '@/components/dashboard/JobCardDocument';
@@ -20,6 +20,8 @@ import { AddItemForm } from '@/components/dashboard/AddItemForm';
 import { AddExpenseForm } from '@/components/dashboard/AddExpenseForm';
 import { ExportPDFButton } from '@/components/dashboard/ExportPDFButton';
 import { EditItemDialog } from '@/components/dashboard/EditItemDialog';
+import { EditJobSheetDialog } from '@/components/dashboard/EditJobSheetDialog';
+import { EditExpenseDialog } from '@/components/dashboard/EditExpenseDialog';
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
 
@@ -70,6 +72,7 @@ export default async function JobSheetDetailPage({ params }: { params: Promise<{
           <ChevronLeft className="h-4 w-4 mr-1" /> Back to Job Sheets
         </Link>
         <div className="flex items-center gap-2">
+           <EditJobSheetDialog job={job} />
            <JobCardPreview job={job} settings={settings} mode="CUSTOMER" />
            <JobCardPreview job={job} settings={settings} mode="INTERNAL" />
         </div>
@@ -86,15 +89,14 @@ export default async function JobSheetDetailPage({ params }: { params: Promise<{
                 <ExportPDFButton 
                   targetId="jobcard-document-customer" 
                   filename={`JOBCARD-${job.jobNo}`} 
-                  forceSinglePage={false} 
                 />
                 <form action={handleCreateReport}>
-                    <Button variant="outline" type="submit" size="sm" className="border-blue-200 hover:bg-blue-50 text-blue-700">
+                    <Button variant="outline" type="submit" size="sm" className="border-blue-200 hover:bg-blue-50 text-blue-700 font-bold">
                         <FileBadge className="mr-2 h-4 w-4" /> Technical Report
                     </Button>
                 </form>
                 <form action={handleCreateProforma}>
-                    <Button variant="outline" type="submit" size="sm" className="border-red-100 hover:bg-red-50 text-red-600">
+                    <Button variant="outline" type="submit" size="sm" className="border-red-100 hover:bg-red-50 text-red-600 font-bold">
                         <FilePlus className="mr-2 h-4 w-4" /> Create Proforma
                     </Button>
                 </form>
@@ -130,19 +132,19 @@ export default async function JobSheetDetailPage({ params }: { params: Promise<{
                 <TableBody>
                   {job.items.map((item: any) => (
                     <TableRow key={item.id}>
-                      <td className="p-4"><Badge variant="outline" className="text-[10px]">{item.type}</Badge></td>
-                      <td className="p-4 text-black font-medium">{item.description}</td>
-                      <td className="p-4 text-black text-center">{item.qty}</td>
-                      <td className="p-4 text-black text-right">{item.unitPrice.toLocaleString()}</td>
-                      <td className="p-4 font-bold text-black text-right">{item.subtotal.toLocaleString()}</td>
-                      <td className="p-4 text-right flex justify-end gap-1">
+                      <TableCell><Badge variant="outline" className="text-[10px]">{item.type}</Badge></TableCell>
+                      <TableCell className="text-black font-medium">{item.description}</TableCell>
+                      <TableCell className="text-black text-center">{item.qty}</TableCell>
+                      <TableCell className="text-black text-right">{item.unitPrice.toLocaleString()}</TableCell>
+                      <TableCell className="font-bold text-black text-right">{item.subtotal.toLocaleString()}</TableCell>
+                      <TableCell className="text-right flex justify-end gap-1">
                         <EditItemDialog item={item} jobId={job.id} proformaId={null} />
                         <form action={async () => { 'use server'; await deleteJobItem(item.id, job.id, null); }}>
                           <Button variant="ghost" size="icon" className="text-red-500 hover:text-red-700 h-8 w-8">
                             <Trash2 className="h-4 w-4" />
                           </Button>
                         </form>
-                      </td>
+                      </TableCell>
                     </TableRow>
                   ))}
                   {job.items.length === 0 && (
@@ -176,16 +178,17 @@ export default async function JobSheetDetailPage({ params }: { params: Promise<{
                 <TableBody>
                   {job.expenses.map((exp: any) => (
                     <TableRow key={exp.id}>
-                      <td className="p-4"><Badge variant="outline" className="text-[10px]">{exp.category}</Badge></td>
-                      <td className="p-4 text-black font-medium">{exp.description}</td>
-                      <td className="p-4 font-bold text-red-600">-{exp.amount.toLocaleString()}</td>
-                      <td className="p-4 text-right">
+                      <TableCell><Badge variant="outline" className="text-[10px]">{exp.category}</Badge></TableCell>
+                      <TableCell className="text-black font-medium">{exp.description}</TableCell>
+                      <TableCell className="font-bold text-red-600 text-right">-{exp.amount.toLocaleString()}</TableCell>
+                      <TableCell className="text-right flex justify-end gap-1">
+                        <EditExpenseDialog expense={exp} />
                         <form action={async () => { 'use server'; await deleteExpense(exp.id, job.id, null); }}>
-                          <Button variant="ghost" size="icon" className="text-red-500 hover:text-red-700">
+                          <Button variant="ghost" size="icon" className="text-red-500 hover:text-red-700 h-8 w-8">
                             <Trash2 className="h-4 w-4" />
                           </Button>
                         </form>
-                      </td>
+                      </TableCell>
                     </TableRow>
                   ))}
                   {job.expenses.length === 0 && (

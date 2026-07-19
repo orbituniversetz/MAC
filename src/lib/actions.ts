@@ -104,6 +104,12 @@ export async function createJobSheet(formData: FormData) {
   redirect(`/dashboard/jobsheets/${info.lastInsertRowid}`);
 }
 
+export async function updateJobSheet(id: number, data: { complaint: string, status: string }) {
+  db.prepare('UPDATE jobsheets SET complaint = ?, status = ? WHERE id = ?').run(data.complaint, data.status, id);
+  revalidatePath(`/dashboard/jobsheets/${id}`);
+  revalidatePath('/dashboard/jobsheets');
+}
+
 export async function deleteJobSheet(id: number) {
   db.prepare('DELETE FROM job_items WHERE jobSheetId = ?').run(id);
   db.prepare('DELETE FROM expenses WHERE jobSheetId = ?').run(id);
@@ -158,6 +164,14 @@ export async function addExpense(formData: FormData) {
   revalidatePath('/dashboard/expenses');
   if (jobSheetId) revalidatePath(`/dashboard/jobsheets/${jobSheetId}`);
   if (proformaId) revalidatePath(`/dashboard/proformas/${proformaId}`);
+}
+
+export async function updateExpense(id: number, data: { description: string, category: string, amount: number }) {
+  db.prepare('UPDATE expenses SET description = ?, category = ?, amount = ? WHERE id = ?').run(data.description, data.category, data.amount, id);
+  const exp = db.prepare('SELECT jobSheetId, proformaId FROM expenses WHERE id = ?').get(id) as any;
+  revalidatePath('/dashboard/expenses');
+  if (exp?.jobSheetId) revalidatePath(`/dashboard/jobsheets/${exp.jobSheetId}`);
+  if (exp?.proformaId) revalidatePath(`/dashboard/proformas/${exp.proformaId}`);
 }
 
 export async function deleteExpense(id: number, jobSheetId: number | null, proformaId: number | null) {
@@ -228,6 +242,12 @@ export async function finalizeProforma(id: number) {
   revalidatePath(`/dashboard/proformas/${id}`);
 }
 
+export async function updateProformaStatus(id: number, status: string) {
+  db.prepare("UPDATE proformas SET status = ? WHERE id = ?").run(status, id);
+  revalidatePath(`/dashboard/proformas/${id}`);
+  revalidatePath('/dashboard/proformas');
+}
+
 export async function recordProformaPayment(formData: FormData) {
   const proformaId = parseInt(formData.get('proformaId') as string);
   const amount = parseFloat(formData.get('amount') as string);
@@ -270,6 +290,12 @@ export const getInvoiceById = cache(async (id: number) => {
   }
   return inv;
 });
+
+export async function updateInvoiceStatus(id: number, status: string) {
+  db.prepare("UPDATE invoices SET status = ? WHERE id = ?").run(status, id);
+  revalidatePath(`/dashboard/invoices/${id}`);
+  revalidatePath('/dashboard/invoices');
+}
 
 export async function deleteInvoice(id: number) {
   db.prepare('DELETE FROM invoices WHERE id = ?').run(id);
