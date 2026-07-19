@@ -163,7 +163,7 @@ export function ProformaDocument({ proforma, settings, className }: ProformaDocu
           </div>
           <div className="text-[10px] text-zinc-500 italic leading-relaxed font-medium">
             <h3 className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest mb-2 not-italic">Quotation Terms</h3>
-            <p>This quotation is valid for 30 days. Any additional work discovered during service will be quoted separately. Management approval is required before proceeding.</p>
+            <p>Payment must be completed before the vehicle is released unless otherwise agreed in writing.</p>
           </div>
         </div>
       </div>
