@@ -12,13 +12,16 @@ const dbName = 'garage.db';
 let dbPath: string;
 
 if (isBuild) {
-  // During build, use a temporary local file
-  dbPath = path.join(process.cwd(), 'local_data', 'build-temp.db');
+  // During build, use a temporary local file in the project directory
+  const buildDir = path.join(process.cwd(), '.next_build_data');
+  if (!fs.existsSync(buildDir)) fs.mkdirSync(buildDir, { recursive: true });
+  dbPath = path.join(buildDir, 'temp.db');
 } else if (isElectron) {
+  // Production desktop mode
   const dataDir = path.join(os.homedir(), '.garageflow_desk');
   dbPath = path.join(dataDir, dbName);
 } else {
-  // Standard PWA / Local Web Server mode
+  // Local web server / PWA mode
   const localDataDir = path.join(process.cwd(), 'local_data');
   dbPath = path.join(localDataDir, dbName);
 }
@@ -29,12 +32,21 @@ if (!fs.existsSync(dbDir)) {
   fs.mkdirSync(dbDir, { recursive: true });
 }
 
-const db = new Database(dbPath);
+// Initialize database with a fail-safe check
+let db: Database.Database;
+try {
+  db = new Database(dbPath);
+} catch (error) {
+  console.error('Failed to open database at:', dbPath);
+  // Fallback to in-memory if disk access fails (emergency only)
+  db = new Database(':memory:');
+}
 
 // Performance Optimizations
 db.pragma('journal_mode = WAL');
 db.pragma('synchronous = NORMAL');
 
+// Schema Definition
 db.exec(`
   CREATE TABLE IF NOT EXISTS users (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
