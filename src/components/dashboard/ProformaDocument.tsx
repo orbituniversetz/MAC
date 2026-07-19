@@ -23,8 +23,8 @@ export function ProformaDocument({ proforma, settings, className }: ProformaDocu
 
   return (
     <div id="proforma-document" className={cn("a4-page font-sans", className)}>
-      {/* Header - Keep Together */}
-      <div className="avoid-break mb-4 border-b-2 border-zinc-100 pb-4">
+      {/* Header - Branding */}
+      <div className="avoid-break mb-4 border-b-2 border-zinc-100 pb-4 shrink-0">
         <div className="flex items-center justify-between">
           <div className="flex items-center">
             {settings.garage_logo ? (
@@ -50,7 +50,7 @@ export function ProformaDocument({ proforma, settings, className }: ProformaDocu
         </div>
       </div>
 
-      <div className="avoid-break mb-8 bg-primary text-white p-4 rounded shadow-sm">
+      <div className="avoid-break mb-8 bg-primary text-white p-4 rounded shadow-sm shrink-0">
         <div className="flex justify-between items-center">
           <h2 className="text-lg font-bold uppercase tracking-widest">PROFORMA INVOICE</h2>
           <div className="text-right">
@@ -60,8 +60,8 @@ export function ProformaDocument({ proforma, settings, className }: ProformaDocu
         </div>
       </div>
 
-      {/* Recipient Details - Keep Together */}
-      <div className="avoid-break grid grid-cols-2 gap-12 mb-8">
+      {/* Recipient Details */}
+      <div className="avoid-break grid grid-cols-2 gap-12 mb-8 shrink-0">
         <div>
           <h3 className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest mb-2">Quotation For</h3>
           <div className="space-y-1">
@@ -81,8 +81,8 @@ export function ProformaDocument({ proforma, settings, className }: ProformaDocu
         </div>
       </div>
 
-      {/* Main Table - Splittable only between rows */}
-      <div className="mb-8">
+      {/* Main Table - Splittable */}
+      <div className="mb-8 flex-1">
         <table className="w-full border-collapse">
           <thead>
             <tr className="bg-zinc-950 text-white">
@@ -105,8 +105,8 @@ export function ProformaDocument({ proforma, settings, className }: ProformaDocu
         </table>
       </div>
 
-      {/* Financial Block - Unified Container to Prevent Splitting */}
-      <div className="avoid-break space-y-6 mb-12">
+      {/* Financial Block & Status - Keep Together */}
+      <div className="avoid-break space-y-6 mb-12 shrink-0">
         <div className="flex justify-end">
           <div className="w-72 space-y-2 bg-zinc-50 p-6 rounded-3xl border border-zinc-100 shadow-sm">
             <div className="flex justify-between text-xs font-bold uppercase tracking-tight">
@@ -152,8 +152,8 @@ export function ProformaDocument({ proforma, settings, className }: ProformaDocu
         </div>
       </div>
 
-      {/* Footer Instructions - Keep Together */}
-      <div className="avoid-break mt-auto pt-8 border-t border-zinc-100">
+      {/* Footer Instructions */}
+      <div className="avoid-break mt-auto pt-8 border-t border-zinc-100 shrink-0">
         <div className="grid grid-cols-2 gap-12">
           <div>
             <h3 className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest mb-4">Banking Instructions</h3>
