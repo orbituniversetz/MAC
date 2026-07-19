@@ -30,13 +30,19 @@ export function ExportPDFButton({ targetId, filename, forceSinglePage = false }:
 
     setIsExporting(true);
     try {
-      // Configure high-res A4 PDF
-      const pdf = new jsPDF('p', 'mm', 'a4');
+      // Configuration for professional typeset A4
+      const pdf = new jsPDF({
+        orientation: 'p',
+        unit: 'mm',
+        format: 'a4',
+        compress: true,
+      });
+
       const pdfWidth = pdf.internal.pageSize.getWidth(); // 210mm
       const pdfHeight = pdf.internal.pageSize.getHeight(); // 297mm
       
       const canvas = await html2canvas(element, {
-        scale: 2.5, // Ultra-high fidelity for crisp text
+        scale: 2.5, // Enterprise resolution for crisp fonts
         useCORS: true,
         logging: false,
         backgroundColor: '#ffffff',
@@ -50,11 +56,13 @@ export function ExportPDFButton({ targetId, filename, forceSinglePage = false }:
             clonedElement.style.margin = '0';
             clonedElement.style.width = '210mm';
             clonedElement.style.minHeight = 'auto';
+            // Ensure background is visible
+            clonedElement.style.background = 'white';
           }
         }
       });
       
-      const imgData = canvas.toDataURL('image/jpeg', 1.0);
+      const imgData = canvas.toDataURL('image/jpeg', 0.95);
       const canvasWidth = canvas.width;
       const canvasHeight = canvas.height;
       
@@ -68,7 +76,6 @@ export function ExportPDFButton({ targetId, filename, forceSinglePage = false }:
         imgWidthInPdf = pdfWidth * ratio;
       }
 
-      // Center horizontally if scaled down
       const xOffset = (pdfWidth - imgWidthInPdf) / 2;
       let heightLeft = imgHeightInPdf;
       let position = 0;
@@ -78,8 +85,8 @@ export function ExportPDFButton({ targetId, filename, forceSinglePage = false }:
       
       if (!forceSinglePage) {
         heightLeft -= pdfHeight;
-        // Subsequent pages for multi-page documents (Invoices/Proformas)
-        while (heightLeft > 5) {
+        // Logic for professional pagination: slicing with standard A4 blocks
+        while (heightLeft > 2) {
           position = heightLeft - imgHeightInPdf; 
           pdf.addPage();
           pdf.addImage(imgData, 'JPEG', xOffset, position, imgWidthInPdf, imgHeightInPdf, undefined, 'FAST');
@@ -90,8 +97,8 @@ export function ExportPDFButton({ targetId, filename, forceSinglePage = false }:
       pdf.save(filename.endsWith('.pdf') ? filename : `${filename}.pdf`);
       
       toast({
-        title: forceSinglePage ? "Single Page PDF Exported" : "A4 PDF Exported",
-        description: forceSinglePage ? "Document scaled to fit on one page." : "Generated with professional document pagination."
+        title: "Professional PDF Generated",
+        description: "Document successfully exported with high-fidelity pagination."
       });
     } catch (error) {
       console.error('PDF Error:', error);
@@ -117,7 +124,7 @@ export function ExportPDFButton({ targetId, filename, forceSinglePage = false }:
       ) : (
         <Download className="mr-2 h-4 w-4" />
       )}
-      {isExporting ? 'Processing...' : 'Export A4 PDF'}
+      {isExporting ? 'Generating...' : 'Download A4 PDF'}
     </Button>
   );
 }

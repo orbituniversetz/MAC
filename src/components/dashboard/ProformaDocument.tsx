@@ -85,7 +85,7 @@ export function ProformaDocument({ proforma, settings, className }: ProformaDocu
         </div>
       </div>
 
-      {/* Main Table */}
+      {/* Main Table - Supports Pagination Slicing */}
       <div className="flex-1 mb-12">
         <table className="w-full border-collapse">
           <thead className="table-header-group">
@@ -98,7 +98,7 @@ export function ProformaDocument({ proforma, settings, className }: ProformaDocu
           </thead>
           <tbody className="divide-y divide-zinc-100">
             {proforma.items?.map((item: any) => (
-              <tr key={item.id} className="text-xs avoid-break">
+              <tr key={item.id} className="text-xs">
                 <td className="p-4 font-black text-zinc-900 uppercase tracking-tight">{item.description}</td>
                 <td className="p-4 text-center font-bold">{item.qty}</td>
                 <td className="p-4 text-right whitespace-nowrap text-zinc-600">{item.unitPrice.toLocaleString()}</td>
@@ -109,9 +109,9 @@ export function ProformaDocument({ proforma, settings, className }: ProformaDocu
         </table>
       </div>
 
-      {/* Summary and Payment Block - Keep Together */}
-      <div className="mt-auto space-y-6 shrink-0">
-        <div className="flex justify-end avoid-break">
+      {/* Footer Financial Block - Keep Together */}
+      <div className="mt-auto space-y-6 shrink-0 avoid-break pt-8 border-t-2 border-zinc-50">
+        <div className="flex justify-end">
           <div className="w-72 space-y-2 bg-zinc-50 p-6 rounded-3xl border border-zinc-100 shadow-sm">
             <div className="flex justify-between text-xs font-black uppercase tracking-tight">
               <span className="text-zinc-500">Subtotal:</span>
@@ -144,7 +144,7 @@ export function ProformaDocument({ proforma, settings, className }: ProformaDocu
           </div>
         </div>
 
-        <div className="avoid-break p-6 rounded-2xl flex justify-between items-center border-2 bg-zinc-950 text-white shadow-md">
+        <div className="p-6 rounded-2xl flex justify-between items-center border-2 bg-zinc-950 text-white shadow-md">
           <div>
             <p className="text-[9px] font-black uppercase tracking-widest opacity-70 mb-1">Current Payment Status</p>
             <h4 className="text-xl font-black tracking-tight">{isFullyPaid ? 'FULLY SETTLED' : 'PENDING PAYMENT'}</h4>
@@ -154,22 +154,21 @@ export function ProformaDocument({ proforma, settings, className }: ProformaDocu
             <p className="text-3xl font-black tracking-tighter">TZS {balanceDue.toLocaleString()}</p>
           </div>
         </div>
-      </div>
 
-      {/* Footer and Banking - Keep Together */}
-      <div className="mt-12 pt-8 border-t-4 border-zinc-950 shrink-0 avoid-break">
-        <div className="grid grid-cols-2 gap-12">
-          <div>
-            <h3 className="text-[10px] font-black text-zinc-400 uppercase tracking-widest mb-4">Banking Instructions</h3>
-            <div className="space-y-1.5 text-xs">
-              <p><span className="font-black text-zinc-400 uppercase text-[9px] w-28 inline-block tracking-widest">Bank:</span> <span className="font-black text-zinc-900">{settings.bank_name}</span></p>
-              <p><span className="font-black text-zinc-400 uppercase text-[9px] w-28 inline-block tracking-widest">Account Name:</span> <span className="font-bold text-zinc-700">{settings.bank_account_name}</span></p>
-              <p><span className="font-black text-zinc-400 uppercase text-[9px] w-28 inline-block tracking-widest">Account No:</span> <span className="font-black text-zinc-900">{settings.bank_account_number}</span></p>
+        <div className="pt-8 border-t-4 border-zinc-950">
+          <div className="grid grid-cols-2 gap-12">
+            <div>
+              <h3 className="text-[10px] font-black text-zinc-400 uppercase tracking-widest mb-4">Banking Instructions</h3>
+              <div className="space-y-1.5 text-xs">
+                <p><span className="font-black text-zinc-400 uppercase text-[9px] w-28 inline-block tracking-widest">Bank:</span> <span className="font-black text-zinc-900">{settings.bank_name}</span></p>
+                <p><span className="font-black text-zinc-400 uppercase text-[9px] w-28 inline-block tracking-widest">Account Name:</span> <span className="font-bold text-zinc-700">{settings.bank_account_name}</span></p>
+                <p><span className="font-black text-zinc-400 uppercase text-[9px] w-28 inline-block tracking-widest">Account No:</span> <span className="font-black text-zinc-900">{settings.bank_account_number}</span></p>
+              </div>
             </div>
-          </div>
-          <div className="text-[10px] text-zinc-500 italic leading-relaxed font-bold">
-            <h3 className="text-[10px] font-black text-zinc-400 uppercase tracking-widest mb-2 not-italic">Quotation Terms</h3>
-            <p>Payment must be completed before the vehicle is released unless otherwise agreed in writing.</p>
+            <div className="text-[10px] text-zinc-500 italic leading-relaxed font-bold">
+              <h3 className="text-[10px] font-black text-zinc-400 uppercase tracking-widest mb-2 not-italic">Quotation Terms</h3>
+              <p>Payment must be completed before the vehicle is released unless otherwise agreed in writing.</p>
+            </div>
           </div>
         </div>
       </div>

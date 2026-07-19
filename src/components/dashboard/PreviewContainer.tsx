@@ -42,7 +42,13 @@ export function PreviewContainer({
 
     setIsExporting(true);
     try {
-      const pdf = new jsPDF('p', 'mm', 'a4');
+      const pdf = new jsPDF({
+        orientation: 'p',
+        unit: 'mm',
+        format: 'a4',
+        compress: true,
+      });
+
       const pdfWidth = pdf.internal.pageSize.getWidth();
       const pdfHeight = pdf.internal.pageSize.getHeight();
       
@@ -59,11 +65,14 @@ export function PreviewContainer({
             clonedElement.style.transform = 'none';
             clonedElement.style.boxShadow = 'none';
             clonedElement.style.margin = '0';
+            clonedElement.style.width = '210mm';
+            clonedElement.style.minHeight = 'auto';
+            clonedElement.style.background = 'white';
           }
         }
       });
       
-      const imgData = canvas.toDataURL('image/jpeg', 1.0);
+      const imgData = canvas.toDataURL('image/jpeg', 0.95);
       const canvasWidth = canvas.width;
       const canvasHeight = canvas.height;
       
@@ -76,7 +85,7 @@ export function PreviewContainer({
       heightLeft -= pdfHeight;
 
       // Subsequent pages (clean A4 slices)
-      while (heightLeft > 0) {
+      while (heightLeft > 2) {
         position = heightLeft - imgHeightInPdf;
         pdf.addPage();
         pdf.addImage(imgData, 'JPEG', 0, position, pdfWidth, imgHeightInPdf, undefined, 'FAST');
@@ -84,7 +93,7 @@ export function PreviewContainer({
       }
 
       pdf.save(`${filename}.pdf`);
-      toast({ title: "PDF Exported", description: "Professional A4 document generated successfully." });
+      toast({ title: "PDF Exported", description: "Professional document generated with typeset pagination." });
     } catch (error) {
       console.error('PDF Error:', error);
       toast({ variant: "destructive", title: "Export Failed", description: "Could not generate A4 PDF." });
@@ -104,7 +113,7 @@ export function PreviewContainer({
           </div>
           <div className="hidden sm:block">
             <h2 className="text-sm font-bold tracking-tight uppercase tracking-widest leading-none">{title}</h2>
-            <p className="text-[10px] text-white/40 mt-1 uppercase font-bold">A4 High-Fidelity Preview</p>
+            <p className="text-[10px] text-white/40 mt-1 uppercase font-bold">A4 Professional Preview</p>
           </div>
         </div>
 

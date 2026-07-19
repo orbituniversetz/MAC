@@ -40,7 +40,7 @@
     padding: 20mm;
     margin: 0 auto;
     background: white;
-    box-shadow: 0 0 30px rgba(0,0,0,0.15);
+    box-shadow: 0 0 30px rgba(0,0,0,0.1);
     position: relative;
     box-sizing: border-box;
     display: flex;
@@ -70,17 +70,21 @@
     page-break-inside: auto;
   }
 
-  tr {
-    page-break-inside: avoid !important;
-    break-inside: avoid !important;
-  }
-
   thead {
     display: table-header-group !important;
   }
 
+  tbody {
+    display: table-row-group !important;
+  }
+
   tfoot {
     display: table-footer-group !important;
+  }
+
+  tr {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
   }
 }
 
@@ -107,7 +111,7 @@
   
   @page { 
     size: A4; 
-    margin: 10mm 0 10mm 0; 
+    margin: 0; 
   }
 
   .no-print { display: none !important; }
