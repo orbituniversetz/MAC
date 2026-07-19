@@ -1,3 +1,4 @@
+
 'use client'
 
 import { cn } from '@/lib/utils';
@@ -22,7 +23,8 @@ export function ProformaDocument({ proforma, settings, className }: ProformaDocu
   const isFullyPaid = balanceDue <= 0;
 
   return (
-    <div id="proforma-document" className={cn("a4-page font-sans", className)}>
+    <div id="proforma-document" className={cn("a4-page font-sans print-container", className)}>
+      {/* Header - Stays together */}
       <div className="avoid-break mb-4 border-b-2 border-zinc-100 pb-4 shrink-0">
         <div className="flex items-center justify-between">
           <div className="flex items-center">
@@ -79,6 +81,7 @@ export function ProformaDocument({ proforma, settings, className }: ProformaDocu
         </div>
       </div>
 
+      {/* Main Table - Can split across pages BETWEEN rows */}
       <div className="mb-8 flex-1">
         <table className="w-full border-collapse">
           <thead>
@@ -91,7 +94,7 @@ export function ProformaDocument({ proforma, settings, className }: ProformaDocu
           </thead>
           <tbody className="divide-y divide-zinc-100">
             {proforma.items?.map((item: any) => (
-              <tr key={item.id} className="text-xs">
+              <tr key={item.id} className="text-xs avoid-break">
                 <td className="p-3.5 font-black text-zinc-900 uppercase tracking-tight">{item.description}</td>
                 <td className="p-3.5 text-center font-bold">{item.qty}</td>
                 <td className="p-3.5 text-right font-bold whitespace-nowrap text-zinc-600">{item.unitPrice.toLocaleString()}</td>
@@ -102,6 +105,7 @@ export function ProformaDocument({ proforma, settings, className }: ProformaDocu
         </table>
       </div>
 
+      {/* Summary Block - Stays together */}
       <div className="avoid-break space-y-6 mb-12 shrink-0">
         <div className="flex justify-end">
           <div className="w-72 space-y-2 bg-zinc-50 p-6 rounded-3xl border border-zinc-100 shadow-sm">
@@ -148,6 +152,7 @@ export function ProformaDocument({ proforma, settings, className }: ProformaDocu
         </div>
       </div>
 
+      {/* Footer Instructions - Stays together */}
       <div className="avoid-break mt-auto pt-8 border-t border-zinc-100 shrink-0">
         <div className="grid grid-cols-2 gap-12">
           <div>

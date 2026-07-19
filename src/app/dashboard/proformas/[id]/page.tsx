@@ -1,3 +1,4 @@
+
 import { getProformaById, getSettings, finalizeProforma, saveProformaDraft, getRecentItems, deleteJobItem, convertToInvoice, updateProformaDiscount, recordProformaPayment, updateProformaTaxStatus } from '@/lib/actions';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -42,7 +43,6 @@ export default async function ProformaDetailPage({ params }: { params: Promise<{
   const subtotal = pf.items.reduce((acc: number, item: any) => acc + item.subtotal, 0);
   const discount = pf.discount || 0;
   
-  // Conditionally calculate VAT (Defaults to 1 if null)
   const taxEnabled = pf.taxEnabled !== 0; 
   const taxAmount = taxEnabled ? (subtotal - discount) * 0.18 : 0;
   const total = subtotal - discount + taxAmount;
@@ -79,7 +79,7 @@ export default async function ProformaDetailPage({ params }: { params: Promise<{
         </Link>
       </div>
 
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-4 border rounded-lg shadow-sm sticky top-0 z-20">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-4 border rounded-xl shadow-sm sticky top-0 z-20">
         <div className="flex items-center gap-4">
           <div>
             <h2 className="text-2xl font-bold tracking-tight text-black">{pf.proformaNo}</h2>
@@ -126,11 +126,13 @@ export default async function ProformaDetailPage({ params }: { params: Promise<{
         </div>
       </div>
 
-      {/* Matching Professional Inline Preview Section */}
+      {/* Matching High-Fidelity Professional Inline Preview */}
       <div className="max-w-6xl mx-auto space-y-6">
-        <h3 className="font-bold text-lg text-zinc-500 uppercase tracking-widest px-4">Document Preview</h3>
-        <div className="bg-gray-100 border rounded-2xl shadow-inner overflow-y-auto p-4 sm:p-12 flex justify-center min-h-[1400px]">
-          <ProformaDocument proforma={pf} settings={settings} />
+        <h3 className="font-bold text-xs text-zinc-400 uppercase tracking-widest px-4">Professional Document Preview</h3>
+        <div className="bg-zinc-100/50 border rounded-3xl shadow-inner overflow-y-auto p-4 sm:p-12 flex justify-center min-h-[1400px]">
+          <div className="origin-top shadow-2xl">
+            <ProformaDocument proforma={pf} settings={settings} />
+          </div>
         </div>
       </div>
 
@@ -138,7 +140,7 @@ export default async function ProformaDetailPage({ params }: { params: Promise<{
         <div className="md:col-span-2 space-y-6">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between">
-              <CardTitle>Quotation Items</CardTitle>
+              <CardTitle className="text-lg">Quotation Items</CardTitle>
               {!isFinalized && <Badge variant="outline">Editable</Badge>}
             </CardHeader>
             <CardContent>
@@ -156,7 +158,7 @@ export default async function ProformaDetailPage({ params }: { params: Promise<{
                 <TableBody>
                   {pf.items.map((item: any) => (
                     <TableRow key={item.id}>
-                      <TableCell><Badge variant="outline">{item.type}</Badge></TableCell>
+                      <TableCell><Badge variant="outline" className="text-[10px]">{item.type}</Badge></TableCell>
                       <TableCell className="font-medium">{item.description}</TableCell>
                       <TableCell>{item.qty}</TableCell>
                       <TableCell>{item.unitPrice.toLocaleString()}</TableCell>
@@ -365,15 +367,6 @@ export default async function ProformaDetailPage({ params }: { params: Promise<{
               </div>
             )}
           </Card>
-
-          {isFinalized && !isInvoiced && (
-            <div className="p-4 border rounded-lg bg-green-50 text-green-800 flex items-center gap-3 shadow-sm">
-              <FileCheck className="h-5 w-5" />
-              <p className="text-[10px] font-medium leading-relaxed">
-                Quotation is finalized. Follow the payment steps to enable final invoicing.
-              </p>
-            </div>
-          )}
         </div>
       </div>
     </div>
