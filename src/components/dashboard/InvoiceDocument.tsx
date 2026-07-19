@@ -100,7 +100,7 @@ export function InvoiceDocument({ invoice, settings, className }: InvoiceDocumen
       </div>
 
       <div className="flex justify-end mb-12 shrink-0 avoid-break">
-        <div className="w-72 space-y-2 bg-zinc-50 p-6 rounded-3xl border border-zinc-100 shadow-sm">
+        <div className="w-72 space-y-2 bg-zinc-50 p-6 rounded-3xl border border-zinc-100 shadow-sm avoid-break">
           <div className="flex justify-between text-xs font-bold uppercase tracking-tight">
             <span className="text-zinc-500">Subtotal:</span>
             <span className="text-zinc-900 whitespace-nowrap">{subtotal.toLocaleString()}</span>
