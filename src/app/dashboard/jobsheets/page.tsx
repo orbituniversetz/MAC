@@ -1,5 +1,4 @@
-
-import { getJobSheets, getCustomers, getVehicles, createJobSheet } from '@/lib/actions';
+import { getJobSheets, deleteJobSheet } from '@/lib/actions';
 import { 
   Table, 
   TableBody, 
@@ -10,7 +9,7 @@ import {
 } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Plus, Eye } from 'lucide-react';
+import { Plus, Eye, Trash2 } from 'lucide-react';
 import Link from 'next/link';
 
 export default async function JobSheetsPage() {
@@ -65,12 +64,17 @@ export default async function JobSheetsPage() {
                       {job.status}
                     </Badge>
                   </TableCell>
-                  <TableCell className="text-right">
+                  <TableCell className="text-right flex justify-end gap-2">
                     <Link href={`/dashboard/jobsheets/${job.id}`}>
                       <Button variant="ghost" size="sm">
                         <Eye className="mr-2 h-4 w-4" /> View
                       </Button>
                     </Link>
+                    <form action={async () => { 'use server'; await deleteJobSheet(job.id); }}>
+                      <Button variant="ghost" size="icon" className="text-red-500 hover:text-red-700">
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </form>
                   </TableCell>
                 </TableRow>
               ))

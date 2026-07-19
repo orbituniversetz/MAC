@@ -1,4 +1,4 @@
-import { getProformas } from '@/lib/actions';
+import { getProformas, deleteProforma } from '@/lib/actions';
 import { 
   Table, 
   TableBody, 
@@ -9,7 +9,7 @@ import {
 } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { FileText, Eye, Plus } from 'lucide-react';
+import { FileText, Eye, Plus, Trash2 } from 'lucide-react';
 import Link from 'next/link';
 
 export default async function ProformasPage() {
@@ -62,12 +62,17 @@ export default async function ProformasPage() {
                     </Badge>
                   </TableCell>
                   <TableCell>{new Date(pf.createdAt).toLocaleDateString()}</TableCell>
-                  <TableCell className="text-right">
+                  <TableCell className="text-right flex justify-end gap-2">
                     <Link href={`/dashboard/proformas/${pf.id}`}>
                       <Button variant="ghost" size="sm">
                         <Eye className="mr-2 h-4 w-4" /> View
                       </Button>
                     </Link>
+                    <form action={async () => { 'use server'; await deleteProforma(pf.id); }}>
+                      <Button variant="ghost" size="icon" className="text-red-500 hover:text-red-700">
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </form>
                   </TableCell>
                 </TableRow>
               ))

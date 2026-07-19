@@ -1,4 +1,4 @@
-import { getInvoices, getProformas, convertToInvoice } from '@/lib/actions';
+import { getInvoices, getProformas, convertToInvoice, deleteInvoice } from '@/lib/actions';
 import { 
   Table, 
   TableBody, 
@@ -9,7 +9,7 @@ import {
 } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Receipt, Eye, Plus, ArrowRight, FileText } from 'lucide-react';
+import { Receipt, Eye, Plus, Trash2, FileText } from 'lucide-react';
 import Link from 'next/link';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 
@@ -60,12 +60,17 @@ export default async function InvoicesPage() {
                         </Badge>
                       </TableCell>
                       <TableCell>{new Date(inv.createdAt).toLocaleDateString()}</TableCell>
-                      <TableCell className="text-right">
+                      <TableCell className="text-right flex justify-end gap-2">
                         <Link href={`/dashboard/invoices/${inv.id}`}>
                           <Button variant="ghost" size="sm">
                             <Eye className="mr-2 h-4 w-4" /> View
                           </Button>
                         </Link>
+                        <form action={async () => { 'use server'; await deleteInvoice(inv.id); }}>
+                          <Button variant="ghost" size="icon" className="text-red-500 hover:text-red-700">
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </form>
                       </TableCell>
                     </TableRow>
                   ))

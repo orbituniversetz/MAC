@@ -1,4 +1,3 @@
-
 'use server'
 
 import db, { dbPath } from './db';
@@ -106,6 +105,18 @@ export async function createJobSheet(formData: FormData) {
   redirect(`/dashboard/jobsheets/${info.lastInsertRowid}`);
 }
 
+export async function deleteJobSheet(id: number) {
+  // Delete related items and expenses first (if any)
+  db.prepare('DELETE FROM job_items WHERE jobSheetId = ?').run(id);
+  db.prepare('DELETE FROM expenses WHERE jobSheetId = ?').run(id);
+  db.prepare('DELETE FROM proformas WHERE jobSheetId = ?').run(id);
+  db.prepare('DELETE FROM invoices WHERE jobSheetId = ?').run(id);
+  db.prepare('DELETE FROM documents WHERE jobSheetId = ?').run(id);
+  
+  db.prepare('DELETE FROM jobsheets WHERE id = ?').run(id);
+  revalidatePath('/dashboard/jobsheets');
+}
+
 export async function addJobItem(jobId: number | null, proformaId: number | null, item: any) {
   const subtotal = item.qty * item.unitPrice;
   db.prepare(`
@@ -193,6 +204,15 @@ export const getProformaById = cache(async (id: number) => {
   return pf;
 });
 
+export async function deleteProforma(id: number) {
+  db.prepare('DELETE FROM job_items WHERE proformaId = ?').run(id);
+  db.prepare('DELETE FROM payments WHERE proformaId = ?').run(id);
+  db.prepare('DELETE FROM expenses WHERE proformaId = ?').run(id);
+  db.prepare('DELETE FROM invoices WHERE proformaId = ?').run(id);
+  db.prepare('DELETE FROM proformas WHERE id = ?').run(id);
+  revalidatePath('/dashboard/proformas');
+}
+
 export async function finalizeProforma(id: number) {
   db.prepare("UPDATE proformas SET status = 'Finalized' WHERE id = ?").run(id);
   revalidatePath(`/dashboard/proformas/${id}`);
@@ -240,6 +260,11 @@ export const getInvoiceById = cache(async (id: number) => {
   }
   return inv;
 });
+
+export async function deleteInvoice(id: number) {
+  db.prepare('DELETE FROM invoices WHERE id = ?').run(id);
+  revalidatePath('/dashboard/invoices');
+}
 
 export const getSettings = cache(async () => {
   const settings = db.prepare('SELECT * FROM settings').all() as any[];
