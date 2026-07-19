@@ -1,4 +1,3 @@
-
 import Database from 'better-sqlite3';
 import path from 'path';
 import fs from 'fs';
@@ -17,11 +16,12 @@ if (isBuild) {
   if (!fs.existsSync(buildDir)) fs.mkdirSync(buildDir, { recursive: true });
   dbPath = path.join(buildDir, 'temp.db');
 } else if (isElectron) {
-  // Production desktop mode
+  // Production desktop mode (Electron EXE)
   const dataDir = path.join(os.homedir(), '.garageflow_desk');
   dbPath = path.join(dataDir, dbName);
 } else {
   // Local web server / PWA mode
+  // We keep the database inside the project folder for easy portability on Windows
   const localDataDir = path.join(process.cwd(), 'local_data');
   dbPath = path.join(localDataDir, dbName);
 }

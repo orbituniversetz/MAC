@@ -1,25 +1,21 @@
-
 @echo off
-title GarageFlow Desk - Local Server
+TITLE GarageFlow Desk - Local Server
+echo --------------------------------------------------
+echo   GARAGEFLOW DESK - STARTING LOCAL SERVER
+echo --------------------------------------------------
 echo.
-echo ==========================================
-echo    GarageFlow Desk - Local Web Server
-echo ==========================================
+echo [1/2] Checking if server is ready...
+echo [2/2] Opening your browser to http://localhost:9002
 echo.
-echo [1/3] Checking Node.js installation...
-node -v >nul 2>&1
-if %errorlevel% neq 0 (
-    echo [ERROR] Node.js is not installed. Please install it from https://nodejs.org/
-    pause
-    exit
-)
+echo * Keep this window open while using the app.
+echo * You can close this window when you are finished.
+echo.
+echo --------------------------------------------------
 
-echo [2/3] Starting Local Server on Port 9002...
-echo.
-echo NOTE: Do not close this window while using the app.
-echo.
-
+:: Start the browser
 start "" "http://localhost:9002"
-npm run dev
+
+:: Start the Next.js production server
+npm run start
 
 pause
