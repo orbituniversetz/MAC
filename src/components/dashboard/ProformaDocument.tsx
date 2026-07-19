@@ -167,7 +167,6 @@ export function ProformaDocument({ proforma, settings, className }: ProformaDocu
                 </div>
               </div>
               <div className="text-[10px] text-zinc-500 italic leading-relaxed font-bold">
-                <h3 className="text-[10px] font-black text-zinc-400 uppercase tracking-widest mb-2 not-italic">Quotation Terms</h3>
                 <div className="mt-8 text-right">
                   <div className="h-10 border-b border-zinc-300 w-48 ml-auto mb-1"></div>
                   <p className="uppercase tracking-widest opacity-50">Authorized Signature</p>

@@ -29,6 +29,35 @@ export function ExportPDFButton({ targetId, filename }: ExportPDFButtonProps) {
 
     setIsExporting(true);
     try {
+      // Create high-fidelity canvas with intelligent multi-page slicing
+      const canvas = await html2canvas(element, {
+        scale: 2.5,
+        useCORS: true,
+        logging: false,
+        backgroundColor: '#ffffff',
+        width: element.offsetWidth,
+        onclone: (clonedDoc) => {
+          const clonedElement = clonedDoc.getElementById(targetId);
+          if (!clonedElement) return;
+
+          // Standardize styles for consistent capture
+          clonedElement.style.transform = 'none';
+          clonedElement.style.boxShadow = 'none';
+          clonedElement.style.margin = '0';
+          clonedElement.style.width = '210mm';
+          clonedElement.style.background = 'white';
+          clonedElement.style.height = 'auto'; 
+          
+          // Remove UI helpers for clean PDF
+          const pages = clonedElement.querySelectorAll('.a4-page');
+          pages.forEach((page: any) => {
+            page.style.boxShadow = 'none';
+            page.style.border = 'none';
+            page.style.margin = '0';
+          });
+        }
+      });
+      
       const pdf = new jsPDF({
         orientation: 'p',
         unit: 'mm',
@@ -39,93 +68,16 @@ export function ExportPDFButton({ targetId, filename }: ExportPDFButtonProps) {
       const pdfWidth = pdf.internal.pageSize.getWidth();
       const pdfHeight = pdf.internal.pageSize.getHeight();
       
-      // Smart Multi-Page Paginator
-      const canvas = await html2canvas(element, {
-        scale: 2.5,
-        useCORS: true,
-        logging: false,
-        backgroundColor: '#ffffff',
-        width: element.scrollWidth,
-        // Remove fixed height to allow capture of expanded elements during onclone
-        onclone: (clonedDoc) => {
-          const clonedElement = clonedDoc.getElementById(targetId);
-          if (!clonedElement) return;
-
-          // A4 aspect ratio in pixels based on rendered width
-          const a4HeightPx = clonedElement.offsetWidth * (297 / 210);
-          
-          clonedElement.style.transform = 'none';
-          clonedElement.style.boxShadow = 'none';
-          clonedElement.style.margin = '0';
-          clonedElement.style.width = '210mm';
-          clonedElement.style.background = 'white';
-
-          // 1. Identify and push sections that straddle page breaks
-          const sections = clonedElement.querySelectorAll('.avoid-break');
-          sections.forEach((section: any) => {
-            const rect = section.getBoundingClientRect();
-            const top = section.offsetTop;
-            const bottom = top + rect.height;
-            
-            const pageNum = Math.floor(top / a4HeightPx);
-            const pageEnd = (pageNum + 1) * a4HeightPx;
-            
-            // If section straddles a page break, push it to next page
-            if (bottom > pageEnd - 10) { 
-              const pushAmount = pageEnd - top + 5; 
-              section.style.marginTop = `${pushAmount}px`;
-            }
-          });
-
-          // 2. Identify and paginate table rows strictly
-          const tables = clonedElement.querySelectorAll('table');
-          tables.forEach((table: any) => {
-            const thead = table.querySelector('thead');
-            const tbody = table.querySelector('tbody');
-            if (!tbody) return;
-
-            const rows = Array.from(tbody.querySelectorAll('tr'));
-            
-            rows.forEach((row: any) => {
-              const rect = row.getBoundingClientRect();
-              const top = row.offsetTop + table.offsetTop;
-              const bottom = top + rect.height;
-              
-              const pageNum = Math.floor(top / a4HeightPx);
-              const pageEnd = (pageNum + 1) * a4HeightPx;
-              
-              if (bottom > pageEnd - 20) {
-                const pushAmount = pageEnd - top + 2;
-                
-                const spacer = clonedDoc.createElement('tr');
-                spacer.style.height = `${pushAmount}px`;
-                spacer.style.backgroundColor = 'white';
-                spacer.innerHTML = `<td colspan="100%"></td>`;
-                tbody.insertBefore(spacer, row);
-
-                if (thead) {
-                  const headerClone = thead.cloneNode(true) as HTMLElement;
-                  const headerRows = Array.from(headerClone.querySelectorAll('tr'));
-                  headerRows.forEach((hRow) => {
-                    hRow.style.backgroundColor = '#09090b';
-                    tbody.insertBefore(hRow, row);
-                  });
-                }
-              }
-            });
-          });
-        }
-      });
-      
       const imgData = canvas.toDataURL('image/jpeg', 0.95);
       const canvasWidth = canvas.width;
       const canvasHeight = canvas.height;
       
       const imgHeightInPdf = (canvasHeight * pdfWidth) / canvasWidth;
+      
       let heightLeft = imgHeightInPdf;
       let pageNumber = 0;
 
-      // Add pages sequentially with correct offsets
+      // Slice the high-res capture into clean A4 pages
       while (heightLeft > 0) {
         if (pageNumber > 0) {
           pdf.addPage();
@@ -142,7 +94,7 @@ export function ExportPDFButton({ targetId, filename }: ExportPDFButtonProps) {
       
       toast({
         title: "Professional PDF Exported",
-        description: "Document generated with intelligent multi-page pagination."
+        description: "Document generated with high-fidelity pagination."
       });
     } catch (error) {
       console.error('PDF Error:', error);
