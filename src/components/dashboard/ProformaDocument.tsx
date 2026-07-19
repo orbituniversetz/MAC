@@ -44,7 +44,7 @@ export function ProformaDocument({ proforma, settings, className }: ProformaDocu
         </div>
         <div className="text-right flex flex-col justify-center">
           <h1 className="text-2xl font-black text-[#c10d12] uppercase leading-none tracking-tighter mb-1">{settings.garage_name}</h1>
-          <div className="text-[10px] text-zinc-500 font-bold leading-tight uppercase tracking-tight">
+          <div className="text-[10px] text-zinc-500 font-bold leading-tight uppercase tracking-tight flex flex-col items-end">
             <p>{settings.garage_mailbox}</p>
             <p>{settings.garage_address}</p>
             <p className="text-zinc-800 font-black">Tel: {settings.garage_phone} | TIN: {settings.garage_tin}</p>
@@ -110,8 +110,8 @@ export function ProformaDocument({ proforma, settings, className }: ProformaDocu
       </div>
 
       {/* Summary and Payment Block - Keep Together */}
-      <div className="mt-auto space-y-6 shrink-0 avoid-break">
-        <div className="flex justify-end">
+      <div className="mt-auto space-y-6 shrink-0">
+        <div className="flex justify-end avoid-break">
           <div className="w-72 space-y-2 bg-zinc-50 p-6 rounded-3xl border border-zinc-100 shadow-sm">
             <div className="flex justify-between text-xs font-black uppercase tracking-tight">
               <span className="text-zinc-500">Subtotal:</span>
@@ -144,7 +144,7 @@ export function ProformaDocument({ proforma, settings, className }: ProformaDocu
           </div>
         </div>
 
-        <div className="p-6 rounded-2xl flex justify-between items-center border-2 bg-zinc-950 text-white shadow-md">
+        <div className="avoid-break p-6 rounded-2xl flex justify-between items-center border-2 bg-zinc-950 text-white shadow-md">
           <div>
             <p className="text-[9px] font-black uppercase tracking-widest opacity-70 mb-1">Current Payment Status</p>
             <h4 className="text-xl font-black tracking-tight">{isFullyPaid ? 'FULLY SETTLED' : 'PENDING PAYMENT'}</h4>

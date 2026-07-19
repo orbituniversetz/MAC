@@ -1,7 +1,7 @@
 'use client'
 
 import { cn } from '@/lib/utils';
-import { CreditCard, Receipt } from 'lucide-react';
+import { Receipt } from 'lucide-react';
 import Image from 'next/image';
 
 interface InvoiceDocumentProps {
@@ -97,8 +97,8 @@ export function InvoiceDocument({ invoice, settings, className }: InvoiceDocumen
       </div>
 
       {/* Totals and Payment Block - Keep Together */}
-      <div className="mt-auto space-y-8 shrink-0 avoid-break">
-        <div className="flex justify-end">
+      <div className="mt-auto space-y-8 shrink-0">
+        <div className="flex justify-end avoid-break">
           <div className="w-72 space-y-2 bg-zinc-50 p-6 rounded-3xl border border-zinc-100 shadow-sm">
             <div className="flex justify-between text-xs font-black uppercase tracking-tight">
               <span className="text-zinc-500">Subtotal:</span>
@@ -123,7 +123,7 @@ export function InvoiceDocument({ invoice, settings, className }: InvoiceDocumen
           </div>
         </div>
 
-        <div className="pt-8 border-t-4 border-zinc-950">
+        <div className="pt-8 border-t-4 border-zinc-950 avoid-break">
           <div className="grid grid-cols-2 gap-12">
             <div>
               <h3 className="text-[10px] font-black text-zinc-400 uppercase tracking-widest mb-4">Payment Instructions</h3>
