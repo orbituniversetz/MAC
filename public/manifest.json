@@ -1,7 +1,7 @@
 {
   "name": "GarageFlow Desk",
   "short_name": "GarageFlow",
-  "description": "Professional Garage Management System",
+  "description": "Professional Garage Management System for Tanzania",
   "start_url": "/dashboard",
   "display": "standalone",
   "background_color": "#ffffff",

@@ -1,28 +1,23 @@
-
 # GarageFlow Desk
 
 A professional, offline-first Garage Management System designed for automotive repair businesses in Tanzania.
 
-## Windows 11 Installation (Quick Start)
+## Windows 11 Installation (Simple Steps)
 
-1. **Install Node.js**: Download and install [Node.js 20 or 22 (LTS)](https://nodejs.org/). This provides the environment to run the app.
-2. **Download & Extract**: Extract this project folder to your preferred location (e.g., `C:\GarageFlow`).
-3. **One-Time Setup**:
-   - Open the folder.
-   - Right-click in the folder and select **Open in Terminal**.
-   - Type `npm install` and press Enter. This downloads the necessary components.
-   - Type `npm run build` and press Enter. This prepares the app for fast, professional use.
-4. **Launch the App**:
-   - Double-click the **Start.bat** file in the main folder.
-   - The app will open in your default browser at `http://localhost:9002`.
-5. **Install as a Desktop App**:
-   - Once open in Chrome or Microsoft Edge, look for the **Install** icon (a small computer/plus icon) in the top-right address bar.
-   - Click it to "Install GarageFlow Desk".
-   - You now have a standalone desktop app with its own icon!
+1. **Install Node.js**: Download and install [Node.js LTS](https://nodejs.org/).
+2. **Setup**: Extract this project folder to your computer (e.g., `C:\GarageFlow`).
+3. **Launch**: Double-click the **Start.bat** file. 
+   - *Note: On the first run, it will install components. Please wait.*
+4. **Desktop App**: 
+   - Once open in Chrome or Edge, click the **Install** icon in the address bar (looks like a monitor or plus sign).
+   - This adds a "GarageFlow" shortcut to your Windows desktop and Start menu.
 
-## Data Safety
-- Your data is stored locally in `local_data/garage.db`.
-- **Important**: Use the **Backup Manager** inside the app to export your data to a USB drive regularly.
+## Data & Safety
+- **Offline Database**: Your data is stored locally in the `local_data` folder inside this project. 
+- **Persistence**: Data is saved to your hard drive instantly and survives computer restarts.
+- **Portability**: You can copy the entire `GarageFlow` folder to a USB drive and run it on any other Windows PC that has Node.js installed.
 
-## Offline Mode
-This app works 100% without internet. Internet is only required if you use the AI (Genkit) features or check for updates from GitHub.
+## Professional Features
+- **Job Cards**: Professional intake receipts with no financial data.
+- **Proformas & Invoices**: Enterprise-grade PDF generation with staple-friendly margins.
+- **Offline-First**: Works 100% without internet.

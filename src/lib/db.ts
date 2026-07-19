@@ -1,48 +1,39 @@
 import Database from 'better-sqlite3';
 import path from 'path';
 import fs from 'fs';
-import os from 'os';
 
-// Detect environment
-const isElectron = typeof process !== 'undefined' && process.versions && !!process.versions.electron;
+// Database naming and location
+const dbName = 'garage_persistence.db';
 const isBuild = process.env.NEXT_PHASE === 'phase-production-build';
-const dbName = 'garage.db';
 
 let dbPath: string;
 
 if (isBuild) {
-  // During build, use a temporary local file in the project directory
+  // During build, use a temporary local file
   const buildDir = path.join(process.cwd(), '.next_build_data');
   if (!fs.existsSync(buildDir)) fs.mkdirSync(buildDir, { recursive: true });
   dbPath = path.join(buildDir, 'temp.db');
-} else if (isElectron) {
-  // Production desktop mode (Electron EXE)
-  const dataDir = path.join(os.homedir(), '.garageflow_desk');
-  dbPath = path.join(dataDir, dbName);
 } else {
-  // Local web server / PWA mode
-  // We keep the database inside the project folder for easy portability on Windows
+  // Production/Development local mode
+  // We keep the database in a dedicated folder at the project root for portability on Windows
   const localDataDir = path.join(process.cwd(), 'local_data');
+  if (!fs.existsSync(localDataDir)) {
+    fs.mkdirSync(localDataDir, { recursive: true });
+  }
   dbPath = path.join(localDataDir, dbName);
 }
 
-// Ensure directory exists
-const dbDir = path.dirname(dbPath);
-if (!fs.existsSync(dbDir)) {
-  fs.mkdirSync(dbDir, { recursive: true });
-}
-
-// Initialize database with a fail-safe check
+// Initialize database
 let db: Database.Database;
 try {
   db = new Database(dbPath);
 } catch (error) {
-  console.error('Failed to open database at:', dbPath);
-  // Fallback to in-memory if disk access fails (emergency only)
+  console.error('Failed to open persistent database at:', dbPath);
+  // Emergency fallback
   db = new Database(':memory:');
 }
 
-// Performance Optimizations
+// Performance Optimizations for local HDD/SSD usage
 db.pragma('journal_mode = WAL');
 db.pragma('synchronous = NORMAL');
 
@@ -175,12 +166,7 @@ db.exec(`
   CREATE INDEX IF NOT EXISTS idx_jobsheets_cust ON jobsheets(customerId);
 `);
 
-// Seed default admin and settings
-const userCount = db.prepare('SELECT count(*) as count FROM users').get() as any;
-if (userCount.count === 0) {
-  db.prepare('INSERT INTO users (username, password, role) VALUES (?, ?, ?)').run('admin', 'admin123', 'admin');
-}
-
+// Seed default settings
 const settingsCount = db.prepare('SELECT count(*) as count FROM settings').get() as any;
 if (settingsCount.count === 0) {
   const defaultSettings = [
