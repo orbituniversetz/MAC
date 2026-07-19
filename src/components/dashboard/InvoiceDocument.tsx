@@ -105,7 +105,7 @@ export function InvoiceDocument({ invoice, settings, className }: InvoiceDocumen
         </table>
       </div>
 
-      {/* Summary Block - Keep Together */}
+      {/* Summary Block - Unified to Prevent Splitting */}
       <div className="avoid-break flex justify-end mb-12">
         <div className="w-72 space-y-2 bg-zinc-50 p-6 rounded-3xl border border-zinc-100 shadow-sm">
           <div className="flex justify-between text-xs font-bold uppercase tracking-tight">

@@ -105,48 +105,50 @@ export function ProformaDocument({ proforma, settings, className }: ProformaDocu
         </table>
       </div>
 
-      {/* Summary Boxes - Keep Together */}
-      <div className="avoid-break flex justify-end mb-10">
-        <div className="w-72 space-y-2 bg-zinc-50 p-6 rounded-3xl border border-zinc-100 shadow-sm">
-          <div className="flex justify-between text-xs font-bold uppercase tracking-tight">
-            <span className="text-zinc-500">Subtotal:</span>
-            <span className="whitespace-nowrap text-zinc-900">{subtotal.toLocaleString()}</span>
-          </div>
-          {discount > 0 && (
-            <div className="flex justify-between text-xs font-bold uppercase tracking-tight text-red-600">
-              <span className="text-zinc-500">Discount:</span>
-              <span className="whitespace-nowrap">({discount.toLocaleString()})</span>
-            </div>
-          )}
-          {taxEnabled && (
+      {/* Financial Block - Unified Container to Prevent Splitting */}
+      <div className="avoid-break space-y-6 mb-12">
+        <div className="flex justify-end">
+          <div className="w-72 space-y-2 bg-zinc-50 p-6 rounded-3xl border border-zinc-100 shadow-sm">
             <div className="flex justify-between text-xs font-bold uppercase tracking-tight">
-              <span className="text-zinc-500">VAT (18%):</span>
-              <span className="whitespace-nowrap text-zinc-900">{taxAmount.toLocaleString()}</span>
+              <span className="text-zinc-500">Subtotal:</span>
+              <span className="whitespace-nowrap text-zinc-900">{subtotal.toLocaleString()}</span>
             </div>
-          )}
-          <div className="pt-4 border-t-2 border-zinc-200 flex justify-between items-center mb-2">
-            <span className="font-bold text-xs uppercase tracking-widest">Grand Total:</span>
-            <span className="font-bold text-2xl text-primary whitespace-nowrap tracking-tighter">TZS {total.toLocaleString()}</span>
-          </div>
-          <div className="flex justify-between text-[10px] pt-2 text-green-700 font-bold border-t border-dashed border-zinc-300">
-            <span>PAID TO DATE:</span>
-            <span>{totalPaid.toLocaleString()}</span>
-          </div>
-          <div className="flex justify-between text-sm text-red-700 font-bold">
-            <span>BALANCE DUE:</span>
-            <span>TZS {balanceDue.toLocaleString()}</span>
+            {discount > 0 && (
+              <div className="flex justify-between text-xs font-bold uppercase tracking-tight text-red-600">
+                <span className="text-zinc-500">Discount:</span>
+                <span className="whitespace-nowrap">({discount.toLocaleString()})</span>
+              </div>
+            )}
+            {taxEnabled && (
+              <div className="flex justify-between text-xs font-bold uppercase tracking-tight">
+                <span className="text-zinc-500">VAT (18%):</span>
+                <span className="whitespace-nowrap text-zinc-900">{taxAmount.toLocaleString()}</span>
+              </div>
+            )}
+            <div className="pt-4 border-t-2 border-zinc-200 flex justify-between items-center mb-2">
+              <span className="font-bold text-xs uppercase tracking-widest">Grand Total:</span>
+              <span className="font-bold text-2xl text-primary whitespace-nowrap tracking-tighter">TZS {total.toLocaleString()}</span>
+            </div>
+            <div className="flex justify-between text-[10px] pt-2 text-green-700 font-bold border-t border-dashed border-zinc-300">
+              <span>PAID TO DATE:</span>
+              <span>{totalPaid.toLocaleString()}</span>
+            </div>
+            <div className="flex justify-between text-sm text-red-700 font-bold">
+              <span>BALANCE DUE:</span>
+              <span>TZS {balanceDue.toLocaleString()}</span>
+            </div>
           </div>
         </div>
-      </div>
 
-      <div className="avoid-break p-6 rounded-2xl mb-10 flex justify-between items-center border-2 bg-zinc-900 border-zinc-950 text-white shadow-md">
-        <div>
-          <p className="text-[9px] font-bold uppercase tracking-widest opacity-70 mb-1">Current Payment Status</p>
-          <h4 className="text-xl font-bold tracking-tight">{isFullyPaid ? 'FULLY SETTLED' : 'PENDING PAYMENT'}</h4>
-        </div>
-        <div className="text-right">
-          <p className="text-[10px] font-bold opacity-70 uppercase tracking-tighter">Outstanding Balance</p>
-          <p className="text-3xl font-bold whitespace-nowrap tracking-tighter">TZS {balanceDue.toLocaleString()}</p>
+        <div className="p-6 rounded-2xl flex justify-between items-center border-2 bg-zinc-900 border-zinc-950 text-white shadow-md">
+          <div>
+            <p className="text-[9px] font-bold uppercase tracking-widest opacity-70 mb-1">Current Payment Status</p>
+            <h4 className="text-xl font-bold tracking-tight">{isFullyPaid ? 'FULLY SETTLED' : 'PENDING PAYMENT'}</h4>
+          </div>
+          <div className="text-right">
+            <p className="text-[10px] font-bold opacity-70 uppercase tracking-tighter">Outstanding Balance</p>
+            <p className="text-3xl font-bold whitespace-nowrap tracking-tighter">TZS {balanceDue.toLocaleString()}</p>
+          </div>
         </div>
       </div>
 

@@ -2,7 +2,8 @@ const CACHE_NAME = 'garageflow-cache-v1';
 const ASSETS_TO_CACHE = [
   '/',
   '/dashboard',
-  '/manifest.json'
+  '/manifest.json',
+  '/logo.png'
 ];
 
 self.addEventListener('install', (event) => {
