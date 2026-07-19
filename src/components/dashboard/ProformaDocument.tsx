@@ -23,7 +23,6 @@ export function ProformaDocument({ proforma, settings, className }: ProformaDocu
 
   return (
     <div id="proforma-document" className={cn("a4-page font-sans", className)}>
-      {/* Header - Branding */}
       <div className="avoid-break mb-4 border-b-2 border-zinc-100 pb-4 shrink-0">
         <div className="flex items-center justify-between">
           <div className="flex items-center">
@@ -60,7 +59,6 @@ export function ProformaDocument({ proforma, settings, className }: ProformaDocu
         </div>
       </div>
 
-      {/* Recipient Details */}
       <div className="avoid-break grid grid-cols-2 gap-12 mb-8 shrink-0">
         <div>
           <h3 className="text-[10px] font-black text-zinc-400 uppercase tracking-widest mb-2">Quotation For</h3>
@@ -73,15 +71,14 @@ export function ProformaDocument({ proforma, settings, className }: ProformaDocu
         </div>
         <div className="bg-zinc-50 p-5 rounded-2xl border border-zinc-100 flex flex-col justify-center">
           <h3 className="text-[10px] font-black text-zinc-400 uppercase tracking-widest mb-2">Vehicle Details</h3>
-          <div className="space-y-1">
-            <p><span className="font-black text-zinc-400 uppercase text-[9px] tracking-widest w-24 inline-block">Plate Number:</span> <span className="font-black text-zinc-900">{proforma.vehiclePlate || 'N/A'}</span></p>
-            <p><span className="font-black text-zinc-400 uppercase text-[9px] tracking-widest w-24 inline-block">Make / Model:</span> <span className="font-bold text-zinc-700">{proforma.vehicleModel || 'N/A'}</span></p>
+          <div className="space-y-1 text-sm">
+            <p><span className="font-black text-zinc-400 uppercase text-[9px] tracking-widest w-24 inline-block">Plate No:</span> <span className="font-black text-zinc-900">{proforma.vehiclePlate || 'N/A'}</span></p>
+            <p><span className="font-black text-zinc-400 uppercase text-[9px] tracking-widest w-24 inline-block">Make/Model:</span> <span className="font-bold text-zinc-700">{proforma.vehicleModel || 'N/A'}</span></p>
             {proforma.jobNo && <p className="mt-2 text-[10px] font-black bg-white border px-2 py-0.5 rounded-full inline-block">Ref Job: {proforma.jobNo}</p>}
           </div>
         </div>
       </div>
 
-      {/* Main Table - Splittable */}
       <div className="mb-8 flex-1">
         <table className="w-full border-collapse">
           <thead>
@@ -105,29 +102,28 @@ export function ProformaDocument({ proforma, settings, className }: ProformaDocu
         </table>
       </div>
 
-      {/* Financial Block & Status - Keep Together */}
       <div className="avoid-break space-y-6 mb-12 shrink-0">
         <div className="flex justify-end">
           <div className="w-72 space-y-2 bg-zinc-50 p-6 rounded-3xl border border-zinc-100 shadow-sm">
             <div className="flex justify-between text-xs font-black uppercase tracking-tight">
               <span className="text-zinc-500">Subtotal:</span>
-              <span className="whitespace-nowrap text-zinc-900">{subtotal.toLocaleString()}</span>
+              <span className="text-zinc-900">{subtotal.toLocaleString()}</span>
             </div>
             {discount > 0 && (
               <div className="flex justify-between text-xs font-black uppercase tracking-tight text-red-600">
                 <span className="text-zinc-500">Discount:</span>
-                <span className="whitespace-nowrap">({discount.toLocaleString()})</span>
+                <span>({discount.toLocaleString()})</span>
               </div>
             )}
             {taxEnabled && (
               <div className="flex justify-between text-xs font-black uppercase tracking-tight">
                 <span className="text-zinc-500">VAT (18%):</span>
-                <span className="whitespace-nowrap text-zinc-900">{taxAmount.toLocaleString()}</span>
+                <span className="text-zinc-900">{taxAmount.toLocaleString()}</span>
               </div>
             )}
             <div className="pt-4 border-t-2 border-zinc-200 flex justify-between items-center mb-2">
               <span className="font-black text-xs uppercase tracking-widest">Grand Total:</span>
-              <span className="font-black text-2xl text-[#c10d12] whitespace-nowrap tracking-tighter">TZS {total.toLocaleString()}</span>
+              <span className="font-black text-2xl text-[#c10d12] tracking-tighter">TZS {total.toLocaleString()}</span>
             </div>
             <div className="flex justify-between text-[10px] pt-2 text-green-700 font-black border-t border-dashed border-zinc-300">
               <span>PAID TO DATE:</span>
@@ -140,19 +136,18 @@ export function ProformaDocument({ proforma, settings, className }: ProformaDocu
           </div>
         </div>
 
-        <div className="p-6 rounded-2xl flex justify-between items-center border-2 bg-zinc-950 border-zinc-950 text-white shadow-md">
+        <div className="p-6 rounded-2xl flex justify-between items-center border-2 bg-zinc-950 text-white shadow-md">
           <div>
             <p className="text-[9px] font-black uppercase tracking-widest opacity-70 mb-1">Current Payment Status</p>
             <h4 className="text-xl font-black tracking-tight">{isFullyPaid ? 'FULLY SETTLED' : 'PENDING PAYMENT'}</h4>
           </div>
           <div className="text-right">
             <p className="text-[10px] font-black opacity-70 uppercase tracking-tighter">Outstanding Balance</p>
-            <p className="text-3xl font-black whitespace-nowrap tracking-tighter">TZS {balanceDue.toLocaleString()}</p>
+            <p className="text-3xl font-black tracking-tighter">TZS {balanceDue.toLocaleString()}</p>
           </div>
         </div>
       </div>
 
-      {/* Footer Instructions */}
       <div className="avoid-break mt-auto pt-8 border-t border-zinc-100 shrink-0">
         <div className="grid grid-cols-2 gap-12">
           <div>

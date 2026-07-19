@@ -36,10 +36,8 @@ export async function exportDatabase() {
 export async function importDatabase(base64Data: string) {
   try {
     const buffer = Buffer.from(base64Data, 'base64');
-    // Ensure WAL mode is closed before overwriting
     db.close();
     fs.writeFileSync(dbPath, buffer);
-    // Force process restart or just notify user to restart app
     return { success: true };
   } catch (error) {
     return { success: false, error: 'Failed to write database file' };
@@ -106,13 +104,11 @@ export async function createJobSheet(formData: FormData) {
 }
 
 export async function deleteJobSheet(id: number) {
-  // Delete related items and expenses first (if any)
   db.prepare('DELETE FROM job_items WHERE jobSheetId = ?').run(id);
   db.prepare('DELETE FROM expenses WHERE jobSheetId = ?').run(id);
   db.prepare('DELETE FROM proformas WHERE jobSheetId = ?').run(id);
   db.prepare('DELETE FROM invoices WHERE jobSheetId = ?').run(id);
   db.prepare('DELETE FROM documents WHERE jobSheetId = ?').run(id);
-  
   db.prepare('DELETE FROM jobsheets WHERE id = ?').run(id);
   revalidatePath('/dashboard/jobsheets');
 }
@@ -155,6 +151,7 @@ export async function deleteExpense(id: number, jobSheetId: number | null, profo
   db.prepare('DELETE FROM expenses WHERE id = ?').run(id);
   revalidatePath('/dashboard/expenses');
   if (jobSheetId) revalidatePath(`/dashboard/jobsheets/${jobSheetId}`);
+  if (proformaId) revalidatePath(`/dashboard/proformas/${proformaId}`);
 }
 
 export const getExpenses = cache(async () => {
@@ -240,7 +237,7 @@ export const getInvoices = cache(async () => {
     SELECT i.*, js.jobNo, c.name as customerName 
     FROM invoices i
     LEFT JOIN jobsheets js ON i.jobSheetId = js.id
-    LEFT JOIN customers c ON i.id = c.id
+    LEFT JOIN customers c ON js.customerId = c.id
     ORDER BY i.createdAt DESC
   `).all();
 });

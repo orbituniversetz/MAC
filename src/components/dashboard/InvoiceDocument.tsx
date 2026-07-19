@@ -21,7 +21,6 @@ export function InvoiceDocument({ invoice, settings, className }: InvoiceDocumen
 
   return (
     <div id="invoice-document" className={cn("a4-page font-sans", className)}>
-      {/* Header - Branding */}
       <div className="avoid-break mb-4 border-b-2 border-zinc-100 pb-4 shrink-0">
         <div className="flex items-center justify-between">
           <div className="flex items-center">
@@ -58,7 +57,6 @@ export function InvoiceDocument({ invoice, settings, className }: InvoiceDocumen
         </div>
       </div>
 
-      {/* Info Grid */}
       <div className="avoid-break grid grid-cols-2 gap-12 mb-8 shrink-0">
         <div>
           <h3 className="text-[10px] font-black text-zinc-400 uppercase tracking-widest mb-3">Customer Billing Info</h3>
@@ -74,14 +72,10 @@ export function InvoiceDocument({ invoice, settings, className }: InvoiceDocumen
           <div className="space-y-2 text-sm">
             <p><span className="font-black text-zinc-400 uppercase text-[9px] tracking-widest w-24 inline-block">Registration:</span> <span className="font-black text-zinc-900">{invoice.vehiclePlate || 'N/A'}</span></p>
             <p><span className="font-black text-zinc-400 uppercase text-[9px] tracking-widest w-24 inline-block">Make/Model:</span> <span className="font-bold text-zinc-700">{invoice.vehicleModel || 'N/A'}</span></p>
-            <p className="pt-2 border-t border-zinc-200 mt-2 font-black text-zinc-500 text-[10px] uppercase tracking-widest">
-              Job Ref: {invoice.jobNo || 'General'} | Date: {new Date(invoice.createdAt).toLocaleDateString()}
-            </p>
           </div>
         </div>
       </div>
 
-      {/* Table Section */}
       <div className="mb-8 flex-1">
         <table className="w-full border-collapse">
           <thead>
@@ -92,11 +86,11 @@ export function InvoiceDocument({ invoice, settings, className }: InvoiceDocumen
               <th className="p-3 text-right text-[10px] font-black uppercase w-32">Total (TZS)</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-zinc-100 font-bold">
+          <tbody className="divide-y divide-zinc-100">
             {snapshot.items?.map((item: any) => (
               <tr key={item.id} className="text-xs">
                 <td className="p-4 font-black text-zinc-900 uppercase tracking-tight">{item.description}</td>
-                <td className="p-4 text-center text-zinc-800">{item.qty}</td>
+                <td className="p-4 text-center font-bold">{item.qty}</td>
                 <td className="p-4 text-right whitespace-nowrap text-zinc-600">{item.unitPrice.toLocaleString()}</td>
                 <td className="p-4 text-right font-black whitespace-nowrap text-zinc-900">TZS {item.subtotal.toLocaleString()}</td>
               </tr>
@@ -105,33 +99,31 @@ export function InvoiceDocument({ invoice, settings, className }: InvoiceDocumen
         </table>
       </div>
 
-      {/* Summary Block - Unified and Avoid Break */}
       <div className="avoid-break flex justify-end mb-12 shrink-0">
         <div className="w-72 space-y-2 bg-zinc-50 p-6 rounded-3xl border border-zinc-100 shadow-sm">
           <div className="flex justify-between text-xs font-black uppercase tracking-tight">
             <span className="text-zinc-500">Subtotal:</span>
-            <span className="text-zinc-900 whitespace-nowrap">{subtotal.toLocaleString()}</span>
+            <span className="text-zinc-900">{subtotal.toLocaleString()}</span>
           </div>
           {discount > 0 && (
             <div className="flex justify-between text-xs font-black uppercase tracking-tight text-red-600">
               <span className="text-zinc-500">Discount:</span>
-              <span className="whitespace-nowrap">({discount.toLocaleString()})</span>
+              <span>({discount.toLocaleString()})</span>
             </div>
           )}
           {taxEnabled && (
             <div className="flex justify-between text-xs font-black uppercase tracking-tight">
               <span className="text-zinc-500">VAT (18%):</span>
-              <span className="text-zinc-900 whitespace-nowrap">{taxAmount.toLocaleString()}</span>
+              <span className="text-zinc-900">{taxAmount.toLocaleString()}</span>
             </div>
           )}
           <div className="pt-4 border-t-2 border-zinc-200 flex justify-between items-center">
             <span className="font-black text-xs uppercase tracking-widest">Grand Total:</span>
-            <span className="font-black text-2xl text-[#c10d12] whitespace-nowrap tracking-tighter">TZS {total.toLocaleString()}</span>
+            <span className="font-black text-2xl text-[#c10d12] tracking-tighter">TZS {total.toLocaleString()}</span>
           </div>
         </div>
       </div>
 
-      {/* Footer Instructions */}
       <div className="avoid-break mt-auto pt-8 border-t-4 border-zinc-950 shrink-0">
         <div className="grid grid-cols-2 gap-12">
           <div>
@@ -140,7 +132,6 @@ export function InvoiceDocument({ invoice, settings, className }: InvoiceDocumen
               <p><span className="font-black text-zinc-400 uppercase text-[9px] w-28 inline-block tracking-widest">Bank:</span> <span className="font-black text-zinc-900">{settings.bank_name}</span></p>
               <p><span className="font-black text-zinc-400 uppercase text-[9px] w-28 inline-block tracking-widest">Account Name:</span> <span className="font-bold text-zinc-700">{settings.bank_account_name}</span></p>
               <p><span className="font-black text-zinc-400 uppercase text-[9px] w-28 inline-block tracking-widest">Account No:</span> <span className="font-black text-zinc-900">{settings.bank_account_number}</span></p>
-              <p><span className="font-black text-zinc-400 uppercase text-[9px] w-28 inline-block tracking-widest">SWIFT Code:</span> <span className="font-bold text-zinc-700">{settings.bank_swift}</span></p>
             </div>
           </div>
           <div className="text-right flex flex-col justify-end">

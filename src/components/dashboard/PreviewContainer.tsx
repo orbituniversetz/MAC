@@ -42,18 +42,12 @@ export function PreviewContainer({
 
     setIsExporting(true);
     try {
-      // Create high-res A4 PDF
       const pdf = new jsPDF('p', 'mm', 'a4');
-      const pdfWidth = pdf.internal.pageSize.getWidth(); // 210mm
-      const pdfHeight = pdf.internal.pageSize.getHeight(); // 297mm
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = pdf.internal.pageSize.getHeight();
       
-      // Configuration for professional multi-page splitting
-      const stapleMargin = 20; // 20mm top margin on page 2+ for stapling
-      const bottomMargin = 10;
-      const effectivePageHeight = pdfHeight - stapleMargin - bottomMargin;
-
       const canvas = await html2canvas(element, {
-        scale: 2, // 300 DPI resolution
+        scale: 2.5,
         useCORS: true,
         logging: false,
         backgroundColor: '#ffffff',
@@ -62,7 +56,6 @@ export function PreviewContainer({
         onclone: (clonedDoc) => {
           const clonedElement = clonedDoc.getElementById(documentId);
           if (clonedElement) {
-            // Strip UI-only styling for clean capture
             clonedElement.style.transform = 'none';
             clonedElement.style.boxShadow = 'none';
             clonedElement.style.margin = '0';
@@ -70,7 +63,7 @@ export function PreviewContainer({
         }
       });
       
-      const imgData = canvas.toDataURL('image/jpeg', 0.98);
+      const imgData = canvas.toDataURL('image/jpeg', 1.0);
       const canvasWidth = canvas.width;
       const canvasHeight = canvas.height;
       
@@ -78,23 +71,20 @@ export function PreviewContainer({
       let heightLeft = imgHeightInPdf;
       let position = 0;
 
-      // Page 1: Standard branding top
+      // Add first page
       pdf.addImage(imgData, 'JPEG', 0, position, pdfWidth, imgHeightInPdf, undefined, 'FAST');
       heightLeft -= pdfHeight;
 
-      // Subsequent pages: Add staple margin at top
-      while (heightLeft > 2) {
-        position = heightLeft - imgHeightInPdf + stapleMargin; 
+      // Subsequent pages (clean A4 slices)
+      while (heightLeft > 0) {
+        position = heightLeft - imgHeightInPdf;
         pdf.addPage();
         pdf.addImage(imgData, 'JPEG', 0, position, pdfWidth, imgHeightInPdf, undefined, 'FAST');
-        heightLeft -= effectivePageHeight;
+        heightLeft -= pdfHeight;
       }
 
       pdf.save(`${filename}.pdf`);
-      toast({ 
-        title: "A4 Export Success", 
-        description: "PDF generated with professional staple margins." 
-      });
+      toast({ title: "PDF Exported", description: "Professional A4 document generated successfully." });
     } catch (error) {
       console.error('PDF Error:', error);
       toast({ variant: "destructive", title: "Export Failed", description: "Could not generate A4 PDF." });
@@ -114,7 +104,7 @@ export function PreviewContainer({
           </div>
           <div className="hidden sm:block">
             <h2 className="text-sm font-bold tracking-tight uppercase tracking-widest leading-none">{title}</h2>
-            <p className="text-[10px] text-white/40 mt-1 uppercase font-bold">A4 High-Fidelity Print Protocol</p>
+            <p className="text-[10px] text-white/40 mt-1 uppercase font-bold">A4 High-Fidelity Preview</p>
           </div>
         </div>
 
