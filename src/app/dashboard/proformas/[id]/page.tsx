@@ -121,14 +121,14 @@ export default async function ProformaDetailPage({ params }: { params: Promise<{
         </div>
       </div>
 
-      {/* High-Fidelity Professional Document View */}
+      {/* High-Fidelity Professional Document View - Handles Multiple Pages */}
       <div className="max-w-6xl mx-auto space-y-6">
         <div className="flex items-center justify-between px-4">
-          <h3 className="font-bold text-xs text-zinc-400 uppercase tracking-widest">A4 High-Fidelity Preview</h3>
-          <span className="text-[10px] text-zinc-400 italic">Identical to exported PDF file</span>
+          <h3 className="font-bold text-xs text-zinc-400 uppercase tracking-widest">High-Fidelity Multi-Page Preview</h3>
+          <span className="text-[10px] text-zinc-400 italic">Scroll to view all pages (Total height based on items)</span>
         </div>
         <div className="bg-zinc-100/50 border rounded-[2.5rem] shadow-inner overflow-y-auto p-4 sm:p-12 flex justify-center min-h-[1400px]">
-          <div className="origin-top shadow-2xl transition-all duration-300 hover:shadow-primary/10">
+          <div className="origin-top shadow-2xl transition-all duration-300 hover:shadow-primary/10 h-fit">
              <ProformaDocument proforma={pf} settings={settings} />
           </div>
         </div>

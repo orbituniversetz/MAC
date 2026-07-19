@@ -50,15 +50,15 @@ export default async function InvoiceDetailPage({ params }: { params: Promise<{ 
         </div>
       </div>
 
-      {/* Main A4 High-Fidelity Preview */}
+      {/* Main A4 High-Fidelity Preview - Handles Multi-Page Scrolling */}
       <div className="max-w-6xl mx-auto space-y-6">
         <div className="flex items-center justify-between px-4">
           <h3 className="font-bold text-xs text-zinc-400 uppercase tracking-widest">High-Fidelity Document Preview</h3>
-          <span className="text-[10px] text-zinc-400 italic">Exactly as it will appear on A4 paper</span>
+          <span className="text-[10px] text-zinc-400 italic">Exactly as it will appear on A4 paper (Multi-page supported)</span>
         </div>
         
         <div className="bg-zinc-100/50 border rounded-[2rem] shadow-inner overflow-y-auto p-4 sm:p-12 flex justify-center min-h-[1400px]">
-          <div className="origin-top shadow-2xl transition-all hover:shadow-primary/5">
+          <div className="origin-top shadow-2xl transition-all hover:shadow-primary/5 h-fit">
              <InvoiceDocument invoice={inv} settings={settings} />
           </div>
         </div>
