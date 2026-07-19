@@ -11,13 +11,14 @@ import {
   TableHeader, 
   TableRow 
 } from '@/components/ui/table';
-import { ChevronLeft, Trash2, Save, Lock, FileCheck, Receipt, Banknote, CreditCard, History, AlertCircle } from 'lucide-react';
+import { ChevronLeft, Trash2, Save, Lock, FileCheck, Receipt, Banknote, CreditCard, History, AlertCircle, FileText } from 'lucide-react';
 import { ProformaPreview } from '@/components/dashboard/ProformaPreview';
 import { ProformaDocument } from '@/components/dashboard/ProformaDocument';
 import { AddItemForm } from '@/components/dashboard/AddItemForm';
 import { Label } from '@/components/ui/label';
 import { PriceInput } from '@/components/dashboard/PriceInput';
 import { TaxToggle } from '@/components/dashboard/TaxToggle';
+import { ExportPDFButton } from '@/components/dashboard/ExportPDFButton';
 import Link from 'next/link';
 
 export default async function ProformaDetailPage({ params }: { params: Promise<{ id: string }> }) {
@@ -71,9 +72,9 @@ export default async function ProformaDetailPage({ params }: { params: Promise<{
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 pb-20">
       <div className="flex items-center">
-        <Link href="/dashboard/proformas" className="flex items-center text-sm text-muted-foreground hover:text-black">
+        <Link href="/dashboard/proformas" className="flex items-center text-sm text-muted-foreground hover:text-black transition-colors">
           <ChevronLeft className="h-4 w-4 mr-1" /> Back to Proformas
         </Link>
       </div>
@@ -107,79 +108,84 @@ export default async function ProformaDetailPage({ params }: { params: Promise<{
             </>
           )}
           
+          <ExportPDFButton targetId="proforma-document" filename={`PROFORMA-${pf.proformaNo}`} />
           <ProformaPreview proforma={pf} settings={settings} />
           
           {isFinalized && !isInvoiced && isFullyPaid && (
             <form action={handleConvertToInvoice}>
-              <Button className="bg-[#c10d12]" type="submit">
+              <Button className="bg-[#c10d12] text-white hover:bg-[#a00b0f]" type="submit">
                 <Receipt className="mr-2 h-4 w-4" /> Convert to Invoice
               </Button>
             </form>
-          )}
-
-          {isInvoiced && (
-            <Button variant="outline" disabled className="bg-blue-50 text-blue-700 border-blue-200">
-              <FileCheck className="mr-2 h-4 w-4" /> Already Invoiced
-            </Button>
           )}
         </div>
       </div>
 
       {/* High-Fidelity Professional Document View */}
       <div className="max-w-6xl mx-auto space-y-6">
-        <h3 className="font-bold text-xs text-zinc-400 uppercase tracking-widest px-4">Professional A4 Preview</h3>
-        <div className="bg-zinc-100/50 border rounded-3xl shadow-inner overflow-y-auto p-4 sm:p-12 flex justify-center min-h-[1400px]">
-          <div className="origin-top shadow-2xl transition-transform">
+        <div className="flex items-center justify-between px-4">
+          <h3 className="font-bold text-xs text-zinc-400 uppercase tracking-widest">A4 High-Fidelity Preview</h3>
+          <span className="text-[10px] text-zinc-400 italic">Identical to exported PDF file</span>
+        </div>
+        <div className="bg-zinc-100/50 border rounded-[2.5rem] shadow-inner overflow-y-auto p-4 sm:p-12 flex justify-center min-h-[1400px]">
+          <div className="origin-top shadow-2xl transition-all duration-300 hover:shadow-primary/10">
              <ProformaDocument proforma={pf} settings={settings} />
           </div>
         </div>
       </div>
 
-      <div className="grid gap-6 md:grid-cols-3">
+      <div className="grid gap-6 md:grid-cols-3 max-w-6xl mx-auto mt-12">
         <div className="md:col-span-2 space-y-6">
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between">
-              <CardTitle className="text-lg">Quotation Items</CardTitle>
-              {!isFinalized && <Badge variant="outline">Editable</Badge>}
+          <Card className="rounded-2xl overflow-hidden shadow-sm">
+            <CardHeader className="bg-zinc-50/50 border-b border-zinc-100">
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-lg flex items-center gap-2">
+                  <FileText className="h-5 w-5 text-red-600" />
+                  Repair Items & Services
+                </CardTitle>
+                {!isFinalized && <Badge variant="outline" className="bg-blue-50 text-blue-700">Live Editor</Badge>}
+              </div>
             </CardHeader>
-            <CardContent>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Type</TableHead>
-                    <TableHead>Description</TableHead>
-                    <TableHead>Qty</TableHead>
-                    <TableHead>Price</TableHead>
-                    <TableHead>Subtotal</TableHead>
-                    <TableHead></TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {pf.items.map((item: any) => (
-                    <TableRow key={item.id}>
-                      <TableCell><Badge variant="outline" className="text-[10px]">{item.type}</Badge></TableCell>
-                      <TableCell className="font-medium">{item.description}</TableCell>
-                      <TableCell>{item.qty}</TableCell>
-                      <TableCell>{item.unitPrice.toLocaleString()}</TableCell>
-                      <TableCell className="font-bold">{item.subtotal.toLocaleString()}</TableCell>
-                      <TableCell>
-                        {!isFinalized && (
-                          <form action={async () => { 'use server'; await deleteJobItem(item.id, pf.jobSheetId, pf.id); }}>
-                            <Button variant="ghost" size="icon" className="text-red-500 hover:text-red-700">
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
-                          </form>
-                        )}
-                      </TableCell>
+            <CardContent className="pt-6">
+              <div className="border rounded-xl overflow-hidden">
+                <Table>
+                  <TableHeader>
+                    <TableRow className="bg-zinc-50 hover:bg-zinc-50 border-b">
+                      <TableHead className="font-bold">Type</TableHead>
+                      <TableHead className="font-bold">Description</TableHead>
+                      <TableHead className="font-bold text-center">Qty</TableHead>
+                      <TableHead className="font-bold text-right">Price</TableHead>
+                      <TableHead className="font-bold text-right">Subtotal</TableHead>
+                      <TableHead></TableHead>
                     </TableRow>
-                  ))}
-                  {pf.items.length === 0 && (
-                    <TableRow>
-                      <TableCell colSpan={6} className="text-center py-8 text-muted-foreground italic">No items added to this proforma yet.</TableCell>
-                    </TableRow>
-                  )}
-                </TableBody>
-              </Table>
+                  </TableHeader>
+                  <TableBody>
+                    {pf.items.map((item: any) => (
+                      <TableRow key={item.id}>
+                        <TableCell><Badge variant="outline" className="text-[10px] font-black">{item.type}</Badge></TableCell>
+                        <TableCell className="font-medium text-zinc-900">{item.description}</TableCell>
+                        <TableCell className="text-center">{item.qty}</TableCell>
+                        <TableCell className="text-right font-mono">{item.unitPrice.toLocaleString()}</TableCell>
+                        <TableCell className="font-black text-right font-mono">{item.subtotal.toLocaleString()}</TableCell>
+                        <TableCell className="text-right">
+                          {!isFinalized && (
+                            <form action={async () => { 'use server'; await deleteJobItem(item.id, pf.jobSheetId, pf.id); }}>
+                              <Button variant="ghost" size="icon" className="text-red-500 hover:text-red-700 h-8 w-8">
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </form>
+                          )}
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                    {pf.items.length === 0 && (
+                      <TableRow>
+                        <TableCell colSpan={6} className="text-center py-12 text-muted-foreground italic">No services listed yet.</TableCell>
+                      </TableRow>
+                    )}
+                  </TableBody>
+                </Table>
+              </div>
 
               {!isFinalized && (
                 <AddItemForm jobId={pf.jobSheetId} proformaId={pf.id} recentItems={recentItems} />
@@ -187,14 +193,14 @@ export default async function ProformaDetailPage({ params }: { params: Promise<{
             </CardContent>
           </Card>
 
-          <Card>
-            <CardHeader>
+          <Card className="rounded-2xl shadow-sm">
+            <CardHeader className="bg-zinc-50/50 border-b border-zinc-100">
               <CardTitle className="text-lg flex items-center gap-2">
                 <History className="h-5 w-5 text-green-600" />
-                Payment History
+                Payment & Deposit History
               </CardTitle>
             </CardHeader>
-            <CardContent>
+            <CardContent className="pt-6">
               <Table>
                 <TableHeader>
                   <TableRow>
@@ -206,15 +212,15 @@ export default async function ProformaDetailPage({ params }: { params: Promise<{
                 <TableBody>
                   {pf.payments?.map((p: any) => (
                     <TableRow key={p.id}>
-                      <TableCell>{new Date(p.paidAt).toLocaleDateString()}</TableCell>
-                      <TableCell className="font-bold text-green-700">{p.amount.toLocaleString()}</TableCell>
-                      <TableCell><Badge variant="outline" className="text-[10px]">{p.method}</Badge></TableCell>
+                      <TableCell className="text-zinc-500">{new Date(p.paidAt).toLocaleDateString()}</TableCell>
+                      <TableCell className="font-black text-green-700 font-mono">+{p.amount.toLocaleString()}</TableCell>
+                      <TableCell><Badge variant="secondary" className="text-[9px] uppercase tracking-wider">{p.method}</Badge></TableCell>
                     </TableRow>
                   ))}
                   {(!pf.payments || pf.payments.length === 0) && (
                     <TableRow>
-                      <TableCell colSpan={3} className="text-center py-4 text-muted-foreground italic text-xs">
-                        No payments recorded yet.
+                      <TableCell colSpan={3} className="text-center py-6 text-muted-foreground italic text-xs">
+                        No payments recorded for this quotation.
                       </TableCell>
                     </TableRow>
                   )}
@@ -225,66 +231,65 @@ export default async function ProformaDetailPage({ params }: { params: Promise<{
         </div>
 
         <div className="space-y-6">
-          <Card>
+          <Card className="rounded-2xl shadow-sm border-l-4 border-l-red-600">
             <CardHeader>
-              <CardTitle className="text-lg">Customer Info</CardTitle>
+              <CardTitle className="text-lg">Customer Profile</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div>
-                <p className="text-[10px] text-muted-foreground uppercase font-black tracking-wider">Client</p>
-                <p className="font-bold text-black">{pf.customerName}</p>
-                <p className="text-sm">{pf.customerPhone}</p>
-                <p className="text-xs text-muted-foreground italic">{pf.customerAddress}</p>
-                <p className="text-xs font-bold mt-1">TIN: {pf.customerTin || 'N/A'}</p>
+              <div className="p-4 bg-zinc-50 rounded-xl border border-zinc-100">
+                <p className="text-[10px] text-zinc-400 uppercase font-black tracking-widest mb-1">Billing Client</p>
+                <p className="font-black text-zinc-900 leading-tight">{pf.customerName}</p>
+                <p className="text-xs text-zinc-600 font-medium">{pf.customerPhone}</p>
+                <p className="text-[10px] text-zinc-400 mt-2 font-bold uppercase">TIN: {pf.customerTin || 'N/A'}</p>
               </div>
-              <Separator />
+              <Separator className="opacity-50" />
               {pf.vehiclePlate && (
-                <div>
-                  <p className="text-[10px] text-muted-foreground uppercase font-black tracking-wider">Vehicle</p>
-                  <p className="font-bold text-black">{pf.vehiclePlate}</p>
-                  <p className="text-sm">{pf.vehicleModel}</p>
+                <div className="p-4 bg-zinc-50 rounded-xl border border-zinc-100">
+                  <p className="text-[10px] text-zinc-400 uppercase font-black tracking-widest mb-1">Subject Vehicle</p>
+                  <p className="font-black text-zinc-900 leading-tight">{pf.vehiclePlate}</p>
+                  <p className="text-xs text-zinc-600 font-medium">{pf.vehicleModel}</p>
                 </div>
               )}
             </CardContent>
           </Card>
 
-          <Card className="bg-white border rounded-xl p-6 shadow-sm space-y-4 border-l-4 border-l-[#c10d12]">
-            <h3 className="font-bold flex items-center gap-2">
-              <CreditCard className="h-4 w-4 text-[#c10d12]" />
+          <Card className="bg-zinc-950 text-white rounded-2xl p-8 shadow-2xl space-y-6 border border-zinc-800">
+            <h3 className="font-black flex items-center gap-2 text-red-500 uppercase tracking-widest text-xs">
+              <CreditCard className="h-4 w-4" />
               Payment Summary
             </h3>
             
-            <div className="space-y-2">
+            <div className="space-y-4">
               <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">Subtotal:</span>
-                <span>{subtotal.toLocaleString()}</span>
+                <span className="text-zinc-500">Gross Subtotal:</span>
+                <span className="font-mono">{subtotal.toLocaleString()}</span>
               </div>
               
-              <div className="py-2 space-y-2">
+              <div className="space-y-3">
                 {discount > 0 && (
                   <div className="flex justify-between items-center text-sm">
-                    <span className="text-muted-foreground">Discount:</span>
-                    <span className="font-medium text-red-600">({discount.toLocaleString()})</span>
+                    <span className="text-zinc-500">Total Discount:</span>
+                    <span className="font-black text-red-400 font-mono">({discount.toLocaleString()})</span>
                   </div>
                 )}
                 
                 {!isFinalized && (
-                  <form action={handleUpdateDiscount} className="bg-gray-50 p-3 border rounded-md shadow-sm">
-                    <Label className="text-[10px] uppercase font-black text-muted-foreground flex items-center gap-1 mb-1.5">
-                      <Banknote className="h-3 w-3" /> Set Discount (Cash TZS)
+                  <form action={handleUpdateDiscount} className="bg-zinc-900 p-4 rounded-xl border border-zinc-800 space-y-2">
+                    <Label className="text-[10px] uppercase font-black text-zinc-500 flex items-center gap-1">
+                      <Banknote className="h-3 w-3" /> Update Cash Discount
                     </Label>
                     <div className="flex gap-2">
-                      <PriceInput name="discount" defaultValue={pf.discount} className="h-9 text-sm" placeholder="Amount (TZS)" />
-                      <Button type="submit" size="sm" variant="outline" className="h-9 bg-white">Apply</Button>
+                      <PriceInput name="discount" defaultValue={pf.discount} className="h-9 text-sm bg-zinc-950 border-zinc-800 text-white" placeholder="Amount (TZS)" />
+                      <Button type="submit" size="sm" variant="outline" className="h-9 border-zinc-700 bg-transparent text-white hover:bg-zinc-800">Apply</Button>
                     </div>
                   </form>
                 )}
               </div>
 
-              <div className="flex items-center justify-between py-2 border-y border-dashed">
+              <div className="flex items-center justify-between py-4 border-y border-dashed border-zinc-800">
                 <div className="space-y-0.5">
-                  <Label className="text-xs font-bold">Include VAT (18%)</Label>
-                  <p className="text-[10px] text-muted-foreground">Always on by default</p>
+                  <Label className="text-xs font-bold">Tax Inclusion (18%)</Label>
+                  <p className="text-[9px] text-zinc-500 uppercase font-black">Standard TZS VAT</p>
                 </div>
                 <TaxToggle 
                   proformaId={pf.id} 
@@ -295,22 +300,21 @@ export default async function ProformaDetailPage({ params }: { params: Promise<{
 
               {taxEnabled && (
                 <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">VAT (18%):</span>
-                  <span>{taxAmount.toLocaleString()}</span>
+                  <span className="text-zinc-500">VAT (18%):</span>
+                  <span className="font-mono">{taxAmount.toLocaleString()}</span>
                 </div>
               )}
 
               {isFinalized && (
                 <>
-                  <Separator />
-                  <div className="flex justify-between text-sm py-1">
-                    <span className="text-muted-foreground">Paid to Date:</span>
-                    <span className="font-bold text-green-600">{pf.totalPaid?.toLocaleString() || 0}</span>
+                  <div className="flex justify-between text-sm py-1 border-t border-zinc-800 pt-4">
+                    <span className="text-zinc-500 font-black">PAID TO DATE:</span>
+                    <span className="font-black text-green-500 font-mono">+{pf.totalPaid?.toLocaleString() || 0}</span>
                   </div>
 
-                  <div className="pt-2 border-t flex justify-between items-center font-black">
-                    <span className="text-lg">Balance Due:</span>
-                    <span className="text-2xl text-[#c10d12]">TZS {balanceDue.toLocaleString()}</span>
+                  <div className="pt-2 flex justify-between items-center">
+                    <span className="text-xs uppercase font-black text-zinc-500 tracking-widest">Balance Due:</span>
+                    <span className="text-2xl font-black text-red-500 tracking-tighter font-mono">TZS {balanceDue.toLocaleString()}</span>
                   </div>
                 </>
               )}
@@ -318,51 +322,39 @@ export default async function ProformaDetailPage({ params }: { params: Promise<{
 
             {!isFinalized && (
                <form action={handleFinalize}>
-                <Button className="w-full bg-black hover:bg-gray-800 py-6 text-lg font-bold">
-                  Finalize Quotation
+                <Button className="w-full bg-red-600 hover:bg-red-700 py-6 text-lg font-black shadow-lg shadow-red-900/20">
+                  <Lock className="mr-2 h-5 w-5" /> Finalize Quotation
                 </Button>
-                <p className="text-[10px] text-muted-foreground text-center mt-2">
-                  Finalizing will enable payment recording.
-                </p>
               </form>
             )}
 
             {isFinalized && !isInvoiced && !isFullyPaid && (
-              <form action={recordProformaPayment} className="space-y-3 bg-red-50/50 p-4 rounded-xl border border-red-100">
-                <Label className="text-[10px] uppercase font-black text-red-700 flex items-center gap-1">
-                  <Banknote className="h-3 w-3" /> Record New Payment (Cash)
+              <form action={recordProformaPayment} className="space-y-3 bg-red-950/20 p-4 rounded-xl border border-red-900/50">
+                <Label className="text-[10px] uppercase font-black text-red-500 flex items-center gap-1">
+                  <Banknote className="h-3 w-3" /> Quick Cash Entry
                 </Label>
                 <input type="hidden" name="proformaId" value={pf.id} />
                 <div className="flex gap-2">
-                  <PriceInput name="amount" placeholder="Paid Amount" className="h-10 text-sm bg-white" required />
-                  <Button type="submit" className="bg-black text-white hover:bg-gray-800 h-10 px-4">Record</Button>
-                </div>
-                <div className="flex items-start gap-2 text-[9px] text-red-600 bg-white p-2 rounded border border-red-100">
-                  <AlertCircle className="h-3 w-3 shrink-0" />
-                  <span>Remaining balance must be TZS 0 before generating final invoice.</span>
+                  <PriceInput name="amount" placeholder="Paid Amount" className="h-10 text-sm bg-zinc-950 border-zinc-800 text-white" required />
+                  <Button type="submit" className="bg-white text-black hover:bg-zinc-200 h-10 px-4 font-black">Record</Button>
                 </div>
               </form>
             )}
             
             {isFinalized && !isInvoiced && isFullyPaid && (
               <form action={handleConvertToInvoice}>
-                <Button className="w-full bg-red-700 hover:bg-red-800 text-white font-bold py-6 text-lg shadow-lg">
-                  <Receipt className="mr-2 h-5 w-5" /> Generate Final Invoice
+                <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white font-black py-6 text-lg shadow-lg">
+                  <Receipt className="mr-2 h-5 w-5" /> Convert to Final Invoice
                 </Button>
-                <p className="text-[10px] text-green-600 font-bold text-center mt-2">
-                  Fully Paid! Ready for official invoicing.
-                </p>
               </form>
             )}
             
             {isInvoiced && (
-              <div className="space-y-3">
-                <Button disabled className="w-full bg-green-600 text-white opacity-100 py-6">
-                  <FileCheck className="mr-2 h-5 w-5" /> Fully Invoiced
-                </Button>
-                <p className="text-[10px] text-muted-foreground text-center italic">
-                  This proforma is now a locked historical record.
+              <div className="p-4 bg-green-950/20 border border-green-900 rounded-xl text-center">
+                <p className="text-green-500 font-black flex items-center justify-center gap-2">
+                  <FileCheck className="h-5 w-5" /> FULLY INVOICED
                 </p>
+                <p className="text-[10px] text-zinc-500 mt-1 italic">This record is now permanent.</p>
               </div>
             )}
           </Card>

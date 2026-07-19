@@ -88,7 +88,7 @@ export function ProformaDocument({ proforma, settings, className }: ProformaDocu
       {/* Main Table */}
       <div className="flex-1 mb-12">
         <table className="w-full border-collapse">
-          <thead>
+          <thead className="table-header-group">
             <tr className="bg-zinc-950 text-white">
               <th className="p-3 text-left text-[10px] font-black uppercase">Service / Part Description</th>
               <th className="p-3 text-center text-[10px] font-black uppercase w-16">Qty</th>

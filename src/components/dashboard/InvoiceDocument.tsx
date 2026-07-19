@@ -1,7 +1,7 @@
 'use client'
 
 import { cn } from '@/lib/utils';
-import { CreditCard } from 'lucide-react';
+import { CreditCard, Receipt } from 'lucide-react';
 import Image from 'next/image';
 
 interface InvoiceDocumentProps {
@@ -30,7 +30,7 @@ export function InvoiceDocument({ invoice, settings, className }: InvoiceDocumen
             </div>
           ) : (
             <div className="h-20 w-20 bg-zinc-50 rounded-lg flex items-center justify-center text-zinc-200">
-              <CreditCard className="h-10 w-10" />
+              <Receipt className="h-10 w-10" />
             </div>
           )}
         </div>
@@ -75,7 +75,7 @@ export function InvoiceDocument({ invoice, settings, className }: InvoiceDocumen
 
       <div className="flex-1 mb-12">
         <table className="w-full border-collapse">
-          <thead>
+          <thead className="table-header-group">
             <tr className="bg-zinc-950 text-white">
               <th className="p-3 text-left text-[10px] font-black uppercase">Service / Part Description</th>
               <th className="p-3 text-center text-[10px] font-black uppercase w-16">Qty</th>
