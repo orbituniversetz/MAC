@@ -1,3 +1,4 @@
+
 import { getProformaById, getSettings, finalizeProforma, saveProformaDraft, getRecentItems, deleteJobItem, convertToInvoice, updateProformaDiscount, recordProformaPayment, updateProformaTaxStatus } from '@/lib/actions';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -15,6 +16,7 @@ import { ChevronLeft, Trash2, Save, Lock, FileCheck, Receipt, Banknote, CreditCa
 import { ProformaPreview } from '@/components/dashboard/ProformaPreview';
 import { ProformaDocument } from '@/components/dashboard/ProformaDocument';
 import { AddItemForm } from '@/components/dashboard/AddItemForm';
+import { EditItemDialog } from '@/components/dashboard/EditItemDialog';
 import { Label } from '@/components/ui/label';
 import { PriceInput } from '@/components/dashboard/PriceInput';
 import { TaxToggle } from '@/components/dashboard/TaxToggle';
@@ -167,13 +169,16 @@ export default async function ProformaDetailPage({ params }: { params: Promise<{
                         <TableCell className="text-center">{item.qty}</TableCell>
                         <TableCell className="text-right font-mono">{item.unitPrice.toLocaleString()}</TableCell>
                         <TableCell className="font-black text-right font-mono">{item.subtotal.toLocaleString()}</TableCell>
-                        <TableCell className="text-right">
+                        <TableCell className="text-right flex justify-end gap-1">
                           {!isFinalized && (
-                            <form action={async () => { 'use server'; await deleteJobItem(item.id, pf.jobSheetId, pf.id); }}>
-                              <Button variant="ghost" size="icon" className="text-red-500 hover:text-red-700 h-8 w-8">
-                                <Trash2 className="h-4 w-4" />
-                              </Button>
-                            </form>
+                            <>
+                              <EditItemDialog item={item} jobId={pf.jobSheetId} proformaId={pf.id} />
+                              <form action={async () => { 'use server'; await deleteJobItem(item.id, pf.jobSheetId, pf.id); }}>
+                                <Button variant="ghost" size="icon" className="text-red-500 hover:text-red-700 h-8 w-8">
+                                  <Trash2 className="h-4 w-4" />
+                                </Button>
+                              </form>
+                            </>
                           )}
                         </TableCell>
                       </TableRow>

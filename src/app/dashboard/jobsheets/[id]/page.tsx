@@ -1,3 +1,4 @@
+
 import { getJobSheetById, getSettings, createProformaFromJob, createReportFromJob, deleteJobItem, getRecentItems, deleteExpense, getRecentExpenses } from '@/lib/actions';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -18,6 +19,7 @@ import { JobCardDocument } from '@/components/dashboard/JobCardDocument';
 import { AddItemForm } from '@/components/dashboard/AddItemForm';
 import { AddExpenseForm } from '@/components/dashboard/AddExpenseForm';
 import { ExportPDFButton } from '@/components/dashboard/ExportPDFButton';
+import { EditItemDialog } from '@/components/dashboard/EditItemDialog';
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
 
@@ -133,9 +135,10 @@ export default async function JobSheetDetailPage({ params }: { params: Promise<{
                       <td className="p-4 text-black text-center">{item.qty}</td>
                       <td className="p-4 text-black text-right">{item.unitPrice.toLocaleString()}</td>
                       <td className="p-4 font-bold text-black text-right">{item.subtotal.toLocaleString()}</td>
-                      <td className="p-4 text-right">
+                      <td className="p-4 text-right flex justify-end gap-1">
+                        <EditItemDialog item={item} jobId={job.id} proformaId={null} />
                         <form action={async () => { 'use server'; await deleteJobItem(item.id, job.id, null); }}>
-                          <Button variant="ghost" size="icon" className="text-red-500 hover:text-red-700">
+                          <Button variant="ghost" size="icon" className="text-red-500 hover:text-red-700 h-8 w-8">
                             <Trash2 className="h-4 w-4" />
                           </Button>
                         </form>

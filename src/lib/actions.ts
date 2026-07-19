@@ -1,3 +1,4 @@
+
 'use server'
 
 import db, { dbPath } from './db';
@@ -119,6 +120,18 @@ export async function addJobItem(jobId: number | null, proformaId: number | null
     INSERT INTO job_items (jobSheetId, proformaId, type, description, qty, unitPrice, subtotal)
     VALUES (?, ?, ?, ?, ?, ?, ?)
   `).run(jobId, proformaId, item.type, item.description, item.qty, item.unitPrice, subtotal);
+  
+  if (jobId) revalidatePath(`/dashboard/jobsheets/${jobId}`);
+  if (proformaId) revalidatePath(`/dashboard/proformas/${proformaId}`);
+}
+
+export async function updateJobItem(id: number, jobId: number | null, proformaId: number | null, item: any) {
+  const subtotal = item.qty * item.unitPrice;
+  db.prepare(`
+    UPDATE job_items 
+    SET type = ?, description = ?, qty = ?, unitPrice = ?, subtotal = ?
+    WHERE id = ?
+  `).run(item.type, item.description, item.qty, item.unitPrice, subtotal, id);
   
   if (jobId) revalidatePath(`/dashboard/jobsheets/${jobId}`);
   if (proformaId) revalidatePath(`/dashboard/proformas/${proformaId}`);
