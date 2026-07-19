@@ -51,9 +51,7 @@ export function ExportPDFButton({ targetId, filename }: ExportPDFButtonProps) {
           const clonedElement = clonedDoc.getElementById(targetId);
           if (!clonedElement) return;
 
-          // Apply pagination awareness to the cloned DOM
-          const pageHeightPx = (297 / 25.4) * 96 * 2.5; // Roughly 1122px at 96dpi scaled by 2.5
-          // However, simpler to work with normalized units
+          // A4 aspect ratio in pixels based on the rendered width
           const a4HeightPx = clonedElement.offsetWidth * (297 / 210);
           
           clonedElement.style.transform = 'none';
@@ -73,8 +71,8 @@ export function ExportPDFButton({ targetId, filename }: ExportPDFButtonProps) {
             const pageEnd = (pageNum + 1) * a4HeightPx;
             
             // If it straddles a page break, push it down
-            if (bottom > pageEnd - 20) { // 20px safety margin
-              const pushAmount = pageEnd - top + 40; // Push to next page with margin
+            if (bottom > pageEnd - 20) { 
+              const pushAmount = pageEnd - top + 10; 
               section.style.marginTop = `${pushAmount}px`;
             }
           });
@@ -82,23 +80,41 @@ export function ExportPDFButton({ targetId, filename }: ExportPDFButtonProps) {
           // 2. Identify and paginate table rows strictly
           const tables = clonedElement.querySelectorAll('table');
           tables.forEach((table: any) => {
-            const rows = table.querySelectorAll('tbody tr');
             const thead = table.querySelector('thead');
+            const tbody = table.querySelector('tbody');
+            if (!tbody) return;
+
+            const rows = Array.from(tbody.querySelectorAll('tr'));
             
             rows.forEach((row: any) => {
               const rect = row.getBoundingClientRect();
-              const top = row.offsetTop;
+              const top = row.offsetTop + table.offsetTop;
               const bottom = top + rect.height;
               
               const pageNum = Math.floor(top / a4HeightPx);
               const pageEnd = (pageNum + 1) * a4HeightPx;
               
-              if (bottom > pageEnd - 40) {
-                const pushAmount = pageEnd - top + 20;
-                row.style.borderTop = `${pushAmount}px solid white`; // Visible gap in canvas
+              // If row straddles or starts too close to the end of a page
+              if (bottom > pageEnd - 30) {
+                const pushAmount = pageEnd - top + 5;
                 
-                // If header repetition is needed, we'd need to insert a DOM node here.
-                // For bitmap slicing, header repetition is best handled by repeating the capture chunk.
+                // Create a spacer row to push the content
+                const spacer = clonedDoc.createElement('tr');
+                spacer.style.height = `${pushAmount}px`;
+                spacer.style.backgroundColor = 'white';
+                spacer.innerHTML = `<td colspan="100%"></td>`;
+                tbody.insertBefore(spacer, row);
+
+                // Clone and repeat table header if it overflows
+                if (thead) {
+                  const headerClone = thead.cloneNode(true) as HTMLElement;
+                  // In HTML, we insert the cloned row(s) from the header into the body
+                  const headerRows = Array.from(headerClone.querySelectorAll('tr'));
+                  headerRows.forEach((hRow) => {
+                    hRow.style.backgroundColor = '#09090b'; // Force background visibility
+                    tbody.insertBefore(hRow, row);
+                  });
+                }
               }
             });
           });
@@ -128,8 +144,8 @@ export function ExportPDFButton({ targetId, filename }: ExportPDFButtonProps) {
       pdf.save(`${filename}.pdf`);
       
       toast({
-        title: "Enterprise PDF Generated",
-        description: "Professional multi-page document successfully exported."
+        title: "High-Fidelity PDF Generated",
+        description: "Professional multi-page document successfully exported with row integrity."
       });
     } catch (error) {
       console.error('PDF Error:', error);
@@ -148,7 +164,7 @@ export function ExportPDFButton({ targetId, filename }: ExportPDFButtonProps) {
       variant="outline" 
       onClick={handleExport}
       disabled={isExporting}
-      className="border-[#c10d12]/20 text-[#c10d12] hover:bg-red-50"
+      className="border-[#c10d12]/20 text-[#c10d12] hover:bg-red-50 font-bold"
     >
       {isExporting ? (
         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
