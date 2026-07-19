@@ -15,10 +15,10 @@ export function JobCardDocument({ job, settings, isInternal = false, className }
   return (
     <div 
       id={isInternal ? "jobcard-document-internal" : "jobcard-document-customer"} 
-      className={cn("a4-page font-sans shadow-lg", className)}
+      className={cn("space-y-8 print:space-y-0", className)}
     >
       {/* PAGE 1: INTAKE RECEIPT */}
-      <div className="flex flex-col min-h-[257mm]">
+      <div className="a4-page font-sans relative flex flex-col shadow-lg print:shadow-none">
         {/* Header */}
         <div className="flex items-center justify-between mb-4 border-b-2 border-zinc-100 pb-4 shrink-0 avoid-break">
           <div className="flex items-center">
@@ -78,7 +78,7 @@ export function JobCardDocument({ job, settings, isInternal = false, className }
           </div>
         </div>
 
-        {/* Placeholder for work in progress */}
+        {/* Status Section */}
         <div className="flex-1 flex flex-col justify-center items-center border-2 border-dashed border-zinc-100 rounded-3xl mb-8 avoid-break">
           <Wrench className="h-12 w-12 text-zinc-50 mb-4" />
           <p className="text-zinc-400 font-bold uppercase tracking-widest text-[10px] text-center px-12 leading-relaxed">
@@ -110,7 +110,7 @@ export function JobCardDocument({ job, settings, isInternal = false, className }
       </div>
 
       {/* PAGE 2: TERMS AND CONDITIONS */}
-      <div className="break-before-page pt-10 min-h-[297mm]">
+      <div className="a4-page font-sans relative flex flex-col shadow-lg print:shadow-none break-before-page">
         <div className="flex items-center justify-between mb-8 border-b-2 border-zinc-900 pb-4 avoid-break">
           <h2 className="text-xl font-black uppercase tracking-widest text-zinc-900 flex items-center gap-2">
             <FileText className="h-5 w-5 text-[#c10d12]" />

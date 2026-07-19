@@ -99,7 +99,7 @@ export default async function JobSheetDetailPage({ params }: { params: Promise<{
             </div>
         </div>
         
-        <div className="bg-gray-100 border rounded-2xl shadow-inner overflow-y-auto p-4 sm:p-12 flex justify-center min-h-[1200px]">
+        <div className="bg-gray-100 border rounded-2xl shadow-inner overflow-y-auto p-4 sm:p-12 flex justify-center min-h-[1400px]">
           <div className="origin-top h-fit py-4">
             <JobCardDocument job={job} settings={settings} isInternal={false} />
           </div>
