@@ -96,47 +96,49 @@ export function InvoiceDocument({ invoice, settings, className }: InvoiceDocumen
         </table>
       </div>
 
-      {/* Footer Group - Totals, Payment, Signatures - Keep Together Block */}
-      <div className="mt-auto space-y-8 pt-8 border-t-2 border-zinc-50 avoid-break">
-        <div className="flex justify-end">
-          <div className="w-72 space-y-2 bg-zinc-50 p-6 rounded-3xl border border-zinc-100 shadow-sm">
-            <div className="flex justify-between text-xs font-black uppercase tracking-tight">
-              <span className="text-zinc-500">Subtotal:</span>
-              <span className="text-zinc-900">{subtotal.toLocaleString()}</span>
-            </div>
-            {discount > 0 && (
-              <div className="flex justify-between text-xs font-black uppercase tracking-tight text-red-600">
-                <span className="text-zinc-500">Discount:</span>
-                <span>({discount.toLocaleString()})</span>
-              </div>
-            )}
-            {taxEnabled && (
+      {/* Footer Group - Grouped to stay together */}
+      <div className="mt-auto avoid-break pb-8 border-t-2 border-zinc-50 pt-8">
+        <div className="space-y-8">
+          <div className="flex justify-end">
+            <div className="w-72 space-y-2 bg-zinc-50 p-6 rounded-3xl border border-zinc-100 shadow-sm">
               <div className="flex justify-between text-xs font-black uppercase tracking-tight">
-                <span className="text-zinc-500">VAT (18%):</span>
-                <span className="text-zinc-900">{taxAmount.toLocaleString()}</span>
+                <span className="text-zinc-500">Subtotal:</span>
+                <span className="text-zinc-900">{subtotal.toLocaleString()}</span>
               </div>
-            )}
-            <div className="pt-4 border-t-2 border-zinc-200 flex justify-between items-center">
-              <span className="font-black text-xs uppercase tracking-widest">Grand Total:</span>
-              <span className="font-black text-2xl text-[#c10d12] tracking-tighter">TZS {total.toLocaleString()}</span>
+              {discount > 0 && (
+                <div className="flex justify-between text-xs font-black uppercase tracking-tight text-red-600">
+                  <span className="text-zinc-500">Discount:</span>
+                  <span>({discount.toLocaleString()})</span>
+                </div>
+              )}
+              {taxEnabled && (
+                <div className="flex justify-between text-xs font-black uppercase tracking-tight">
+                  <span className="text-zinc-500">VAT (18%):</span>
+                  <span className="text-zinc-900">{taxAmount.toLocaleString()}</span>
+                </div>
+              )}
+              <div className="pt-4 border-t-2 border-zinc-200 flex justify-between items-center">
+                <span className="font-black text-xs uppercase tracking-widest">Grand Total:</span>
+                <span className="font-black text-2xl text-[#c10d12] tracking-tighter">TZS {total.toLocaleString()}</span>
+              </div>
             </div>
           </div>
-        </div>
 
-        <div className="pt-8 border-t-4 border-zinc-950">
-          <div className="grid grid-cols-2 gap-12">
-            <div>
-              <h3 className="text-[10px] font-black text-zinc-400 uppercase tracking-widest mb-4">Payment Instructions</h3>
-              <div className="space-y-2 text-xs">
-                <p><span className="font-black text-zinc-400 uppercase text-[9px] w-28 inline-block tracking-widest">Bank:</span> <span className="font-black text-zinc-900">{settings.bank_name}</span></p>
-                <p><span className="font-black text-zinc-400 uppercase text-[9px] w-28 inline-block tracking-widest">Account Name:</span> <span className="font-bold text-zinc-700">{settings.bank_account_name}</span></p>
-                <p><span className="font-black text-zinc-400 uppercase text-[9px] w-28 inline-block tracking-widest">Account No:</span> <span className="font-black text-zinc-900">{settings.bank_account_number}</span></p>
+          <div className="pt-8 border-t-4 border-zinc-950">
+            <div className="grid grid-cols-2 gap-12">
+              <div>
+                <h3 className="text-[10px] font-black text-zinc-400 uppercase tracking-widest mb-4">Payment Instructions</h3>
+                <div className="space-y-2 text-xs">
+                  <p><span className="font-black text-zinc-400 uppercase text-[9px] w-28 inline-block tracking-widest">Bank:</span> <span className="font-black text-zinc-900">{settings.bank_name}</span></p>
+                  <p><span className="font-black text-zinc-400 uppercase text-[9px] w-28 inline-block tracking-widest">Account Name:</span> <span className="font-bold text-zinc-700">{settings.bank_account_name}</span></p>
+                  <p><span className="font-black text-zinc-400 uppercase text-[9px] w-28 inline-block tracking-widest">Account No:</span> <span className="font-black text-zinc-900">{settings.bank_account_number}</span></p>
+                </div>
               </div>
-            </div>
-            <div className="text-right flex flex-col justify-end">
-              <p className="text-[10px] font-black mb-6 uppercase tracking-widest text-zinc-400">Authorized Signature & Seal</p>
-              <div className="h-12 border-b-2 border-zinc-900 w-48 ml-auto mb-2 opacity-20"></div>
-              <p className="text-[10px] text-zinc-900 uppercase font-black tracking-widest">{settings.garage_name} Management</p>
+              <div className="text-right flex flex-col justify-end">
+                <p className="text-[10px] font-black mb-6 uppercase tracking-widest text-zinc-400">Authorized Signature & Seal</p>
+                <div className="h-12 border-b-2 border-zinc-900 w-48 ml-auto mb-2 opacity-20"></div>
+                <p className="text-[10px] text-zinc-900 uppercase font-black tracking-widest">{settings.garage_name} Management</p>
+              </div>
             </div>
           </div>
         </div>

@@ -46,12 +46,12 @@ export function ExportPDFButton({ targetId, filename }: ExportPDFButtonProps) {
         logging: false,
         backgroundColor: '#ffffff',
         width: element.scrollWidth,
-        height: element.scrollHeight,
+        // Remove fixed height to allow capture of expanded elements during onclone
         onclone: (clonedDoc) => {
           const clonedElement = clonedDoc.getElementById(targetId);
           if (!clonedElement) return;
 
-          // A4 aspect ratio in pixels based on the rendered width
+          // A4 aspect ratio in pixels based on rendered width
           const a4HeightPx = clonedElement.offsetWidth * (297 / 210);
           
           clonedElement.style.transform = 'none';
@@ -60,7 +60,7 @@ export function ExportPDFButton({ targetId, filename }: ExportPDFButtonProps) {
           clonedElement.style.width = '210mm';
           clonedElement.style.background = 'white';
 
-          // 1. Identify all critical "keep together" sections
+          // 1. Identify and push sections that straddle page breaks
           const sections = clonedElement.querySelectorAll('.avoid-break');
           sections.forEach((section: any) => {
             const rect = section.getBoundingClientRect();
@@ -70,9 +70,9 @@ export function ExportPDFButton({ targetId, filename }: ExportPDFButtonProps) {
             const pageNum = Math.floor(top / a4HeightPx);
             const pageEnd = (pageNum + 1) * a4HeightPx;
             
-            // If it straddles a page break, push it down
-            if (bottom > pageEnd - 20) { 
-              const pushAmount = pageEnd - top + 10; 
+            // If section straddles a page break, push it to next page
+            if (bottom > pageEnd - 10) { 
+              const pushAmount = pageEnd - top + 5; 
               section.style.marginTop = `${pushAmount}px`;
             }
           });
@@ -94,24 +94,20 @@ export function ExportPDFButton({ targetId, filename }: ExportPDFButtonProps) {
               const pageNum = Math.floor(top / a4HeightPx);
               const pageEnd = (pageNum + 1) * a4HeightPx;
               
-              // If row straddles or starts too close to the end of a page
-              if (bottom > pageEnd - 30) {
-                const pushAmount = pageEnd - top + 5;
+              if (bottom > pageEnd - 20) {
+                const pushAmount = pageEnd - top + 2;
                 
-                // Create a spacer row to push the content
                 const spacer = clonedDoc.createElement('tr');
                 spacer.style.height = `${pushAmount}px`;
                 spacer.style.backgroundColor = 'white';
                 spacer.innerHTML = `<td colspan="100%"></td>`;
                 tbody.insertBefore(spacer, row);
 
-                // Clone and repeat table header if it overflows
                 if (thead) {
                   const headerClone = thead.cloneNode(true) as HTMLElement;
-                  // In HTML, we insert the cloned row(s) from the header into the body
                   const headerRows = Array.from(headerClone.querySelectorAll('tr'));
                   headerRows.forEach((hRow) => {
-                    hRow.style.backgroundColor = '#09090b'; // Force background visibility
+                    hRow.style.backgroundColor = '#09090b';
                     tbody.insertBefore(hRow, row);
                   });
                 }
@@ -127,25 +123,26 @@ export function ExportPDFButton({ targetId, filename }: ExportPDFButtonProps) {
       
       const imgHeightInPdf = (canvasHeight * pdfWidth) / canvasWidth;
       let heightLeft = imgHeightInPdf;
-      let position = 0;
+      let pageNumber = 0;
 
-      // Add first page
-      pdf.addImage(imgData, 'JPEG', 0, position, pdfWidth, imgHeightInPdf, undefined, 'FAST');
-      heightLeft -= pdfHeight;
-
-      // Add subsequent pages
-      while (heightLeft > 2) {
-        position = heightLeft - imgHeightInPdf;
-        pdf.addPage();
+      // Add pages sequentially with correct offsets
+      while (heightLeft > 0) {
+        if (pageNumber > 0) {
+          pdf.addPage();
+        }
+        
+        const position = -(pageNumber * pdfHeight);
         pdf.addImage(imgData, 'JPEG', 0, position, pdfWidth, imgHeightInPdf, undefined, 'FAST');
+        
         heightLeft -= pdfHeight;
+        pageNumber++;
       }
 
       pdf.save(`${filename}.pdf`);
       
       toast({
-        title: "High-Fidelity PDF Generated",
-        description: "Professional multi-page document successfully exported with row integrity."
+        title: "Professional PDF Exported",
+        description: "Document generated with intelligent multi-page pagination."
       });
     } catch (error) {
       console.error('PDF Error:', error);
