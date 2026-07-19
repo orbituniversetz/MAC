@@ -21,40 +21,45 @@ export function InvoiceDocument({ invoice, settings, className }: InvoiceDocumen
 
   return (
     <div id="invoice-document" className={cn("a4-page font-sans", className)}>
-      {/* Header - Avoid Break */}
-      <div className="flex items-center justify-between mb-4 border-b-2 border-zinc-100 pb-4 shrink-0 avoid-break">
-        <div className="flex items-center">
-          {settings.garage_logo ? (
-            <div className="relative h-20 w-20 overflow-hidden shrink-0">
-              <Image src={settings.garage_logo} alt="Logo" fill className="object-contain" unoptimized />
+      {/* Header - Keep Together */}
+      <div className="avoid-break mb-4 border-b-2 border-zinc-100 pb-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center">
+            {settings.garage_logo ? (
+              <div className="relative h-20 w-20 overflow-hidden shrink-0">
+                <Image src={settings.garage_logo} alt="Logo" fill className="object-contain" unoptimized />
+              </div>
+            ) : (
+              <div className="h-20 w-20 bg-zinc-50 rounded-lg flex items-center justify-center">
+                <CreditCard className="h-10 w-10 text-zinc-200" />
+              </div>
+            )}
+          </div>
+          <div className="text-right flex flex-col justify-center">
+            <h1 className="text-2xl font-black text-[#c10d12] uppercase leading-none tracking-tighter mb-1">
+              {settings.garage_name}
+            </h1>
+            <div className="text-[10px] font-bold text-zinc-500 uppercase tracking-tight flex flex-col items-end">
+              <span>{settings.garage_mailbox}</span>
+              <span>{settings.garage_address}</span>
+              <span className="text-zinc-800 font-black">Tel: {settings.garage_phone} | TIN: {settings.garage_tin}</span>
             </div>
-          ) : (
-            <div className="h-20 w-20 bg-zinc-50 rounded-lg flex items-center justify-center">
-              <CreditCard className="h-10 w-10 text-zinc-200" />
-            </div>
-          )}
-        </div>
-        <div className="text-right flex flex-col justify-center">
-          <h1 className="text-2xl font-black text-[#c10d12] uppercase leading-none tracking-tighter mb-1">
-            {settings.garage_name}
-          </h1>
-          <div className="text-[10px] font-bold text-zinc-500 uppercase tracking-tight flex flex-col items-end">
-            <span>{settings.garage_mailbox}</span>
-            <span>{settings.garage_address}</span>
-            <span className="text-zinc-800 font-black">Tel: {settings.garage_phone} | TIN: {settings.garage_tin}</span>
           </div>
         </div>
       </div>
 
-      <div className="flex justify-between items-center mb-8 bg-zinc-950 text-white p-4 rounded shadow-sm shrink-0 avoid-break">
-        <h2 className="text-lg font-bold uppercase tracking-widest">TAX INVOICE</h2>
-        <div className="text-right">
-          <p className="text-[9px] font-black uppercase tracking-widest opacity-70 leading-none">INVOICE NUMBER</p>
-          <p className="text-xl font-black leading-none">{invoice.invoiceNo}</p>
+      <div className="avoid-break mb-8 bg-zinc-950 text-white p-4 rounded shadow-sm">
+        <div className="flex justify-between items-center">
+          <h2 className="text-lg font-bold uppercase tracking-widest">TAX INVOICE</h2>
+          <div className="text-right">
+            <p className="text-[9px] font-black uppercase tracking-widest opacity-70 leading-none">INVOICE NUMBER</p>
+            <p className="text-xl font-black leading-none">{invoice.invoiceNo}</p>
+          </div>
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-12 mb-8 shrink-0 avoid-break">
+      {/* Info Grid - Keep Together */}
+      <div className="avoid-break grid grid-cols-2 gap-12 mb-8">
         <div>
           <h3 className="text-[10px] font-black text-zinc-400 uppercase tracking-widest mb-3">Customer Billing Info</h3>
           <div className="space-y-1">
@@ -76,7 +81,8 @@ export function InvoiceDocument({ invoice, settings, className }: InvoiceDocumen
         </div>
       </div>
 
-      <div className="mb-8 allow-break">
+      {/* Table Section - Splittable only between rows */}
+      <div className="mb-8">
         <table className="w-full border-collapse">
           <thead>
             <tr className="bg-zinc-900 text-white">
@@ -99,8 +105,9 @@ export function InvoiceDocument({ invoice, settings, className }: InvoiceDocumen
         </table>
       </div>
 
-      <div className="flex justify-end mb-12 shrink-0 avoid-break">
-        <div className="w-72 space-y-2 bg-zinc-50 p-6 rounded-3xl border border-zinc-100 shadow-sm avoid-break">
+      {/* Summary Block - Keep Together */}
+      <div className="avoid-break flex justify-end mb-12">
+        <div className="w-72 space-y-2 bg-zinc-50 p-6 rounded-3xl border border-zinc-100 shadow-sm">
           <div className="flex justify-between text-xs font-bold uppercase tracking-tight">
             <span className="text-zinc-500">Subtotal:</span>
             <span className="text-zinc-900 whitespace-nowrap">{subtotal.toLocaleString()}</span>
@@ -124,7 +131,8 @@ export function InvoiceDocument({ invoice, settings, className }: InvoiceDocumen
         </div>
       </div>
 
-      <div className="mt-auto pt-8 border-t-4 border-zinc-950 shrink-0 avoid-break">
+      {/* Footer Instructions - Keep Together */}
+      <div className="avoid-break mt-auto pt-8 border-t-4 border-zinc-950">
         <div className="grid grid-cols-2 gap-12">
           <div>
             <h3 className="text-[10px] font-black text-zinc-400 uppercase tracking-widest mb-4">Payment Instructions</h3>

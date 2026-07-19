@@ -29,18 +29,13 @@ export function ExportPDFButton({ targetId, filename }: ExportPDFButtonProps) {
 
     setIsExporting(true);
     try {
-      // Strictly enforce A4 dimensions (210mm x 297mm)
+      // Configure high-res A4 PDF
       const pdf = new jsPDF('p', 'mm', 'a4');
-      const pdfWidth = pdf.internal.pageSize.getWidth();
-      const pdfHeight = pdf.internal.pageSize.getHeight();
+      const pdfWidth = pdf.internal.pageSize.getWidth(); // 210mm
+      const pdfHeight = pdf.internal.pageSize.getHeight(); // 297mm
       
-      // Configuration for professional multi-page splitting
-      const stapleMargin = 20; // 20mm top margin on page 2+ for stapling
-      const bottomMargin = 10;
-      const effectivePageHeight = pdfHeight - stapleMargin - bottomMargin;
-
       const canvas = await html2canvas(element, {
-        scale: 2, // High resolution capture
+        scale: 2.5, // Ultra-high fidelity for crisp text
         useCORS: true,
         logging: false,
         backgroundColor: '#ffffff',
@@ -49,15 +44,16 @@ export function ExportPDFButton({ targetId, filename }: ExportPDFButtonProps) {
         onclone: (clonedDoc) => {
           const clonedElement = clonedDoc.getElementById(targetId);
           if (clonedElement) {
-            // Strip UI-only styling for clean capture
             clonedElement.style.transform = 'none';
             clonedElement.style.boxShadow = 'none';
             clonedElement.style.margin = '0';
+            clonedElement.style.width = '210mm';
+            clonedElement.style.minHeight = 'auto';
           }
         }
       });
       
-      const imgData = canvas.toDataURL('image/jpeg', 0.98);
+      const imgData = canvas.toDataURL('image/jpeg', 1.0);
       const canvasWidth = canvas.width;
       const canvasHeight = canvas.height;
       
@@ -69,26 +65,26 @@ export function ExportPDFButton({ targetId, filename }: ExportPDFButtonProps) {
       pdf.addImage(imgData, 'JPEG', 0, position, pdfWidth, imgHeightInPdf, undefined, 'FAST');
       heightLeft -= pdfHeight;
 
-      // Subsequent pages with staple spacing
-      while (heightLeft > 2) {
-        position = heightLeft - imgHeightInPdf + stapleMargin;
+      // Subsequent pages
+      while (heightLeft > 5) { // Small threshold to avoid tiny sliver pages
+        position = heightLeft - imgHeightInPdf; 
         pdf.addPage();
         pdf.addImage(imgData, 'JPEG', 0, position, pdfWidth, imgHeightInPdf, undefined, 'FAST');
-        heightLeft -= effectivePageHeight;
+        heightLeft -= pdfHeight;
       }
 
       pdf.save(filename.endsWith('.pdf') ? filename : `${filename}.pdf`);
       
       toast({
         title: "A4 PDF Exported",
-        description: "Generated with professional margins and resolution."
+        description: "Generated with professional document pagination."
       });
     } catch (error) {
-      console.error('Error generating PDF:', error);
+      console.error('PDF Error:', error);
       toast({
         variant: "destructive",
         title: "Export Failed",
-        description: "An error occurred during A4 PDF generation."
+        description: "An error occurred during high-fidelity PDF generation."
       });
     } finally {
       setIsExporting(false);
@@ -107,7 +103,7 @@ export function ExportPDFButton({ targetId, filename }: ExportPDFButtonProps) {
       ) : (
         <Download className="mr-2 h-4 w-4" />
       )}
-      {isExporting ? 'Generating...' : 'Export A4 PDF'}
+      {isExporting ? 'Processing...' : 'Export A4 PDF'}
     </Button>
   );
 }

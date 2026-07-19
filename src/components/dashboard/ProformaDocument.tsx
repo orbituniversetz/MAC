@@ -23,39 +23,45 @@ export function ProformaDocument({ proforma, settings, className }: ProformaDocu
 
   return (
     <div id="proforma-document" className={cn("a4-page font-sans", className)}>
-      <div className="flex items-center justify-between mb-4 border-b-2 border-zinc-100 pb-4 shrink-0 avoid-break">
-        <div className="flex items-center">
-          {settings.garage_logo ? (
-            <div className="relative h-20 w-20 overflow-hidden shrink-0">
-              <Image src={settings.garage_logo} alt="Logo" fill className="object-contain" unoptimized />
+      {/* Header - Keep Together */}
+      <div className="avoid-break mb-4 border-b-2 border-zinc-100 pb-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center">
+            {settings.garage_logo ? (
+              <div className="relative h-20 w-20 overflow-hidden shrink-0">
+                <Image src={settings.garage_logo} alt="Logo" fill className="object-contain" unoptimized />
+              </div>
+            ) : (
+              <div className="h-20 w-20 bg-zinc-50 rounded-lg flex items-center justify-center">
+                <FileText className="h-10 w-10 text-zinc-200" />
+              </div>
+            )}
+          </div>
+          <div className="text-right flex flex-col justify-center">
+            <h1 className="text-2xl font-bold text-primary uppercase leading-none tracking-tighter mb-1">
+              {settings.garage_name}
+            </h1>
+            <div className="text-[10px] font-bold text-zinc-500 uppercase tracking-tight flex flex-col items-end">
+              <span>{settings.garage_mailbox}</span>
+              <span>{settings.garage_address}</span>
+              <span className="text-zinc-800 font-bold">Tel: {settings.garage_phone} | TIN: {settings.garage_tin}</span>
             </div>
-          ) : (
-            <div className="h-20 w-20 bg-zinc-50 rounded-lg flex items-center justify-center">
-              <FileText className="h-10 w-10 text-zinc-200" />
-            </div>
-          )}
-        </div>
-        <div className="text-right flex flex-col justify-center">
-          <h1 className="text-2xl font-bold text-primary uppercase leading-none tracking-tighter mb-1">
-            {settings.garage_name}
-          </h1>
-          <div className="text-[10px] font-bold text-zinc-500 uppercase tracking-tight flex flex-col items-end">
-            <span>{settings.garage_mailbox}</span>
-            <span>{settings.garage_address}</span>
-            <span className="text-zinc-800 font-bold">Tel: {settings.garage_phone} | TIN: {settings.garage_tin}</span>
           </div>
         </div>
       </div>
 
-      <div className="flex justify-between items-center mb-8 bg-primary text-white p-4 rounded shadow-sm shrink-0 avoid-break">
-        <h2 className="text-lg font-bold uppercase tracking-widest">PROFORMA INVOICE</h2>
-        <div className="text-right">
-          <p className="text-[10px] font-bold opacity-70 uppercase tracking-tighter leading-none">QUOTATION NUMBER</p>
-          <p className="text-xl font-bold leading-none">{proforma.proformaNo}</p>
+      <div className="avoid-break mb-8 bg-primary text-white p-4 rounded shadow-sm">
+        <div className="flex justify-between items-center">
+          <h2 className="text-lg font-bold uppercase tracking-widest">PROFORMA INVOICE</h2>
+          <div className="text-right">
+            <p className="text-[10px] font-bold opacity-70 uppercase tracking-tighter leading-none">QUOTATION NUMBER</p>
+            <p className="text-xl font-bold leading-none">{proforma.proformaNo}</p>
+          </div>
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-12 mb-8 shrink-0 avoid-break">
+      {/* Recipient Details - Keep Together */}
+      <div className="avoid-break grid grid-cols-2 gap-12 mb-8">
         <div>
           <h3 className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest mb-2">Quotation For</h3>
           <div className="space-y-1">
@@ -75,7 +81,8 @@ export function ProformaDocument({ proforma, settings, className }: ProformaDocu
         </div>
       </div>
 
-      <div className="mb-8 allow-break">
+      {/* Main Table - Splittable only between rows */}
+      <div className="mb-8">
         <table className="w-full border-collapse">
           <thead>
             <tr className="bg-zinc-950 text-white">
@@ -98,8 +105,9 @@ export function ProformaDocument({ proforma, settings, className }: ProformaDocu
         </table>
       </div>
 
-      <div className="flex justify-end mb-10 shrink-0 avoid-break">
-        <div className="w-72 space-y-2 bg-zinc-50 p-6 rounded-3xl border border-zinc-100 shadow-sm avoid-break">
+      {/* Summary Boxes - Keep Together */}
+      <div className="avoid-break flex justify-end mb-10">
+        <div className="w-72 space-y-2 bg-zinc-50 p-6 rounded-3xl border border-zinc-100 shadow-sm">
           <div className="flex justify-between text-xs font-bold uppercase tracking-tight">
             <span className="text-zinc-500">Subtotal:</span>
             <span className="whitespace-nowrap text-zinc-900">{subtotal.toLocaleString()}</span>
@@ -131,10 +139,7 @@ export function ProformaDocument({ proforma, settings, className }: ProformaDocu
         </div>
       </div>
 
-      <div className={cn(
-        "p-6 rounded-2xl mb-10 flex justify-between items-center border-2 shrink-0 avoid-break",
-        isFullyPaid ? "bg-green-600 border-green-700 text-white shadow-lg" : "bg-zinc-900 border-zinc-950 text-white shadow-md"
-      )}>
+      <div className="avoid-break p-6 rounded-2xl mb-10 flex justify-between items-center border-2 bg-zinc-900 border-zinc-950 text-white shadow-md">
         <div>
           <p className="text-[9px] font-bold uppercase tracking-widest opacity-70 mb-1">Current Payment Status</p>
           <h4 className="text-xl font-bold tracking-tight">{isFullyPaid ? 'FULLY SETTLED' : 'PENDING PAYMENT'}</h4>
@@ -145,7 +150,8 @@ export function ProformaDocument({ proforma, settings, className }: ProformaDocu
         </div>
       </div>
 
-      <div className="mt-auto pt-8 border-t border-zinc-100 shrink-0 avoid-break">
+      {/* Footer Instructions - Keep Together */}
+      <div className="avoid-break mt-auto pt-8 border-t border-zinc-100">
         <div className="grid grid-cols-2 gap-12">
           <div>
             <h3 className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest mb-4">Banking Instructions</h3>
