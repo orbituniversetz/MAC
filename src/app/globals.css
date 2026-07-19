@@ -49,20 +49,21 @@
     overflow: visible;
   }
 
-  /* Professional Pagination Engine */
   .avoid-break {
     break-inside: avoid !important;
     page-break-inside: avoid !important;
-    -webkit-column-break-inside: avoid !important;
   }
 
-  /* Prevent headings from being separated from content */
+  .break-before-page {
+    break-before: page;
+    page-break-before: always;
+  }
+
   h1, h2, h3, h4, h5, h6 {
     break-after: avoid !important;
     page-break-after: avoid !important;
   }
 
-  /* Tables: Only split between rows */
   table {
     border-collapse: collapse;
     width: 100%;
@@ -74,18 +75,12 @@
     break-inside: avoid !important;
   }
 
-  /* Ensure thead repeats on browsers that support it */
   thead {
     display: table-header-group !important;
   }
 
   tfoot {
     display: table-footer-group !important;
-  }
-
-  .allow-break {
-    break-inside: auto !important;
-    page-break-inside: auto !important;
   }
 }
 

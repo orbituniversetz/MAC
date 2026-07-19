@@ -84,7 +84,7 @@ export default async function JobSheetDetailPage({ params }: { params: Promise<{
                 <ExportPDFButton 
                   targetId="jobcard-document-customer" 
                   filename={`JOBCARD-${job.jobNo}`} 
-                  forceSinglePage={true} 
+                  forceSinglePage={false} 
                 />
                 <form action={handleCreateReport}>
                     <Button variant="outline" type="submit" size="sm" className="border-blue-200 hover:bg-blue-50 text-blue-700">
