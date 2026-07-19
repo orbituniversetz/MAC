@@ -76,60 +76,13 @@ export function JobCardDocument({ job, settings, isInternal = false, className }
         </div>
       </div>
 
-      {/* Main Table - ALLOW BREAK */}
-      <div className="mb-8 flex-1 allow-break">
-        <table className="w-full border-collapse">
-          <thead>
-            <tr className="bg-zinc-900 text-white">
-              <th className="p-3 text-left text-[10px] font-black uppercase">Service / Part Description</th>
-              <th className="p-3 text-center text-[10px] font-black uppercase w-16">Qty</th>
-              <th className="p-3 text-center text-[10px] font-black uppercase w-24">Type</th>
-              <th className="p-3 text-right text-[10px] font-black uppercase w-32">Total (TZS)</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-zinc-100 font-bold">
-            {job.items?.length > 0 ? (
-              job.items.map((item: any) => (
-                <tr key={item.id} className="text-xs">
-                  <td className="p-4 font-black text-zinc-900 uppercase tracking-tight">{item.description}</td>
-                  <td className="p-4 text-center text-zinc-800">{item.qty}</td>
-                  <td className="p-4 text-center">
-                    <span className="bg-zinc-100 px-2 py-0.5 rounded text-[8px] font-black text-zinc-500 uppercase">{item.type}</span>
-                  </td>
-                  <td className="p-4 text-right font-black whitespace-nowrap text-zinc-900">{item.subtotal.toLocaleString()}</td>
-                </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan={4} className="p-12 text-center text-zinc-300 italic text-sm">No repair items recorded for this job.</td>
-              </tr>
-            )}
-          </tbody>
-        </table>
+      {/* Tables removed per user request - Job Card is now an intake receipt */}
+      <div className="flex-1 flex flex-col justify-center items-center py-20 border-2 border-dashed border-zinc-100 rounded-3xl mb-8 avoid-break">
+        <Wrench className="h-12 w-12 text-zinc-100 mb-4" />
+        <p className="text-zinc-400 font-bold uppercase tracking-widest text-xs text-center px-12 leading-relaxed">
+          Vehicle Intake confirmed. Full technical findings and repair items will be provided in the Technical Report and Proforma Invoice.
+        </p>
       </div>
-
-      {/* Internal Expenses Section - Avoid Break */}
-      {isInternal && job.expenses?.length > 0 && (
-        <div className="mb-8 avoid-break">
-          <h3 className="text-[10px] font-black text-red-600 uppercase tracking-widest mb-3">Internal Job Expenses (Costs)</h3>
-          <table className="w-full text-[10px] border-collapse">
-            <thead>
-              <tr className="border-b-2 border-red-100 bg-red-50/30">
-                <th className="py-2 text-left px-2 font-black uppercase text-red-800">Cost Description</th>
-                <th className="py-2 text-right px-2 font-black uppercase text-red-800">Amount</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-red-50">
-              {job.expenses?.map((exp: any) => (
-                <tr key={exp.id}>
-                  <td className="py-1.5 font-bold text-zinc-800 px-2 uppercase">{exp.description}</td>
-                  <td className="py-1.5 text-right font-black px-2 text-red-600">{exp.amount.toLocaleString()}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
 
       {/* Footer - Avoid Break */}
       <div className="mt-auto pt-8 border-t border-zinc-100 shrink-0 avoid-break">

@@ -75,7 +75,7 @@ export function ProformaDocument({ proforma, settings, className }: ProformaDocu
         </div>
       </div>
 
-      <div className="mb-8">
+      <div className="mb-8 allow-break">
         <table className="w-full border-collapse">
           <thead>
             <tr className="bg-zinc-950 text-white">
@@ -87,7 +87,7 @@ export function ProformaDocument({ proforma, settings, className }: ProformaDocu
           </thead>
           <tbody className="divide-y divide-zinc-100">
             {proforma.items?.map((item: any) => (
-              <tr key={item.id} className="text-xs avoid-break">
+              <tr key={item.id} className="text-xs">
                 <td className="p-3.5 font-bold text-zinc-900 uppercase tracking-tight">{item.description}</td>
                 <td className="p-3.5 text-center font-medium">{item.qty}</td>
                 <td className="p-3.5 text-right font-medium whitespace-nowrap text-zinc-600">{item.unitPrice.toLocaleString()}</td>

@@ -1,9 +1,9 @@
 const CACHE_NAME = 'garageflow-v1';
 const ASSETS_TO_CACHE = [
   '/',
+  '/dashboard',
   '/manifest.json',
-  '/logo.png',
-  '/dashboard'
+  '/logo.png'
 ];
 
 self.addEventListener('install', (event) => {
@@ -19,7 +19,11 @@ self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys().then((cacheNames) => {
       return Promise.all(
-        cacheNames.filter((name) => name !== CACHE_NAME).map((name) => caches.delete(name))
+        cacheNames.map((cacheName) => {
+          if (cacheName !== CACHE_NAME) {
+            return caches.delete(cacheName);
+          }
+        })
       );
     })
   );
@@ -27,17 +31,10 @@ self.addEventListener('activate', (event) => {
 });
 
 self.addEventListener('fetch', (event) => {
-  // Only handle local requests, ignore chrome-extension, etc.
-  if (!event.request.url.startsWith(self.location.origin)) return;
-
+  // We prioritize network for data, but fallback to cache for UI assets
   event.respondWith(
-    caches.match(event.request).then((response) => {
-      return response || fetch(event.request).catch(() => {
-        // Fallback for document navigation if offline
-        if (event.request.mode === 'navigate') {
-          return caches.match('/');
-        }
-      });
+    fetch(event.request).catch(() => {
+      return caches.match(event.request);
     })
   );
 });
