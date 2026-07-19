@@ -49,10 +49,16 @@
     overflow: visible;
   }
 
-  /* Utility to prevent sections from splitting across PDF/Print pages */
+  /* Prevent elements from splitting across pages in PDF/Print */
   .avoid-break {
-    break-inside: avoid;
-    page-break-inside: avoid;
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+  }
+
+  /* Specifically allow the main repair table to split */
+  .allow-break {
+    break-inside: auto !important;
+    page-break-inside: auto !important;
   }
 }
 
@@ -70,7 +76,6 @@
     box-shadow: none !important; 
   }
   
-  /* Ensure browser print also respects staple space on page 2+ */
   @page { 
     size: A4; 
     margin: 10mm 0 10mm 0; 

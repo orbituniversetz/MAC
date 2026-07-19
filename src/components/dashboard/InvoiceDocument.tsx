@@ -21,7 +21,7 @@ export function InvoiceDocument({ invoice, settings, className }: InvoiceDocumen
 
   return (
     <div id="invoice-document" className={cn("a4-page font-sans", className)}>
-      {/* Header - Logo Left, Text Right */}
+      {/* Header - Avoid Break */}
       <div className="flex items-center justify-between mb-4 border-b-2 border-zinc-100 pb-4 shrink-0 avoid-break">
         <div className="flex items-center">
           {settings.garage_logo ? (
@@ -76,7 +76,7 @@ export function InvoiceDocument({ invoice, settings, className }: InvoiceDocumen
         </div>
       </div>
 
-      <div className="mb-8">
+      <div className="mb-8 allow-break">
         <table className="w-full border-collapse">
           <thead>
             <tr className="bg-zinc-900 text-white">
@@ -88,7 +88,7 @@ export function InvoiceDocument({ invoice, settings, className }: InvoiceDocumen
           </thead>
           <tbody className="divide-y divide-zinc-100 font-bold">
             {snapshot.items?.map((item: any) => (
-              <tr key={item.id} className="text-xs avoid-break">
+              <tr key={item.id} className="text-xs">
                 <td className="p-4 font-black text-zinc-900 uppercase tracking-tight">{item.description}</td>
                 <td className="p-4 text-center text-zinc-800">{item.qty}</td>
                 <td className="p-4 text-right whitespace-nowrap text-zinc-600">{item.unitPrice.toLocaleString()}</td>

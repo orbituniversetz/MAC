@@ -17,7 +17,7 @@ export function JobCardDocument({ job, settings, isInternal = false, className }
       id={isInternal ? "jobcard-document-internal" : "jobcard-document-customer"} 
       className={cn("a4-page font-sans shadow-lg", className)}
     >
-      {/* Header - High Fidelity Branding */}
+      {/* Header - Avoid Break */}
       <div className="flex items-center justify-between mb-4 border-b-2 border-zinc-100 pb-4 shrink-0 avoid-break">
         <div className="flex items-center">
           {settings.garage_logo ? (
@@ -40,7 +40,7 @@ export function JobCardDocument({ job, settings, isInternal = false, className }
         </div>
       </div>
 
-      {/* Banner - Matches Invoice Style */}
+      {/* Banner - Avoid Break */}
       <div className="flex justify-between items-center mb-8 bg-zinc-950 text-white p-4 rounded shadow-sm shrink-0 avoid-break">
         <div className="inline-flex items-center gap-2">
           {isInternal ? <ShieldCheck className="h-4 w-4 text-blue-400" /> : <User className="h-4 w-4 text-red-400" />}
@@ -52,7 +52,7 @@ export function JobCardDocument({ job, settings, isInternal = false, className }
         </div>
       </div>
 
-      {/* Info Grid - Matches Invoice Style */}
+      {/* Info Grid - Avoid Break */}
       <div className="grid grid-cols-2 gap-12 mb-8 avoid-break">
         <div>
           <h3 className="text-[10px] font-black text-zinc-400 uppercase tracking-widest mb-3">Customer Information</h3>
@@ -76,8 +76,8 @@ export function JobCardDocument({ job, settings, isInternal = false, className }
         </div>
       </div>
 
-      {/* Main Table - Matches Invoice Style */}
-      <div className="mb-8 flex-1">
+      {/* Main Table - ALLOW BREAK */}
+      <div className="mb-8 flex-1 allow-break">
         <table className="w-full border-collapse">
           <thead>
             <tr className="bg-zinc-900 text-white">
@@ -90,7 +90,7 @@ export function JobCardDocument({ job, settings, isInternal = false, className }
           <tbody className="divide-y divide-zinc-100 font-bold">
             {job.items?.length > 0 ? (
               job.items.map((item: any) => (
-                <tr key={item.id} className="text-xs avoid-break">
+                <tr key={item.id} className="text-xs">
                   <td className="p-4 font-black text-zinc-900 uppercase tracking-tight">{item.description}</td>
                   <td className="p-4 text-center text-zinc-800">{item.qty}</td>
                   <td className="p-4 text-center">
@@ -108,34 +108,30 @@ export function JobCardDocument({ job, settings, isInternal = false, className }
         </table>
       </div>
 
-      {/* Internal Expenses Section - Aligned with the layout */}
-      <div className="grid grid-cols-2 gap-12 mb-8 avoid-break">
-        <div>
-          {isInternal && job.expenses?.length > 0 && (
-            <>
-              <h3 className="text-[10px] font-black text-red-600 uppercase tracking-widest mb-3">Internal Job Expenses (Costs)</h3>
-              <table className="w-full text-[10px] border-collapse">
-                <thead>
-                  <tr className="border-b-2 border-red-100 bg-red-50/30">
-                    <th className="py-2 text-left px-2 font-black uppercase text-red-800">Cost Description</th>
-                    <th className="py-2 text-right px-2 font-black uppercase text-red-800">Amount</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-red-50">
-                  {job.expenses?.map((exp: any) => (
-                    <tr key={exp.id}>
-                      <td className="py-1.5 font-bold text-zinc-800 px-2 uppercase">{exp.description}</td>
-                      <td className="py-1.5 text-right font-black px-2 text-red-600">{exp.amount.toLocaleString()}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </>
-          )}
+      {/* Internal Expenses Section - Avoid Break */}
+      {isInternal && job.expenses?.length > 0 && (
+        <div className="mb-8 avoid-break">
+          <h3 className="text-[10px] font-black text-red-600 uppercase tracking-widest mb-3">Internal Job Expenses (Costs)</h3>
+          <table className="w-full text-[10px] border-collapse">
+            <thead>
+              <tr className="border-b-2 border-red-100 bg-red-50/30">
+                <th className="py-2 text-left px-2 font-black uppercase text-red-800">Cost Description</th>
+                <th className="py-2 text-right px-2 font-black uppercase text-red-800">Amount</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-red-50">
+              {job.expenses?.map((exp: any) => (
+                <tr key={exp.id}>
+                  <td className="py-1.5 font-bold text-zinc-800 px-2 uppercase">{exp.description}</td>
+                  <td className="py-1.5 text-right font-black px-2 text-red-600">{exp.amount.toLocaleString()}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
-      </div>
+      )}
 
-      {/* Footer - Terms & Signatures */}
+      {/* Footer - Avoid Break */}
       <div className="mt-auto pt-8 border-t border-zinc-100 shrink-0 avoid-break">
         <div className="grid grid-cols-2 gap-12">
           <div className="p-5 bg-zinc-50 rounded-2xl border border-zinc-100 shadow-sm">
