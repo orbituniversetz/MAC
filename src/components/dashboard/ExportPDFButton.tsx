@@ -10,10 +10,9 @@ import { useToast } from '@/hooks/use-toast';
 interface ExportPDFButtonProps {
   targetId: string;
   filename: string;
-  forceSinglePage?: boolean;
 }
 
-export function ExportPDFButton({ targetId, filename, forceSinglePage = false }: ExportPDFButtonProps) {
+export function ExportPDFButton({ targetId, filename }: ExportPDFButtonProps) {
   const [isExporting, setIsExporting] = useState(false);
   const { toast } = useToast();
 
@@ -30,7 +29,6 @@ export function ExportPDFButton({ targetId, filename, forceSinglePage = false }:
 
     setIsExporting(true);
     try {
-      // Configuration for professional typeset A4
       const pdf = new jsPDF({
         orientation: 'p',
         unit: 'mm',
@@ -38,11 +36,12 @@ export function ExportPDFButton({ targetId, filename, forceSinglePage = false }:
         compress: true,
       });
 
-      const pdfWidth = pdf.internal.pageSize.getWidth(); // 210mm
-      const pdfHeight = pdf.internal.pageSize.getHeight(); // 297mm
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = pdf.internal.pageSize.getHeight();
       
+      // Smart Multi-Page Paginator
       const canvas = await html2canvas(element, {
-        scale: 2.5, // Enterprise resolution for crisp fonts
+        scale: 2.5,
         useCORS: true,
         logging: false,
         backgroundColor: '#ffffff',
@@ -50,15 +49,59 @@ export function ExportPDFButton({ targetId, filename, forceSinglePage = false }:
         height: element.scrollHeight,
         onclone: (clonedDoc) => {
           const clonedElement = clonedDoc.getElementById(targetId);
-          if (clonedElement) {
-            clonedElement.style.transform = 'none';
-            clonedElement.style.boxShadow = 'none';
-            clonedElement.style.margin = '0';
-            clonedElement.style.width = '210mm';
-            clonedElement.style.minHeight = 'auto';
-            // Ensure background is visible
-            clonedElement.style.background = 'white';
-          }
+          if (!clonedElement) return;
+
+          // Apply pagination awareness to the cloned DOM
+          const pageHeightPx = (297 / 25.4) * 96 * 2.5; // Roughly 1122px at 96dpi scaled by 2.5
+          // However, simpler to work with normalized units
+          const a4HeightPx = clonedElement.offsetWidth * (297 / 210);
+          
+          clonedElement.style.transform = 'none';
+          clonedElement.style.boxShadow = 'none';
+          clonedElement.style.margin = '0';
+          clonedElement.style.width = '210mm';
+          clonedElement.style.background = 'white';
+
+          // 1. Identify all critical "keep together" sections
+          const sections = clonedElement.querySelectorAll('.avoid-break');
+          sections.forEach((section: any) => {
+            const rect = section.getBoundingClientRect();
+            const top = section.offsetTop;
+            const bottom = top + rect.height;
+            
+            const pageNum = Math.floor(top / a4HeightPx);
+            const pageEnd = (pageNum + 1) * a4HeightPx;
+            
+            // If it straddles a page break, push it down
+            if (bottom > pageEnd - 20) { // 20px safety margin
+              const pushAmount = pageEnd - top + 40; // Push to next page with margin
+              section.style.marginTop = `${pushAmount}px`;
+            }
+          });
+
+          // 2. Identify and paginate table rows strictly
+          const tables = clonedElement.querySelectorAll('table');
+          tables.forEach((table: any) => {
+            const rows = table.querySelectorAll('tbody tr');
+            const thead = table.querySelector('thead');
+            
+            rows.forEach((row: any) => {
+              const rect = row.getBoundingClientRect();
+              const top = row.offsetTop;
+              const bottom = top + rect.height;
+              
+              const pageNum = Math.floor(top / a4HeightPx);
+              const pageEnd = (pageNum + 1) * a4HeightPx;
+              
+              if (bottom > pageEnd - 40) {
+                const pushAmount = pageEnd - top + 20;
+                row.style.borderTop = `${pushAmount}px solid white`; // Visible gap in canvas
+                
+                // If header repetition is needed, we'd need to insert a DOM node here.
+                // For bitmap slicing, header repetition is best handled by repeating the capture chunk.
+              }
+            });
+          });
         }
       });
       
@@ -66,46 +109,34 @@ export function ExportPDFButton({ targetId, filename, forceSinglePage = false }:
       const canvasWidth = canvas.width;
       const canvasHeight = canvas.height;
       
-      let imgWidthInPdf = pdfWidth;
-      let imgHeightInPdf = (canvasHeight * pdfWidth) / canvasWidth;
-
-      // Handle Single Page Scaling
-      if (forceSinglePage && imgHeightInPdf > pdfHeight) {
-        const ratio = pdfHeight / imgHeightInPdf;
-        imgHeightInPdf = pdfHeight;
-        imgWidthInPdf = pdfWidth * ratio;
-      }
-
-      const xOffset = (pdfWidth - imgWidthInPdf) / 2;
+      const imgHeightInPdf = (canvasHeight * pdfWidth) / canvasWidth;
       let heightLeft = imgHeightInPdf;
       let position = 0;
 
-      // Page 1
-      pdf.addImage(imgData, 'JPEG', xOffset, position, imgWidthInPdf, imgHeightInPdf, undefined, 'FAST');
-      
-      if (!forceSinglePage) {
+      // Add first page
+      pdf.addImage(imgData, 'JPEG', 0, position, pdfWidth, imgHeightInPdf, undefined, 'FAST');
+      heightLeft -= pdfHeight;
+
+      // Add subsequent pages
+      while (heightLeft > 2) {
+        position = heightLeft - imgHeightInPdf;
+        pdf.addPage();
+        pdf.addImage(imgData, 'JPEG', 0, position, pdfWidth, imgHeightInPdf, undefined, 'FAST');
         heightLeft -= pdfHeight;
-        // Logic for professional pagination: slicing with standard A4 blocks
-        while (heightLeft > 2) {
-          position = heightLeft - imgHeightInPdf; 
-          pdf.addPage();
-          pdf.addImage(imgData, 'JPEG', xOffset, position, imgWidthInPdf, imgHeightInPdf, undefined, 'FAST');
-          heightLeft -= pdfHeight;
-        }
       }
 
-      pdf.save(filename.endsWith('.pdf') ? filename : `${filename}.pdf`);
+      pdf.save(`${filename}.pdf`);
       
       toast({
-        title: "Professional PDF Generated",
-        description: "Document successfully exported with high-fidelity pagination."
+        title: "Enterprise PDF Generated",
+        description: "Professional multi-page document successfully exported."
       });
     } catch (error) {
       console.error('PDF Error:', error);
       toast({
         variant: "destructive",
         title: "Export Failed",
-        description: "An error occurred during high-fidelity PDF generation."
+        description: "Could not generate professional A4 PDF."
       });
     } finally {
       setIsExporting(false);
@@ -124,7 +155,7 @@ export function ExportPDFButton({ targetId, filename, forceSinglePage = false }:
       ) : (
         <Download className="mr-2 h-4 w-4" />
       )}
-      {isExporting ? 'Generating...' : 'Download A4 PDF'}
+      {isExporting ? 'Processing...' : 'Download A4 PDF'}
     </Button>
   );
 }

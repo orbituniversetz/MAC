@@ -73,20 +73,20 @@ export function InvoiceDocument({ invoice, settings, className }: InvoiceDocumen
         </div>
       </div>
 
-      <div className="flex-1 mb-12">
+      <div className="flex-1 mb-8">
         <table className="w-full border-collapse">
           <thead className="table-header-group">
             <tr className="bg-zinc-950 text-white">
-              <th className="p-3 text-left text-[10px] font-black uppercase">Service / Part Description</th>
-              <th className="p-3 text-center text-[10px] font-black uppercase w-16">Qty</th>
-              <th className="p-3 text-right text-[10px] font-black uppercase w-32">Unit Price</th>
-              <th className="p-3 text-right text-[10px] font-black uppercase w-32">Total (TZS)</th>
+              <th className="p-3 text-left text-[10px] font-black uppercase w-[50%]">Service / Part Description</th>
+              <th className="p-3 text-center text-[10px] font-black uppercase w-12">Qty</th>
+              <th className="p-3 text-right text-[10px] font-black uppercase w-28">Unit Price</th>
+              <th className="p-3 text-right text-[10px] font-black uppercase w-28">Total (TZS)</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-zinc-100">
             {snapshot.items?.map((item: any) => (
               <tr key={item.id} className="text-xs">
-                <td className="p-4 font-black text-zinc-900 uppercase tracking-tight">{item.description}</td>
+                <td className="p-4 font-black text-zinc-900 uppercase tracking-tight break-words">{item.description}</td>
                 <td className="p-4 text-center font-bold">{item.qty}</td>
                 <td className="p-4 text-right whitespace-nowrap text-zinc-600">{item.unitPrice.toLocaleString()}</td>
                 <td className="p-4 text-right font-black whitespace-nowrap text-zinc-900">TZS {item.subtotal.toLocaleString()}</td>
@@ -96,8 +96,8 @@ export function InvoiceDocument({ invoice, settings, className }: InvoiceDocumen
         </table>
       </div>
 
-      {/* Footer Group - Totals, Payment, Signatures - Treat as single keep-together block */}
-      <div className="mt-auto space-y-8 shrink-0 avoid-break pt-8 border-t-2 border-zinc-50">
+      {/* Footer Group - Totals, Payment, Signatures - Keep Together Block */}
+      <div className="mt-auto space-y-8 pt-8 border-t-2 border-zinc-50 avoid-break">
         <div className="flex justify-end">
           <div className="w-72 space-y-2 bg-zinc-50 p-6 rounded-3xl border border-zinc-100 shadow-sm">
             <div className="flex justify-between text-xs font-black uppercase tracking-tight">

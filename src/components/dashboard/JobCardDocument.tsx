@@ -111,7 +111,7 @@ export function JobCardDocument({ job, settings, isInternal = false, className }
 
       {/* PAGE 2: TERMS AND CONDITIONS */}
       <div className="a4-page font-sans relative flex flex-col shadow-lg print:shadow-none break-before-page">
-        <div className="flex items-center justify-between mb-8 border-b-2 border-zinc-900 pb-4 avoid-break">
+        <div className="flex items-center justify-between mb-8 border-b-2 border-zinc-900 pb-4 shrink-0 avoid-break">
           <h2 className="text-xl font-black uppercase tracking-widest text-zinc-900 flex items-center gap-2">
             <FileText className="h-5 w-5 text-[#c10d12]" />
             Document Terms & Conditions
@@ -129,7 +129,7 @@ export function JobCardDocument({ job, settings, isInternal = false, className }
           </div>
         </div>
 
-        <div className="mt-12 pt-8 border-t-4 border-zinc-950 flex justify-between items-center avoid-break">
+        <div className="mt-12 pt-8 border-t-4 border-zinc-950 flex justify-between items-center shrink-0 avoid-break">
           <div className="text-[10px] font-bold text-zinc-400 uppercase tracking-tighter">
             <p>{settings.garage_name}</p>
             <p>Official Document - Page 2 of 2</p>
