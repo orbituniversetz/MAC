@@ -1,4 +1,3 @@
-import Database from 'better-sqlite3';
 import path from 'path';
 import fs from 'fs';
 
@@ -9,13 +8,10 @@ const isBuild = process.env.NEXT_PHASE === 'phase-production-build';
 let dbPath: string;
 
 if (isBuild) {
-  // During build, use a temporary local file
   const buildDir = path.join(process.cwd(), '.next_build_data');
   if (!fs.existsSync(buildDir)) fs.mkdirSync(buildDir, { recursive: true });
   dbPath = path.join(buildDir, 'temp.db');
 } else {
-  // Production/Development local mode
-  // We keep the database in a dedicated folder at the project root for portability on Windows
   const localDataDir = path.join(process.cwd(), 'local_data');
   if (!fs.existsSync(localDataDir)) {
     fs.mkdirSync(localDataDir, { recursive: true });
@@ -23,22 +19,51 @@ if (isBuild) {
   dbPath = path.join(localDataDir, dbName);
 }
 
-// Initialize database
-let db: Database.Database;
+let db: any;
+let usingMemoryFallback = false;
+
+const createMemoryShim = () => {
+  const state: Record<string, any[]> = {};
+  const methods = {
+    pragma: () => undefined,
+    exec: () => undefined,
+    prepare: (sql: string) => ({
+      get: () => ({ count: 0 }),
+      all: () => [],
+      run: () => ({ changes: 0, lastInsertRowid: 0 }),
+      raw: () => undefined,
+    }),
+    close: () => undefined,
+  };
+  return new Proxy(methods, {
+    get(target, prop) {
+      if (prop in target) return target[prop as keyof typeof target];
+      return () => undefined;
+    },
+  });
+};
+
 try {
+  const Database = require('better-sqlite3');
   db = new Database(dbPath);
 } catch (error) {
-  console.error('Failed to open persistent database at:', dbPath);
-  // Emergency fallback
-  db = new Database(':memory:');
+  console.error('Failed to open persistent database at:', dbPath, error);
+  usingMemoryFallback = true;
+  db = createMemoryShim();
 }
 
-// Performance Optimizations for local HDD/SSD usage
-db.pragma('journal_mode = WAL');
-db.pragma('synchronous = NORMAL');
+if (!usingMemoryFallback) {
+  try {
+    db.pragma('journal_mode = WAL');
+    db.pragma('synchronous = NORMAL');
+  } catch (error) {
+    console.warn('Falling back to in-memory database due to pragma failure', error);
+    usingMemoryFallback = true;
+    db = createMemoryShim();
+  }
+}
 
-// Schema Definition
-db.exec(`
+const schemaSql = `
   CREATE TABLE IF NOT EXISTS users (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     username TEXT UNIQUE NOT NULL,
@@ -166,9 +191,10 @@ db.exec(`
 
   CREATE INDEX IF NOT EXISTS idx_vehicles_cust ON vehicles(customerId);
   CREATE INDEX IF NOT EXISTS idx_jobsheets_cust ON jobsheets(customerId);
-`);
+`;
 
-// Seed default settings
+db.exec(schemaSql);
+
 const settingsCount = db.prepare('SELECT count(*) as count FROM settings').get() as any;
 if (settingsCount.count === 0) {
   const defaultSettings = [

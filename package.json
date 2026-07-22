@@ -7,9 +7,9 @@
     "node": ">=20.0.0"
   },
   "scripts": {
-    "dev": "next dev -p 9002",
+    "dev": "next dev --hostname 127.0.0.1 -p 9002",
     "build": "next build",
-    "start": "next start -p 9002",
+    "start": "next start --hostname 127.0.0.1 -p 9002",
     "lint": "next lint",
     "electron-dev": "electron .",
     "dist": "npm run build && electron-builder",
@@ -79,5 +79,8 @@
       "target": "portable",
       "icon": "public/logo.png"
     }
+  },
+  "allowScripts": {
+    "better-sqlite3@11.10.0": true
   }
 }

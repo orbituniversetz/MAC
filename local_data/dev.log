@@ -1,0 +1,54 @@
+npm notice run garageflow-desk@1.0.0 dev
+npm notice run next dev --hostname 127.0.0.1 -p 9002
+   ▲ Next.js 15.5.9
+   - Local:        http://127.0.0.1:9002
+   - Network:      http://127.0.0.1:9002
+
+ ✓ Starting...
+ ✓ Ready in 6.9s
+ ○ Compiling /dashboard ...
+ ✓ Compiled /dashboard in 6.3s (804 modules)
+ GET /dashboard 200 in 8518ms
+ ✓ Compiled in 2.3s (310 modules)
+ ✓ Compiled in 139ms (296 modules)
+ GET /dashboard 200 in 522ms
+ ○ Compiling /favicon.ico ...
+ ✓ Compiled /favicon.ico in 1029ms (511 modules)
+ GET /favicon.ico 200 in 1406ms
+ ○ Compiling /dashboard/jobsheets ...
+ ✓ Compiled /dashboard/jobsheets in 1378ms (820 modules)
+ GET /dashboard/jobsheets 200 in 2101ms
+ ○ Compiling /_not-found ...
+ ✓ Compiled /_not-found in 725ms (825 modules)
+ GET /logo.png 404 in 1562ms
+ POST /dashboard/jobsheets 200 in 421ms
+ GET /logo.png 404 in 152ms
+ ○ Compiling /dashboard/expenses ...
+ ✓ Compiled /dashboard/expenses in 2.3s (992 modules)
+ GET /dashboard/expenses 200 in 3143ms
+ GET /logo.png 404 in 587ms
+ ○ Compiling /dashboard/vehicles ...
+ ✓ Compiled /dashboard/vehicles in 1132ms (998 modules)
+ GET /dashboard/vehicles 200 in 1677ms
+ GET /logo.png 404 in 481ms
+ ○ Compiling /dashboard/customers ...
+ ✓ Compiled /dashboard/customers in 1238ms (1002 modules)
+ GET /dashboard/customers 200 in 1652ms
+ GET /logo.png 404 in 306ms
+ GET /dashboard 200 in 364ms
+ GET /logo.png 404 in 167ms
+ GET /dashboard/jobsheets 200 in 454ms
+ GET /logo.png 404 in 221ms
+ GET /dashboard/jobsheets 200 in 336ms
+ GET /logo.png 404 in 91ms
+ ○ Compiling /dashboard/proformas ...
+ ✓ Compiled /dashboard/proformas in 1418ms (1002 modules)
+ GET /dashboard/proformas 200 in 1752ms
+ GET /dashboard/proformas 200 in 100ms
+ GET /logo.png 404 in 237ms
+ ○ Compiling /dashboard/proformas/[id] ...
+ ✓ Compiled /dashboard/proformas/[id] in 2.1s (1422 modules)
+ GET /dashboard/proformas/5 200 in 3678ms
+ GET /logo.png 404 in 232ms
+ GET /dashboard/customers 200 in 150ms
+ GET /logo.png 404 in 81ms
