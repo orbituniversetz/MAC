@@ -2,12 +2,15 @@
 import { getInvoiceById, getSettings } from '@/lib/actions';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { ChevronLeft, Receipt, CreditCard } from 'lucide-react';
+import { ChevronLeft, Receipt, CreditCard, History, Banknote } from 'lucide-react';
 import Link from 'next/link';
 import { InvoicePreview } from '@/components/dashboard/InvoicePreview';
 import { InvoiceDocument } from '@/components/dashboard/InvoiceDocument';
 import { ExportPDFButton } from '@/components/dashboard/ExportPDFButton';
 import { EditInvoiceDialog } from '@/components/dashboard/EditInvoiceDialog';
+import { RecordPaymentDialog } from '@/components/dashboard/RecordPaymentDialog';
+import { PaymentHistoryTable } from '@/components/dashboard/PaymentHistoryTable';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 export default async function InvoiceDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -30,6 +33,10 @@ export default async function InvoiceDetailPage({ params }: { params: Promise<{ 
   const taxAmount = taxEnabled ? (subtotal - discount) * 0.18 : 0;
   const total = subtotal - discount + taxAmount;
 
+  const totalPaid = inv.totalPaid || 0;
+  const balanceDue = Math.max(0, total - totalPaid);
+  const isFullyPaid = balanceDue <= 0 && total > 0;
+
   return (
     <div className="space-y-6 pb-20">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 sticky top-0 bg-white/80 backdrop-blur-sm p-4 border rounded-xl shadow-sm z-20">
@@ -40,7 +47,13 @@ export default async function InvoiceDetailPage({ params }: { params: Promise<{ 
           <div>
             <h2 className="text-2xl font-bold tracking-tight">{inv.invoiceNo}</h2>
             <div className="flex gap-2">
-              <Badge className={inv.status === 'Paid' ? "bg-green-600" : inv.status === 'Cancelled' ? "bg-zinc-500" : "bg-red-600"}>
+              <Badge className={
+                inv.status === 'Completed' 
+                  ? "bg-green-600" 
+                  : inv.status === 'Cancelled' 
+                  ? "bg-zinc-500" 
+                  : "bg-red-600"
+              }>
                 {inv.status}
               </Badge>
               {inv.jobNo && <Badge variant="secondary">Job Ref: {inv.jobNo}</Badge>}
@@ -49,6 +62,16 @@ export default async function InvoiceDetailPage({ params }: { params: Promise<{ 
         </div>
         
         <div className="flex gap-2">
+          <RecordPaymentDialog
+            invoiceId={inv.id}
+            proformaId={inv.proformaId}
+            balanceDue={balanceDue}
+            totalAmount={total}
+            docNumber={inv.invoiceNo}
+            buttonText={isFullyPaid ? "Record Additional Payment" : "Record Payment"}
+            iconOnly={true}
+            className="bg-green-600 hover:bg-green-700 text-white font-bold"
+          />
           <EditInvoiceDialog invoice={inv} />
           <ExportPDFButton targetId="invoice-document" filename={`INVOICE-${inv.invoiceNo}`} />
           <InvoicePreview invoice={inv} settings={settings} />
@@ -70,7 +93,7 @@ export default async function InvoiceDetailPage({ params }: { params: Promise<{ 
       </div>
 
       {/* Summary Cards */}
-      <div className="max-w-5xl mx-auto grid gap-6 md:grid-cols-3 mt-12">
+      <div className="max-w-6xl mx-auto grid gap-6 md:grid-cols-3 mt-12">
         <div className="md:col-span-2 space-y-6">
            <div className="bg-white border rounded-2xl p-8 shadow-sm">
               <h3 className="text-lg font-bold mb-6 flex items-center gap-2">
@@ -92,6 +115,28 @@ export default async function InvoiceDetailPage({ params }: { params: Promise<{ 
                  </div>
               </div>
            </div>
+
+           <Card className="rounded-2xl shadow-sm">
+             <CardHeader className="bg-zinc-50/50 border-b border-zinc-100 flex flex-row items-center justify-between">
+               <CardTitle className="text-lg flex items-center gap-2">
+                 <History className="h-5 w-5 text-green-600" />
+                 Payment History & Receipts
+               </CardTitle>
+               <RecordPaymentDialog
+                 invoiceId={inv.id}
+                 proformaId={inv.proformaId}
+                 balanceDue={balanceDue}
+                 totalAmount={total}
+                 docNumber={inv.invoiceNo}
+                 buttonText="Add Payment"
+                 variant="outline"
+                 className="text-xs border-green-600 text-green-700 hover:bg-green-50"
+               />
+             </CardHeader>
+             <CardContent className="pt-6">
+               <PaymentHistoryTable payments={inv.payments || []} invoiceId={inv.id} proformaId={inv.proformaId} />
+             </CardContent>
+           </Card>
         </div>
 
         <div className="space-y-6">
@@ -118,10 +163,28 @@ export default async function InvoiceDetailPage({ params }: { params: Promise<{ 
                 </div>
               )}
               <div className="pt-4 border-t border-zinc-800 flex justify-between items-center">
-                <span className="text-lg font-black uppercase tracking-tighter">Grand Total:</span>
-                <span className="text-2xl font-black text-red-500 font-mono">TZS {total.toLocaleString()}</span>
+                <span className="text-sm font-black uppercase tracking-tighter">Grand Total:</span>
+                <span className="text-xl font-black text-white font-mono">TZS {total.toLocaleString()}</span>
+              </div>
+              <div className="flex justify-between text-sm pt-2">
+                <span className="text-zinc-400 font-bold">Total Paid:</span>
+                <span className="font-black text-green-400 font-mono">+{totalPaid.toLocaleString()}</span>
+              </div>
+              <div className="pt-3 border-t border-zinc-800 flex justify-between items-center">
+                <span className="text-xs uppercase font-black text-zinc-400 tracking-widest">Balance Due:</span>
+                <span className="text-2xl font-black text-red-500 font-mono">TZS {balanceDue.toLocaleString()}</span>
               </div>
             </div>
+
+            <RecordPaymentDialog
+              invoiceId={inv.id}
+              proformaId={inv.proformaId}
+              balanceDue={balanceDue}
+              totalAmount={total}
+              docNumber={inv.invoiceNo}
+              buttonText={isFullyPaid ? "Record Additional Payment" : "Record Partial / Full Payment"}
+              className="w-full bg-green-600 hover:bg-green-700 text-white font-black py-6 text-base shadow-lg"
+            />
           </div>
         </div>
       </div>

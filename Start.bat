@@ -1,14 +1,12 @@
 @echo off
 setlocal EnableExtensions
 set "ROOT=%~dp0"
+set "APP_DIR=%ROOT:~0,-1%"
 cd /d "%ROOT%"
 set "ICON=%ROOT%src\app\favicon.ico"
 set "SHORTCUT=%USERPROFILE%\Desktop\GarageFlow Desk.lnk"
 set "NODE_EXE=C:\Program Files\nodejs\node.exe"
 set "NPM_CMD=C:\Program Files\nodejs\npm.cmd"
-set "URL=http://localhost:9002"
-set "LOADING_URL=%ROOT%public\loading.html"
-set "DASHBOARD_URL=%URL%/dashboard"
 set "NEXT_TELEMETRY_DISABLED=1"
 set "CI=1"
 
@@ -45,45 +43,29 @@ if not exist node_modules (
     )
 )
 
+if not exist "%ROOT%.next-production" (
+    echo Initial build: Building application...
+    call "%NPM_CMD%" run build
+)
+
 if exist "%ICON%" (
-    powershell -NoProfile -Command "$ws = New-Object -ComObject WScript.Shell; $s = $ws.CreateShortcut('%SHORTCUT%'); $s.TargetPath = '%ROOT%Start.bat'; $s.WorkingDirectory = '%ROOT%'; $s.IconLocation = '%ICON%,0'; $s.WindowStyle = 7; $s.Save()"
+    rem Use Windows' actual Desktop folder (including redirected OneDrive Desktops).
+    powershell -NoProfile -Command "$ErrorActionPreference = 'Stop'; try { $desktop = [Environment]::GetFolderPath('Desktop'); $ws = New-Object -ComObject WScript.Shell; $s = $ws.CreateShortcut((Join-Path $desktop 'GarageFlow Desk.lnk')); $s.TargetPath = (Join-Path $env:APP_DIR 'Start.bat'); $s.WorkingDirectory = $env:APP_DIR; $s.IconLocation = ((Join-Path $env:APP_DIR 'src\app\favicon.ico') + ',0'); $s.WindowStyle = 7; $s.Save() } catch { Write-Warning ('Desktop shortcut could not be created: ' + $_.Exception.Message) }"
 )
 
 if not exist "%ROOT%local_data" mkdir "%ROOT%local_data" >nul 2>&1
 
-echo Checking whether the app is already running on port 9002...
-powershell -NoProfile -Command "$ErrorActionPreference='SilentlyContinue'; try { $r = Invoke-WebRequest -Uri '%DASHBOARD_URL%' -UseBasicParsing -TimeoutSec 2; if ($r.StatusCode -ge 200 -and $r.StatusCode -lt 500) { exit 0 } } catch { exit 1 }" >nul 2>&1
-if not errorlevel 1 (
-    echo Existing server detected; opening browser to dashboard...
-    start "" "%DASHBOARD_URL%"
-    exit /b 0
+if not exist "%ROOT%node_modules\electron\dist\electron.exe" (
+    echo Ensuring Electron binary is available...
+    call "%NODE_EXE%" "%ROOT%node_modules\electron\install.js"
 )
 
-echo Opening loading screen...
-start "" "%LOADING_URL%"
-
-echo Checking if server is already starting...
-tasklist /FI "WINDOWTITLE eq GarageFlow Desk Server" 2>nul | findstr /i "cmd.exe" >nul 2>&1
-if not errorlevel 1 (
-    echo Server is already starting up in the background...
-    goto :wait_server
+if not exist "%ROOT%node_modules\electron\dist\electron.exe" (
+    echo Electron is not installed. Run npm install first.
+    pause
+    exit /b 1
 )
 
-echo Starting local server on port 9002...
-start "GarageFlow Desk Server" /min cmd /c ""%NPM_CMD%" run dev > "%ROOT%local_data\dev.log" 2>&1"
-
-:wait_server
-echo Waiting for server to initialize...
-for /l %%i in (1,1,60) do (
-    powershell -NoProfile -Command "$ErrorActionPreference='SilentlyContinue'; try { $r = Invoke-WebRequest -Uri '%DASHBOARD_URL%' -UseBasicParsing -TimeoutSec 2; if ($r.StatusCode -ge 200 -and $r.StatusCode -lt 500) { exit 0 } } catch { exit 1 }" >nul 2>&1
-    if not errorlevel 1 goto :ready
-    ping 127.0.0.1 -n 2 >nul
-)
-
-echo Warning: Server did not respond within 60 seconds.
-pause
-exit /b 1
-
-:ready
-echo Server started successfully!
+rem Electron owns the hidden production server and closes it with the app.
+start "" /b "%ROOT%node_modules\electron\dist\electron.exe" "%APP_DIR%"
 exit /b 0

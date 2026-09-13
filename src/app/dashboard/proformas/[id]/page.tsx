@@ -22,6 +22,8 @@ import { Label } from '@/components/ui/label';
 import { PriceInput } from '@/components/dashboard/PriceInput';
 import { TaxToggle } from '@/components/dashboard/TaxToggle';
 import { ExportPDFButton } from '@/components/dashboard/ExportPDFButton';
+import { RecordPaymentDialog } from '@/components/dashboard/RecordPaymentDialog';
+import { PaymentHistoryTable } from '@/components/dashboard/PaymentHistoryTable';
 import Link from 'next/link';
 
 export default async function ProformaDetailPage({ params }: { params: Promise<{ id: string }> }) {
@@ -41,7 +43,10 @@ export default async function ProformaDetailPage({ params }: { params: Promise<{
     );
   }
 
-  const isFinalized = pf.status === 'Finalized' || pf.status === 'Invoiced';
+  // Quotations remain editable until they are invoiced; their status is still
+  // visible as Quoted immediately after creation.
+  const isFinalized = pf.status === 'Invoiced';
+  const isReadyForInvoice = pf.status === 'Quoted';
   const isInvoiced = pf.status === 'Invoiced';
   const subtotal = pf.items.reduce((acc: number, item: any) => acc + item.subtotal, 0);
   const discount = pf.discount || 0;
@@ -87,7 +92,7 @@ export default async function ProformaDetailPage({ params }: { params: Promise<{
           <div>
             <h2 className="text-2xl font-bold tracking-tight text-black">{pf.proformaNo}</h2>
             <div className="flex gap-2 mt-1">
-              <Badge variant={isFinalized ? 'default' : 'outline'} className={isInvoiced ? "bg-blue-600" : isFinalized ? "bg-green-600" : ""}>
+              <Badge variant={isReadyForInvoice || isInvoiced ? 'default' : 'outline'} className={isInvoiced ? "bg-blue-600" : isReadyForInvoice ? "bg-green-600" : ""}>
                 {pf.status}
               </Badge>
               {pf.jobNo && <Badge variant="secondary">Linked to {pf.jobNo}</Badge>}
@@ -101,21 +106,33 @@ export default async function ProformaDetailPage({ params }: { params: Promise<{
             <>
               <form action={handleSaveDraft}>
                 <Button variant="outline" type="submit" className="font-bold">
-                  <Save className="mr-2 h-4 w-4" /> Save Draft
+                  <Save className="mr-2 h-4 w-4" /> Save Quotation
                 </Button>
               </form>
               <form action={handleFinalize}>
                 <Button className="bg-black text-white hover:bg-gray-800 font-bold" type="submit">
-                  <Lock className="mr-2 h-4 w-4" /> Finalize
+                  <Lock className="mr-2 h-4 w-4" /> Mark Quoted
                 </Button>
               </form>
             </>
           )}
           
+          {isReadyForInvoice && !isInvoiced && (
+            <RecordPaymentDialog
+              proformaId={pf.id}
+              balanceDue={balanceDue}
+              totalAmount={total}
+              docNumber={pf.proformaNo}
+              buttonText="Add Deposit / Payment"
+              iconOnly={true}
+              variant="outline"
+              className="border-green-600 text-green-700 hover:bg-green-50"
+            />
+          )}
           <ExportPDFButton targetId="proforma-document" filename={`PROFORMA-${pf.proformaNo}`} />
           <ProformaPreview proforma={pf} settings={settings} />
           
-          {isFinalized && !isInvoiced && isFullyPaid && (
+          {isReadyForInvoice && !isInvoiced && (
             <form action={handleConvertToInvoice}>
               <Button className="bg-[#c10d12] text-white hover:bg-[#a00b0f] font-bold" type="submit">
                 <Receipt className="mr-2 h-4 w-4" /> Convert to Invoice
@@ -175,7 +192,7 @@ export default async function ProformaDetailPage({ params }: { params: Promise<{
                           {!isFinalized && (
                             <>
                               <EditItemDialog item={item} jobId={pf.jobSheetId} proformaId={pf.id} />
-                              <form action={async () => { 'use server'; await deleteJobItem(item.id, pf.jobSheetId, pf.id); }}>
+                              <form action={deleteJobItem.bind(null, item.id, pf.jobSheetId, pf.id)}>
                                 <Button variant="ghost" size="icon" className="text-red-500 hover:text-red-700 h-8 w-8">
                                   <Trash2 className="h-4 w-4" />
                                 </Button>
@@ -201,38 +218,25 @@ export default async function ProformaDetailPage({ params }: { params: Promise<{
           </Card>
 
           <Card className="rounded-2xl shadow-sm">
-            <CardHeader className="bg-zinc-50/50 border-b border-zinc-100">
+            <CardHeader className="bg-zinc-50/50 border-b border-zinc-100 flex flex-row items-center justify-between">
               <CardTitle className="text-lg flex items-center gap-2">
                 <History className="h-5 w-5 text-green-600" />
                 Payment & Deposit History
               </CardTitle>
+              {isReadyForInvoice && !isInvoiced && (
+                <RecordPaymentDialog
+                  proformaId={pf.id}
+                  balanceDue={balanceDue}
+                  totalAmount={total}
+                  docNumber={pf.proformaNo}
+                  buttonText="Add Deposit / Payment"
+                  variant="outline"
+                  className="text-xs border-green-600 text-green-700 hover:bg-green-50"
+                />
+              )}
             </CardHeader>
             <CardContent className="pt-6">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Date</TableHead>
-                    <TableHead>Amount</TableHead>
-                    <TableHead>Method</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {pf.payments?.map((p: any) => (
-                    <TableRow key={p.id}>
-                      <TableCell className="text-zinc-500">{new Date(p.paidAt).toLocaleDateString()}</TableCell>
-                      <TableCell className="font-black text-green-700 font-mono">+{p.amount.toLocaleString()}</TableCell>
-                      <TableCell><Badge variant="secondary" className="text-[9px] uppercase tracking-wider">{p.method}</Badge></TableCell>
-                    </TableRow>
-                  ))}
-                  {(!pf.payments || pf.payments.length === 0) && (
-                    <TableRow>
-                      <TableCell colSpan={3} className="text-center py-6 text-muted-foreground italic text-xs">
-                        No payments recorded for this quotation.
-                      </TableCell>
-                    </TableRow>
-                  )}
-                </TableBody>
-              </Table>
+              <PaymentHistoryTable payments={pf.payments || []} proformaId={pf.id} readOnly={isInvoiced} />
             </CardContent>
           </Card>
         </div>
@@ -312,7 +316,7 @@ export default async function ProformaDetailPage({ params }: { params: Promise<{
                 </div>
               )}
 
-              {isFinalized && (
+              {(isReadyForInvoice || isInvoiced) && (
                 <>
                   <div className="flex justify-between text-sm py-1 border-t border-zinc-800 pt-4">
                     <span className="text-zinc-500 font-black">PAID TO DATE:</span>
@@ -335,25 +339,23 @@ export default async function ProformaDetailPage({ params }: { params: Promise<{
               </form>
             )}
 
-            {isFinalized && !isInvoiced && !isFullyPaid && (
-              <form action={recordProformaPayment} className="space-y-3 bg-red-950/20 p-4 rounded-xl border border-red-900/50">
-                <Label className="text-[10px] uppercase font-black text-red-500 flex items-center gap-1">
-                  <Banknote className="h-3 w-3" /> Quick Cash Entry
-                </Label>
-                <input type="hidden" name="proformaId" value={pf.id} />
-                <div className="flex gap-2">
-                  <PriceInput name="amount" placeholder="Paid Amount" className="h-10 text-sm bg-zinc-950 border-zinc-800 text-white" required />
-                  <Button type="submit" className="bg-white text-black hover:bg-zinc-200 h-10 px-4 font-black">Record</Button>
-                </div>
-              </form>
-            )}
-            
-            {isFinalized && !isInvoiced && isFullyPaid && (
-              <form action={handleConvertToInvoice}>
-                <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white font-black py-6 text-lg shadow-lg">
-                  <Receipt className="mr-2 h-5 w-5" /> Convert to Final Invoice
-                </Button>
-              </form>
+            {isReadyForInvoice && !isInvoiced && (
+              <div className="space-y-3 pt-2">
+                <RecordPaymentDialog
+                  proformaId={pf.id}
+                  balanceDue={balanceDue}
+                  totalAmount={total}
+                  docNumber={pf.proformaNo}
+                  buttonText={isFullyPaid ? "Record Additional Payment" : balanceDue < total ? "Record Partial Payment" : "Record Deposit / Payment"}
+                  className="w-full bg-green-600 hover:bg-green-700 text-white font-black py-6 text-base shadow-lg"
+                />
+
+                <form action={handleConvertToInvoice}>
+                  <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white font-black py-6 text-base shadow-lg" type="submit">
+                    <Receipt className="mr-2 h-5 w-5" /> Convert to Final Invoice
+                  </Button>
+                </form>
+              </div>
             )}
             
             {isInvoiced && (
@@ -361,7 +363,7 @@ export default async function ProformaDetailPage({ params }: { params: Promise<{
                 <p className="text-green-500 font-black flex items-center justify-center gap-2">
                   <FileCheck className="h-5 w-5" /> FULLY INVOICED
                 </p>
-                <p className="text-[10px] text-zinc-500 mt-1 italic">This record is now permanent.</p>
+                <p className="text-[10px] text-zinc-500 mt-1 italic">This record is now permanent and transferred to Tax Invoice.</p>
               </div>
             )}
           </Card>

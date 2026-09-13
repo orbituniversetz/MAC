@@ -1,5 +1,6 @@
 
 import { SidebarNav } from '@/components/dashboard/SidebarNav';
+import { DashboardHeader } from '@/components/dashboard/DashboardHeader';
 import { getSettings } from '@/lib/actions';
 
 // Ensure the dashboard is always rendered dynamically to avoid build-time database access
@@ -17,9 +18,12 @@ export default async function DashboardLayout({
   return (
     <div className="flex h-screen bg-white">
       <SidebarNav garageName={garageName} logo={logo} />
-      <main className="flex-1 overflow-y-auto p-8">
-        {children}
-      </main>
+      <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
+        <DashboardHeader garageName={garageName} />
+        <main className="flex-1 overflow-y-auto p-8">
+          {children}
+        </main>
+      </div>
     </div>
   );
 }

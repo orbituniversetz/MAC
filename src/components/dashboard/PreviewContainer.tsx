@@ -51,45 +51,55 @@ export function PreviewContainer({
 
       const pdfWidth = pdf.internal.pageSize.getWidth();
       const pdfHeight = pdf.internal.pageSize.getHeight();
-      
-      const canvas = await html2canvas(element, {
-        scale: 2.5,
-        useCORS: true,
-        logging: false,
-        backgroundColor: '#ffffff',
-        width: element.scrollWidth,
-        height: element.scrollHeight,
-        onclone: (clonedDoc) => {
-          const clonedElement = clonedDoc.getElementById(documentId);
-          if (clonedElement) {
-            clonedElement.style.transform = 'none';
-            clonedElement.style.boxShadow = 'none';
-            clonedElement.style.margin = '0';
-            clonedElement.style.width = '210mm';
-            clonedElement.style.minHeight = 'auto';
-            clonedElement.style.background = 'white';
+
+      // Find all the .a4-page elements in the container
+      const pages = element.querySelectorAll('.a4-page');
+
+      if (pages.length === 0) {
+        // Fallback to capturing the whole container if there are no pages
+        const canvas = await html2canvas(element, {
+          scale: 2.5,
+          useCORS: true,
+          logging: false,
+          backgroundColor: '#ffffff',
+          width: element.offsetWidth,
+        });
+        const imgData = canvas.toDataURL('image/jpeg', 0.95);
+        pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, (canvas.height * pdfWidth) / canvas.width, undefined, 'FAST');
+      } else {
+        let addedPagesCount = 0;
+        for (let i = 0; i < pages.length; i++) {
+          const pageEl = pages[i] as HTMLElement;
+
+          // Skip completely blank pages
+          if (!pageEl.innerText || pageEl.innerText.trim() === '') {
+            continue;
           }
+
+          const canvas = await html2canvas(pageEl, {
+            scale: 2.5,
+            useCORS: true,
+            logging: false,
+            backgroundColor: '#ffffff',
+            width: pageEl.offsetWidth,
+            height: pageEl.offsetHeight,
+            onclone: (clonedDoc) => {
+              const clonedPages = clonedDoc.querySelectorAll('.a4-page');
+              clonedPages.forEach((page: any) => {
+                page.style.boxShadow = 'none';
+                page.style.border = 'none';
+                page.style.margin = '0';
+              });
+            }
+          });
+
+          const imgData = canvas.toDataURL('image/jpeg', 0.95);
+          if (addedPagesCount > 0) {
+            pdf.addPage();
+          }
+          pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight, undefined, 'FAST');
+          addedPagesCount++;
         }
-      });
-      
-      const imgData = canvas.toDataURL('image/jpeg', 0.95);
-      const canvasWidth = canvas.width;
-      const canvasHeight = canvas.height;
-      
-      const imgHeightInPdf = (canvasHeight * pdfWidth) / canvasWidth;
-      let heightLeft = imgHeightInPdf;
-      let position = 0;
-
-      // Add first page
-      pdf.addImage(imgData, 'JPEG', 0, position, pdfWidth, imgHeightInPdf, undefined, 'FAST');
-      heightLeft -= pdfHeight;
-
-      // Subsequent pages (clean A4 slices)
-      while (heightLeft > 2) {
-        position = heightLeft - imgHeightInPdf;
-        pdf.addPage();
-        pdf.addImage(imgData, 'JPEG', 0, position, pdfWidth, imgHeightInPdf, undefined, 'FAST');
-        heightLeft -= pdfHeight;
       }
 
       pdf.save(`${filename}.pdf`);
@@ -105,8 +115,8 @@ export function PreviewContainer({
   const scale = zoom / 100;
 
   return (
-    <div className="fixed inset-0 z-[9999] flex flex-col bg-zinc-950 no-print">
-      <div className="flex h-16 w-full items-center justify-between border-b border-white/10 bg-zinc-900 px-6 text-white shadow-2xl shrink-0">
+    <div className="fixed inset-0 z-[9999] flex flex-col bg-zinc-950 print:bg-white print:relative print:inset-auto print:z-0 print:block">
+      <div className="flex h-16 w-full items-center justify-between border-b border-white/10 bg-zinc-900 px-6 text-white shadow-2xl shrink-0 no-print">
         <div className="flex items-center gap-3">
           <div className="p-2 bg-zinc-800 rounded-lg">
             {icon}
@@ -148,7 +158,7 @@ export function PreviewContainer({
         </div>
       </div>
 
-      <div className="flex-1 overflow-auto preview-scroll bg-zinc-900/95 flex justify-center p-4 sm:p-12">
+      <div className="flex-1 overflow-auto preview-scroll bg-zinc-900/95 flex justify-center p-4 sm:p-12 print:bg-white print:overflow-visible print:p-0">
         <div 
           className="relative transition-transform duration-200 origin-top print-container shadow-2xl"
           style={{ 

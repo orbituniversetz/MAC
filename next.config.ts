@@ -2,6 +2,11 @@ import type {NextConfig} from 'next';
 
 const nextConfig: NextConfig = {
   /* config options here */
+  // Keep the development compiler cache separate from the desktop app's
+  // production build. Running `next dev` against a production `.next`
+  // directory can otherwise leave missing chunks and manifest mismatches.
+  distDir: process.env.NODE_ENV === 'production' ? '.next-production' : '.next-development',
+  devIndicators: false,
   typescript: {
     ignoreBuildErrors: true,
   },

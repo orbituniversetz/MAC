@@ -1,19 +1,8 @@
 
-import { getExpenses, deleteExpense, getJobSheets, getProformas, getRecentExpenses } from '@/lib/actions';
-import { 
-  Table, 
-  TableBody, 
-  TableCell, 
-  TableHead, 
-  TableHeader, 
-  TableRow 
-} from '@/components/ui/table';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
+import { getExpenses, getJobSheets, getProformas, getRecentExpenses } from '@/lib/actions';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Banknote, Trash2, Calendar, Link as LinkIcon, Edit2 } from 'lucide-react';
 import { AddExpenseForm } from '@/components/dashboard/AddExpenseForm';
-import { EditExpenseDialog } from '@/components/dashboard/EditExpenseDialog';
+import { ExpensesTable } from '@/components/dashboard/ExpensesTable';
 
 export default async function ExpensesPage() {
   const expenses = await getExpenses();
@@ -21,13 +10,13 @@ export default async function ExpensesPage() {
   const proformas = await getProformas();
   const recentExpenses = await getRecentExpenses();
 
-  const total = expenses.reduce((acc, curr) => acc + curr.amount, 0);
+  const total = expenses.reduce((acc: number, curr: any) => acc + (curr.amount || 0), 0);
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-3xl font-bold tracking-tight text-black">Expense Manager</h2>
+          <h2 className="sr-only">Expense Manager</h2>
           <p className="text-muted-foreground">Track all garage costs, wages, and parts purchases.</p>
         </div>
         <div className="text-right">
@@ -42,66 +31,7 @@ export default async function ExpensesPage() {
             <CardTitle>Expense History</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="border rounded-md">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Date</TableHead>
-                    <TableHead>Category</TableHead>
-                    <TableHead>Description</TableHead>
-                    <TableHead>Linked To</TableHead>
-                    <TableHead>Amount</TableHead>
-                    <TableHead className="text-right">Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {expenses.length === 0 ? (
-                    <TableRow>
-                      <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
-                        No expenses recorded yet.
-                      </TableCell>
-                    </TableRow>
-                  ) : (
-                    expenses.map((exp: any) => (
-                      <TableRow key={exp.id}>
-                        <TableCell className="text-xs">
-                          <div className="flex items-center gap-1">
-                            <Calendar className="h-3 w-3" />
-                            {new Date(exp.date).toLocaleDateString()}
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          <Badge variant="secondary" className="text-[10px]">{exp.category}</Badge>
-                        </TableCell>
-                        <TableCell className="font-medium">{exp.description}</TableCell>
-                        <TableCell className="text-xs">
-                          {exp.jobNo ? (
-                            <Badge variant="outline" className="flex items-center gap-1 w-fit bg-blue-50">
-                              <LinkIcon className="h-2 w-2" /> {exp.jobNo}
-                            </Badge>
-                          ) : exp.proformaNo ? (
-                            <Badge variant="outline" className="flex items-center gap-1 w-fit bg-purple-50">
-                              <LinkIcon className="h-2 w-2" /> {exp.proformaNo}
-                            </Badge>
-                          ) : (
-                            <span className="text-gray-400 italic">General</span>
-                          )}
-                        </TableCell>
-                        <TableCell className="font-bold text-red-600">-{exp.amount.toLocaleString()}</TableCell>
-                        <TableCell className="text-right flex justify-end gap-1">
-                          <EditExpenseDialog expense={exp} />
-                          <form action={async () => { 'use server'; await deleteExpense(exp.id, exp.jobSheetId, exp.proformaId); }}>
-                            <Button variant="ghost" size="icon" className="text-red-500 hover:text-red-700 h-8 w-8">
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
-                          </form>
-                        </TableCell>
-                      </TableRow>
-                    ))
-                  )}
-                </TableBody>
-              </Table>
-            </div>
+            <ExpensesTable expenses={expenses} />
           </CardContent>
         </Card>
 

@@ -52,8 +52,9 @@ export function AddExpenseForm({
     
     setCategory(mappedCategory);
     setDescription(`${item.description} (Cost)`);
-    // Reset amount to allow manual entry of the buying price (cost)
-    setAmount('');
+    // Seed the cost with the repair item's selling price. The PriceInput stays
+    // controlled, so staff can immediately replace it with the actual cost.
+    setAmount(item.subtotal ?? '');
   };
 
   async function handleAction(formData: FormData) {

@@ -54,8 +54,9 @@ export function EditJobSheetDialog({ job }: { job: any }) {
               onChange={(e) => setStatus(e.target.value)} 
               className="w-full p-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-[#c10d12]"
             >
-              <option value="Draft">Draft</option>
-              <option value="In Progress">In Progress</option>
+              <option value="Work In Progress">Work In Progress</option>
+              <option value="Quoted">Quoted</option>
+              <option value="Invoiced">Invoiced</option>
               <option value="Completed">Completed</option>
               <option value="Closed">Closed</option>
             </select>

@@ -1,83 +1,31 @@
-import { getInvoices, getProformas, convertToInvoice, deleteInvoice } from '@/lib/actions';
-import { 
-  Table, 
-  TableBody, 
-  TableCell, 
-  TableHead, 
-  TableHeader, 
-  TableRow 
-} from '@/components/ui/table';
-import { Badge } from '@/components/ui/badge';
+import { getInvoices, getProformas, convertToInvoice, getCustomers, getAllVehicles } from '@/lib/actions';
 import { Button } from '@/components/ui/button';
-import { Receipt, Eye, Plus, Trash2, FileText } from 'lucide-react';
+import { Receipt, Plus, FileText } from 'lucide-react';
 import Link from 'next/link';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { CreateDirectInvoiceDialog } from '@/components/dashboard/CreateDirectInvoiceDialog';
+import { InvoicesTable } from '@/components/dashboard/InvoicesTable';
 
 export default async function InvoicesPage() {
   const invoices = await getInvoices();
   const proformas = await getProformas();
-  const finalizedProformas = proformas.filter((p: any) => p.status === 'Finalized');
+  const customers = await getCustomers();
+  const vehicles = await getAllVehicles();
+  const finalizedProformas = proformas.filter((p: any) => p.status === 'Quoted');
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-3xl font-bold tracking-tight text-black">Invoices & Receipts</h2>
+          <h2 className="sr-only">Invoices & Receipts</h2>
           <p className="text-muted-foreground">Track payments and financial records.</p>
         </div>
+        <CreateDirectInvoiceDialog customers={customers} vehicles={vehicles} />
       </div>
 
       <div className="grid gap-6 md:grid-cols-4">
         <div className="md:col-span-3 space-y-6">
-          <div className="border rounded-md bg-white">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Invoice No</TableHead>
-                  <TableHead>Job No</TableHead>
-                  <TableHead>Customer</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Date</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {invoices.length === 0 ? (
-                  <TableRow>
-                    <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
-                      No invoices found.
-                    </TableCell>
-                  </TableRow>
-                ) : (
-                  invoices.map((inv: any) => (
-                    <TableRow key={inv.id}>
-                      <TableCell className="font-bold">{inv.invoiceNo}</TableCell>
-                      <TableCell>{inv.jobNo || '-'}</TableCell>
-                      <TableCell>{inv.customerName}</TableCell>
-                      <TableCell>
-                        <Badge variant={inv.status === 'Paid' ? 'secondary' : 'outline'} className={inv.status === 'Paid' ? "bg-green-100 text-green-800" : ""}>
-                          {inv.status}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>{new Date(inv.createdAt).toLocaleDateString()}</TableCell>
-                      <TableCell className="text-right flex justify-end gap-2">
-                        <Link href={`/dashboard/invoices/${inv.id}`}>
-                          <Button variant="ghost" size="sm">
-                            <Eye className="mr-2 h-4 w-4" /> View
-                          </Button>
-                        </Link>
-                        <form action={async () => { 'use server'; await deleteInvoice(inv.id); }}>
-                          <Button variant="ghost" size="icon" className="text-red-500 hover:text-red-700">
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        </form>
-                      </TableCell>
-                    </TableRow>
-                  ))
-                )}
-              </TableBody>
-            </Table>
-          </div>
+          <InvoicesTable invoices={invoices} />
         </div>
 
         <div className="space-y-6">
@@ -88,7 +36,7 @@ export default async function InvoicesPage() {
                 New Invoice
               </CardTitle>
               <CardDescription className="text-[10px]">
-                Generate an invoice from a finalized quotation.
+                Generate an invoice from a quoted proforma.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -96,7 +44,7 @@ export default async function InvoicesPage() {
                 <p className="text-[10px] font-bold uppercase text-muted-foreground">Ready to Invoice:</p>
                 {finalizedProformas.length === 0 ? (
                   <div className="text-xs text-muted-foreground italic p-3 border rounded-md bg-gray-50">
-                    No finalized proformas found. Go to Proformas to finalize a quotation.
+                    No quoted proformas found. Go to Proformas to prepare a quotation.
                   </div>
                 ) : (
                   <div className="space-y-2">
@@ -112,7 +60,7 @@ export default async function InvoicesPage() {
                               <FileText className="h-3 w-3 text-gray-400" />
                             </Button>
                           </Link>
-                          <form action={async () => { 'use server'; await convertToInvoice(p.id); }}>
+                          <form action={convertToInvoice.bind(null, p.id)}>
                             <Button type="submit" variant="ghost" size="icon" className="h-6 w-6 hover:bg-red-50" title="Generate Final Invoice">
                               <Plus className="h-4 w-4 text-[#c10d12]" />
                             </Button>

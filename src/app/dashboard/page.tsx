@@ -24,10 +24,7 @@ export default async function DashboardPage() {
 
   return (
     <div className="space-y-8">
-      <div>
-        <h2 className="text-3xl font-bold tracking-tight text-black">Dashboard</h2>
-        <p className="text-muted-foreground">Welcome to GarageFlow Management System.</p>
-      </div>
+      <p className="text-muted-foreground">Welcome to GarageFlow Management System.</p>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
         {cards.map((card) => (

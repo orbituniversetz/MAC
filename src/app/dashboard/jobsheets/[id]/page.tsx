@@ -139,7 +139,7 @@ export default async function JobSheetDetailPage({ params }: { params: Promise<{
                       <TableCell className="font-bold text-black text-right">{item.subtotal.toLocaleString()}</TableCell>
                       <TableCell className="text-right flex justify-end gap-1">
                         <EditItemDialog item={item} jobId={job.id} proformaId={null} />
-                        <form action={async () => { 'use server'; await deleteJobItem(item.id, job.id, null); }}>
+                        <form action={deleteJobItem.bind(null, item.id, job.id, null)}>
                           <Button variant="ghost" size="icon" className="text-red-500 hover:text-red-700 h-8 w-8">
                             <Trash2 className="h-4 w-4" />
                           </Button>
@@ -183,7 +183,7 @@ export default async function JobSheetDetailPage({ params }: { params: Promise<{
                       <TableCell className="font-bold text-red-600 text-right">-{exp.amount.toLocaleString()}</TableCell>
                       <TableCell className="text-right flex justify-end gap-1">
                         <EditExpenseDialog expense={exp} />
-                        <form action={async () => { 'use server'; await deleteExpense(exp.id, job.id, null); }}>
+                        <form action={deleteExpense.bind(null, exp.id, job.id, null)}>
                           <Button variant="ghost" size="icon" className="text-red-500 hover:text-red-700 h-8 w-8">
                             <Trash2 className="h-4 w-4" />
                           </Button>

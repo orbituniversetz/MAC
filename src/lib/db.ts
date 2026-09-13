@@ -27,6 +27,7 @@ const createMemoryShim = () => {
   const methods = {
     pragma: () => undefined,
     exec: () => undefined,
+    transaction: (fn: Function) => (...args: any[]) => fn(...args),
     prepare: (sql: string) => ({
       get: () => ({ count: 0 }),
       all: () => [],
@@ -95,7 +96,7 @@ const schemaSql = `
     vehicleId INTEGER,
     complaint TEXT,
     mechanicNotes TEXT,
-    status TEXT DEFAULT 'Draft',
+    status TEXT DEFAULT 'Work In Progress',
     openedAt DATETIME DEFAULT CURRENT_TIMESTAMP,
     closedAt DATETIME,
     FOREIGN KEY(customerId) REFERENCES customers(id),
@@ -121,7 +122,7 @@ const schemaSql = `
     jobSheetId INTEGER,
     customerId INTEGER,
     vehicleId INTEGER,
-    status TEXT DEFAULT 'Draft',
+    status TEXT DEFAULT 'Quoted',
     snapshotJson TEXT,
     discount REAL DEFAULT 0,
     taxEnabled INTEGER DEFAULT 1,
@@ -136,7 +137,7 @@ const schemaSql = `
     invoiceNo TEXT NOT NULL UNIQUE,
     jobSheetId INTEGER,
     proformaId INTEGER,
-    status TEXT DEFAULT 'Unpaid',
+    status TEXT DEFAULT 'Invoiced',
     snapshotJson TEXT,
     createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
     customerId INTEGER,
@@ -194,6 +195,19 @@ const schemaSql = `
 `;
 
 db.exec(schemaSql);
+
+// Soft Delete Schema Migrations
+const tablesToMigrate = ['customers', 'vehicles', 'jobsheets', 'proformas', 'invoices', 'expenses', 'documents'];
+tablesToMigrate.forEach((table) => {
+  try { db.exec(`ALTER TABLE ${table} ADD COLUMN isDeleted INTEGER DEFAULT 0`); } catch (e) {}
+  try { db.exec(`ALTER TABLE ${table} ADD COLUMN deletedAt DATETIME`); } catch (e) {}
+});
+
+// Keep existing data aligned with the operational workflow. These labels were
+// previously called Draft/Finalized, which made active work look unfinished.
+db.prepare("UPDATE jobsheets SET status = 'Work In Progress' WHERE status = 'Draft'").run();
+db.prepare("UPDATE proformas SET status = 'Quoted' WHERE status IN ('Draft', 'Finalized')").run();
+db.prepare("UPDATE invoices SET status = 'Invoiced' WHERE status = 'Unpaid'").run();
 
 const settingsCount = db.prepare('SELECT count(*) as count FROM settings').get() as any;
 if (settingsCount.count === 0) {

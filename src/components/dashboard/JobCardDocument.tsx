@@ -110,7 +110,7 @@ export function JobCardDocument({ job, settings, isInternal = false, className }
       </div>
 
       {/* PAGE 2: TERMS AND CONDITIONS */}
-      <div className="a4-page font-sans relative flex flex-col shadow-lg print:shadow-none break-before-page">
+      <div className="a4-page font-sans relative flex flex-col shadow-lg print:shadow-none">
         <div className="flex items-center justify-between mb-6 border-b-2 border-zinc-900 pb-3 shrink-0 avoid-break">
           <h2 className="text-lg font-black uppercase tracking-widest text-zinc-900 flex items-center gap-2">
             <FileText className="h-4 w-4 text-[#c10d12]" />

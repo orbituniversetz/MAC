@@ -2,8 +2,10 @@
   "name": "GarageFlow Desk",
   "short_name": "GarageFlow",
   "description": "Professional Garage Management System",
-  "start_url": "/",
+  "start_url": "/dashboard",
   "display": "standalone",
+  "display_override": ["standalone", "fullscreen"],
+  "orientation": "any",
   "background_color": "#ffffff",
   "theme_color": "#c10d12",
   "icons": [

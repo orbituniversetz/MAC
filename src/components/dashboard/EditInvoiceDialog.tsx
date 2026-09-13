@@ -36,14 +36,14 @@ export function EditInvoiceDialog({ invoice }: { invoice: any }) {
         </DialogHeader>
         <div className="space-y-4 py-4">
           <div className="space-y-2">
-            <Label>Payment Status</Label>
+            <Label>Invoice Status</Label>
             <select 
               value={status} 
               onChange={(e) => setStatus(e.target.value)} 
               className="w-full p-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-[#c10d12]"
             >
-              <option value="Unpaid">Unpaid</option>
-              <option value="Paid">Paid</option>
+              <option value="Invoiced">Invoiced</option>
+              <option value="Completed">Completed</option>
               <option value="Cancelled">Cancelled</option>
             </select>
           </div>

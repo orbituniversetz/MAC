@@ -29,35 +29,6 @@ export function ExportPDFButton({ targetId, filename }: ExportPDFButtonProps) {
 
     setIsExporting(true);
     try {
-      // Create high-fidelity canvas with intelligent multi-page slicing
-      const canvas = await html2canvas(element, {
-        scale: 2.5,
-        useCORS: true,
-        logging: false,
-        backgroundColor: '#ffffff',
-        width: element.offsetWidth,
-        onclone: (clonedDoc) => {
-          const clonedElement = clonedDoc.getElementById(targetId);
-          if (!clonedElement) return;
-
-          // Standardize styles for consistent capture
-          clonedElement.style.transform = 'none';
-          clonedElement.style.boxShadow = 'none';
-          clonedElement.style.margin = '0';
-          clonedElement.style.width = '210mm';
-          clonedElement.style.background = 'white';
-          clonedElement.style.height = 'auto'; 
-          
-          // Remove UI helpers for clean PDF
-          const pages = clonedElement.querySelectorAll('.a4-page');
-          pages.forEach((page: any) => {
-            page.style.boxShadow = 'none';
-            page.style.border = 'none';
-            page.style.margin = '0';
-          });
-        }
-      });
-      
       const pdf = new jsPDF({
         orientation: 'p',
         unit: 'mm',
@@ -67,27 +38,55 @@ export function ExportPDFButton({ targetId, filename }: ExportPDFButtonProps) {
 
       const pdfWidth = pdf.internal.pageSize.getWidth();
       const pdfHeight = pdf.internal.pageSize.getHeight();
-      
-      const imgData = canvas.toDataURL('image/jpeg', 0.95);
-      const canvasWidth = canvas.width;
-      const canvasHeight = canvas.height;
-      
-      const imgHeightInPdf = (canvasHeight * pdfWidth) / canvasWidth;
-      
-      let heightLeft = imgHeightInPdf;
-      let pageNumber = 0;
 
-      // Slice the high-res capture into clean A4 pages
-      while (heightLeft > 0) {
-        if (pageNumber > 0) {
-          pdf.addPage();
+      // Find all the .a4-page elements in the container
+      const pages = element.querySelectorAll('.a4-page');
+
+      if (pages.length === 0) {
+        // Fallback to capturing the whole container if there are no pages
+        const canvas = await html2canvas(element, {
+          scale: 2.5,
+          useCORS: true,
+          logging: false,
+          backgroundColor: '#ffffff',
+          width: element.offsetWidth,
+        });
+        const imgData = canvas.toDataURL('image/jpeg', 0.95);
+        pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, (canvas.height * pdfWidth) / canvas.width, undefined, 'FAST');
+      } else {
+        let addedPagesCount = 0;
+        for (let i = 0; i < pages.length; i++) {
+          const pageEl = pages[i] as HTMLElement;
+
+          // Skip completely blank pages
+          if (!pageEl.innerText || pageEl.innerText.trim() === '') {
+            continue;
+          }
+
+          const canvas = await html2canvas(pageEl, {
+            scale: 2.5,
+            useCORS: true,
+            logging: false,
+            backgroundColor: '#ffffff',
+            width: pageEl.offsetWidth,
+            height: pageEl.offsetHeight,
+            onclone: (clonedDoc) => {
+              const clonedPages = clonedDoc.querySelectorAll('.a4-page');
+              clonedPages.forEach((page: any) => {
+                page.style.boxShadow = 'none';
+                page.style.border = 'none';
+                page.style.margin = '0';
+              });
+            }
+          });
+
+          const imgData = canvas.toDataURL('image/jpeg', 0.95);
+          if (addedPagesCount > 0) {
+            pdf.addPage();
+          }
+          pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight, undefined, 'FAST');
+          addedPagesCount++;
         }
-        
-        const position = -(pageNumber * pdfHeight);
-        pdf.addImage(imgData, 'JPEG', 0, position, pdfWidth, imgHeightInPdf, undefined, 'FAST');
-        
-        heightLeft -= pdfHeight;
-        pageNumber++;
       }
 
       pdf.save(`${filename}.pdf`);

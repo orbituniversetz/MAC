@@ -27,7 +27,7 @@ export default function NewDocumentPage() {
         <Link href="/dashboard/documents" className="flex items-center text-sm text-muted-foreground hover:text-black">
           <ChevronLeft className="h-4 w-4 mr-1" /> Back to Documents
         </Link>
-        <h2 className="text-2xl font-bold tracking-tight">Create New Document</h2>
+        <h2 className="sr-only">Create New Document</h2>
       </div>
 
       <div className="grid grid-cols-2 gap-4">

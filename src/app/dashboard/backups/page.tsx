@@ -46,7 +46,7 @@ export default function BackupsPage() {
   return (
     <div className="max-w-4xl space-y-6">
       <div>
-        <h2 className="text-3xl font-bold tracking-tight text-black">Backup Manager</h2>
+        <h2 className="sr-only">Backup Manager</h2>
         <p className="text-muted-foreground">Secure your garage data locally.</p>
       </div>
 

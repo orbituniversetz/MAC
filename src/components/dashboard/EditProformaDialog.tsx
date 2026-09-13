@@ -42,8 +42,7 @@ export function EditProformaDialog({ proforma }: { proforma: any }) {
               onChange={(e) => setStatus(e.target.value)} 
               className="w-full p-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-[#c10d12]"
             >
-              <option value="Draft">Draft</option>
-              <option value="Finalized">Finalized (Ready to Invoice)</option>
+              <option value="Quoted">Quoted (Ready to Invoice)</option>
               <option value="Invoiced">Invoiced (Locked)</option>
               <option value="Cancelled">Cancelled</option>
             </select>

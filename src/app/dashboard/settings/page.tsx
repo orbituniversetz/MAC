@@ -11,7 +11,7 @@ export default async function SettingsPage() {
   return (
     <div className="max-w-4xl space-y-6 pb-12">
       <div>
-        <h2 className="text-3xl font-bold tracking-tight text-black">Settings</h2>
+        <h2 className="sr-only">Settings</h2>
         <p className="text-muted-foreground">Configure your garage information, logo, and payment details.</p>
       </div>
 

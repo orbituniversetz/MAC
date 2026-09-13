@@ -3,6 +3,7 @@
 import { cn } from '@/lib/utils';
 import { FileText, Mail } from 'lucide-react';
 import Image from 'next/image';
+import { PagedDocumentRenderer } from './PagedDocumentRenderer';
 
 interface DocumentPaperProps {
   doc: any;
@@ -11,10 +12,12 @@ interface DocumentPaperProps {
 }
 
 export function DocumentPaper({ doc, settings, className }: DocumentPaperProps) {
-  return (
-    <div id="document-paper" className={cn("a4-page font-sans", className)}>
+  const paragraphs = doc.content ? doc.content.split('\n').filter((p: string) => p.trim() !== '') : [];
+
+  const header = (
+    <div className="w-full shrink-0">
       {/* Header - Logo Left, Text Right */}
-      <div className="flex items-center justify-between mb-4 border-b-2 border-zinc-100 pb-4 shrink-0 avoid-break">
+      <div className="flex items-center justify-between mb-4 border-b-2 border-zinc-100 pb-4 shrink-0 avoid-break text-left">
         <div className="flex items-center">
           {settings.garage_logo ? (
             <div className="relative h-20 w-20 overflow-hidden shrink-0">
@@ -34,7 +37,7 @@ export function DocumentPaper({ doc, settings, className }: DocumentPaperProps) 
         </div>
         <div className="text-right flex flex-col justify-center">
           <h1 className="text-2xl font-black text-[#c10d12] uppercase leading-none tracking-tighter mb-1">{settings.garage_name}</h1>
-          <div className="text-[10px] text-zinc-500 font-bold leading-tight uppercase tracking-tight">
+          <div className="text-[10px] text-zinc-500 font-bold leading-tight uppercase tracking-tight text-right">
             <p>{settings.garage_mailbox}</p>
             <p>{settings.garage_address}</p>
             <p className="text-zinc-800 font-black">Tel: {settings.garage_phone} | TIN: {settings.garage_tin}</p>
@@ -42,7 +45,7 @@ export function DocumentPaper({ doc, settings, className }: DocumentPaperProps) 
         </div>
       </div>
 
-      <div className="flex justify-between items-center mb-10 border-b-4 border-zinc-900 pb-2 shrink-0 avoid-break">
+      <div className="flex justify-between items-center mb-10 border-b-4 border-zinc-900 pb-2 shrink-0 avoid-break text-left">
         <div className="inline-flex items-center gap-2 bg-zinc-950 text-white px-4 py-1.5 rounded text-[10px] font-black uppercase tracking-widest">
           {doc.docType === 'LETTER' ? <Mail className="h-3.5 w-3.5" /> : <FileText className="h-3.5 w-3.5" />}
           {doc.docType === 'LETTER' ? 'Official Correspondence' : 'Technical Inspection Report'}
@@ -53,7 +56,11 @@ export function DocumentPaper({ doc, settings, className }: DocumentPaperProps) 
           <p className="text-[10px] text-zinc-500 mt-1 uppercase font-bold tracking-tight">{new Date(doc.createdAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}</p>
         </div>
       </div>
+    </div>
+  );
 
+  const details = (
+    <div className="w-full text-left shrink-0">
       <div className="mb-12 space-y-8 avoid-break">
         <div className="space-y-1">
           <p className="text-[10px] font-black uppercase text-zinc-400 tracking-widest mb-1">Recipient Address</p>
@@ -75,12 +82,18 @@ export function DocumentPaper({ doc, settings, className }: DocumentPaperProps) 
           {doc.title}
         </h2>
       </div>
+    </div>
+  );
 
-      <div className="prose prose-sm max-w-none whitespace-pre-wrap font-sans text-zinc-800 leading-relaxed text-base flex-1 mb-12">
-        {doc.content}
-      </div>
+  const renderItem = (item: string) => (
+    <p className="mb-4 text-base text-zinc-800 leading-relaxed font-sans text-left whitespace-pre-wrap">
+      {item}
+    </p>
+  );
 
-      <div className="mt-auto space-y-12 shrink-0 avoid-break">
+  const footer = (
+    <div className="w-full text-left avoid-break mt-6">
+      <div className="space-y-12 shrink-0">
         <div className="p-6 bg-zinc-50 rounded-2xl border border-zinc-100">
           <h3 className="text-[10px] font-black text-zinc-400 uppercase tracking-widest mb-2">Standard Notice</h3>
           <p className="text-[10px] text-zinc-500 italic leading-relaxed">This document serves as an official communication. Any technical findings are based on the inspection performed on the date stated above.</p>
@@ -96,5 +109,19 @@ export function DocumentPaper({ doc, settings, className }: DocumentPaperProps) 
         </div>
       </div>
     </div>
+  );
+
+  return (
+    <PagedDocumentRenderer
+      documentId="document-paper"
+      mode="text"
+      header={header}
+      details={details}
+      items={paragraphs}
+      renderItem={renderItem}
+      footer={footer}
+      className={className}
+      settings={settings}
+    />
   );
 }
